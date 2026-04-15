@@ -1,0 +1,11 @@
+# Godot 4+ specific ignores
+.godot/
+*.translation
+*.pyc
+.export_presets.cfg
+
+# Ignore all beta exports
+testbuilds/
+
+# Ignore the github personal access token
+pat_github.txt/
