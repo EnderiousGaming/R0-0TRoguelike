@@ -15,11 +15,19 @@ func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func _unhandled_input(event):
-	if event is InputEventMouseMotion:
-		rotate_y(-event.relative.x * mouse_sensitivity)
-		head.rotate_x(-event.relative.y * mouse_sensitivity)
-		head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(89))
+	# 1. CLICK TO CAPTURE: If we click the left mouse button, lock the mouse!
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
+			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+	# 2. LOOK AROUND: Only rotate the camera IF the mouse is currently locked
+	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		if event is InputEventMouseMotion:
+			rotate_y(-event.relative.x * mouse_sensitivity)
+			head.rotate_x(-event.relative.y * mouse_sensitivity)
+			head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(89))
 		
+	# 3. ESCAPE HATCH: Press ESC to free the mouse so you can close the window
 	if event.is_action_pressed("ui_cancel"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 

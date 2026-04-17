@@ -27,16 +27,16 @@ shadow_enabled = true
 
 [node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=96458215]
 use_collision = true
-size = Vector3(20, 1, 20)
+size = Vector3(50, 1, 50)
 
 [node name="Player" parent="." unique_id=665301636 instance=ExtResource("1_nnsk1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9011092, 1.6220384, 4.196512)
 
 [node name="Enemy" parent="." unique_id=1355696254 instance=ExtResource("2_rwgxs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.5347385, 1, 6.760109)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.802523, 1, 9.905136)
 
 [node name="Enemy2" parent="." unique_id=227273080 instance=ExtResource("2_rwgxs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.332243, 1, 3.3740954)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.400453, 1, 3.3740954)
 
 [node name="Enemy3" parent="." unique_id=901211199 instance=ExtResource("2_rwgxs")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.817487, 0.99999905, -2.6392164)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.585904, 0.99999905, -7.3681755)

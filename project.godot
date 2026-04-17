@@ -13,7 +13,14 @@ config_version=5
 config/name="R0-0T_Roguelike"
 run/main_scene="uid://dbhrcwgu5wykn"
 config/features=PackedStringArray("4.6", "Forward Plus")
+boot_splash/show_image=false
 config/icon="res://icon.svg"
+
+[display]
+
+window/size/viewport_width=1280
+window/size/viewport_height=720
+window/size/resizable=false
 
 [input]
 
