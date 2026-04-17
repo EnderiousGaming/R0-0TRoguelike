@@ -53,6 +53,9 @@ func _physics_process(delta):
 func fire_weapon():
 	if aim_raycast.is_colliding():
 		var target = aim_raycast.get_collider()
-		print("PEW! You hit: ", target.name)
-	else:
-		print("PEW! You missed.")
+		
+		# Check if the thing we hit has the 'take_damage' script attached
+		if target.has_method("take_damage"):
+			target.take_damage(1) # Deal 1 damage!
+		else:
+			print("PEW! You hit a wall: ", target.name)
