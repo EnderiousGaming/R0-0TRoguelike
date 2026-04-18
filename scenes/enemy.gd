@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 var health = 3
 const SPEED = 3.0
+var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var player = null
 
 func _ready():
@@ -14,7 +15,11 @@ func _ready():
 	else:
 		print("Target Acquired: Hunting R0-0T.")
 
-func _physics_process(_delta): # Warning fixed here!
+func _physics_process(delta):
+	# Apply gravity if the virus is in the air
+	if not is_on_floor():
+		velocity.y -= gravity * delta
+
 	# If the player exists, hunt them down
 	if player:
 		var direction = (player.global_position - global_position).normalized()
@@ -23,7 +28,8 @@ func _physics_process(_delta): # Warning fixed here!
 		velocity.x = direction.x * SPEED
 		velocity.z = direction.z * SPEED
 		
-		move_and_slide()
+	# Move the enemy
+	move_and_slide()
 
 # --- COMBAT LOGIC ---
 func take_damage(amount):
