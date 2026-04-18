@@ -1,19 +1,27 @@
 extends CharacterBody3D
 
+# --- MOVEMENT VARIABLES ---
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
+var max_health = 5
+var current_health = max_health
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- CAMERA VARIABLES ---
 @export var mouse_sensitivity := 0.002
 @onready var head = $Head
 
+# --- HEALTH VARIABLES ---
+@onready var health_display = $HUD/HealthDisplay
+
 # --- WEAPON VARIABLES ---
 @onready var aim_raycast = $Head/Camera3D/RayCast3D
 
+# --- INITIALIZATION ---
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
+# --- INPUT HANDLING ---
 func _unhandled_input(event):
 	# 1. CLICK TO CAPTURE: If we click the left mouse button, lock the mouse!
 	if event is InputEventMouseButton:
@@ -31,6 +39,7 @@ func _unhandled_input(event):
 	if event.is_action_pressed("ui_cancel"):
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 
+# --- PHYSICS PROCESSING ---
 func _physics_process(delta):
 	# Add gravity.
 	if not is_on_floor():
@@ -44,6 +53,7 @@ func _physics_process(delta):
 	if Input.is_action_just_pressed("shoot"):
 		fire_weapon()
 
+	# --- MOVEMENT LOGIC ---
 	# Get WASD input
 	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -57,6 +67,7 @@ func _physics_process(delta):
 
 	move_and_slide()
 
+# --- CUSTOM FUNCTIONS ---
 # Custom function to handle what happens when we pull the trigger
 func fire_weapon():
 	if aim_raycast.is_colliding():
@@ -67,3 +78,16 @@ func fire_weapon():
 			target.take_damage(1) # Deal 1 damage!
 		else:
 			print("PEW! You hit a wall: ", target.name)
+
+# --- PLAYER SURVIVAL LOGIC ---
+func take_damage(amount):
+	current_health -= amount
+	health_display.text = "HP: " + str(current_health) # Updates the HUD!
+
+	if current_health <= 0:
+		die()
+
+func die():
+	print("CRITICAL FAILURE: R0-0T Offline.")
+	# This instantly resets the current level back to the beginning!
+	get_tree().reload_current_scene()

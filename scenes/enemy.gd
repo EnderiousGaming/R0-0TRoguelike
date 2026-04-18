@@ -38,3 +38,11 @@ func take_damage(amount):
 func die():
 	print("Enemy destroyed!")
 	queue_free()
+
+
+func _on_hitbox_body_entered(body):
+	# Did the thing that touched us have the "player" tag?
+	if body.is_in_group("player"):
+		# Does the player have a way to take damage?
+		if body.has_method("take_damage"):
+			body.take_damage(1) # Bite them for 1 HP!

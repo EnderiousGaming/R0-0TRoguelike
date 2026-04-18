@@ -8,6 +8,9 @@
 
 [sub_resource type="BoxMesh" id="BoxMesh_3vyb7"]
 
+[sub_resource type="LabelSettings" id="LabelSettings_3vyb7"]
+font_size = 32
+
 [node name="Player" type="CharacterBody3D" unique_id=665301636 groups=["player"]]
 script = ExtResource("1_3vyb7")
 
@@ -45,3 +48,13 @@ offset_bottom = 2.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="HealthDisplay" type="Label" parent="HUD" unique_id=510640362]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -45.0
+offset_right = 79.0
+grow_vertical = 0
+text = "HP: 5"
+label_settings = SubResource("LabelSettings_3vyb7")

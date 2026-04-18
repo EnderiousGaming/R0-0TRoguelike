@@ -10,6 +10,8 @@ albedo_color = Color(1, 0, 0, 1)
 [sub_resource type="BoxMesh" id="BoxMesh_5uy6h"]
 material = SubResource("StandardMaterial3D_4ra3w")
 
+[sub_resource type="BoxShape3D" id="BoxShape3D_7p1mj"]
+
 [node name="Enemy" type="CharacterBody3D" unique_id=1355696254]
 script = ExtResource("1_7p1mj")
 
@@ -18,3 +20,11 @@ shape = SubResource("BoxShape3D_md0e3")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=442172353]
 mesh = SubResource("BoxMesh_5uy6h")
+
+[node name="Hitbox" type="Area3D" parent="." unique_id=401828642]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox" unique_id=226766134]
+transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
+shape = SubResource("BoxShape3D_7p1mj")
+
+[connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]
