@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="R0-0T_Roguelike"
-run/main_scene="uid://dbhrcwgu5wykn"
+run/main_scene="uid://dbd58g2wdp54u"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"

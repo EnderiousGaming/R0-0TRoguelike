@@ -7,6 +7,11 @@ var max_health = 5
 var current_health = max_health
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+# --- UI REFERENCES ---
+@onready var pause_menu = $HUD/PauseMenu
+@onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
+@onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
+
 # --- CAMERA VARIABLES ---
 @export var mouse_sensitivity := 0.002
 @onready var head = $Head
@@ -21,6 +26,11 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 # --- INITIALIZATION ---
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+	laser_pivot.visible = false
+	
+	# Connect the pause menu buttons via code
+	resume_button.pressed.connect(toggle_pause)
+	quit_button.pressed.connect(quit_to_menu)
 
 # --- INPUT HANDLING ---
 func _unhandled_input(event):
@@ -36,9 +46,9 @@ func _unhandled_input(event):
 			head.rotate_x(-event.relative.y * mouse_sensitivity)
 			head.rotation.x = clamp(head.rotation.x, deg_to_rad(-89), deg_to_rad(89))
 		
-	# 3. ESCAPE HATCH: Press ESC to free the mouse so you can close the window
+	# 3. ESCAPE HATCH: Toggle the pause state
 	if event.is_action_pressed("ui_cancel"):
-		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+		toggle_pause()
 
 # --- PHYSICS PROCESSING ---
 func _physics_process(delta):
@@ -109,3 +119,22 @@ func die():
 	print("CRITICAL FAILURE: R0-0T Offline.")
 	# This instantly resets the current level back to the beginning!
 	get_tree().reload_current_scene()
+	
+func toggle_pause():
+	# Flip the pause state
+	var new_pause_state = not get_tree().paused
+	get_tree().paused = new_pause_state
+	
+	# Show/Hide the menu
+	pause_menu.visible = new_pause_state
+	
+	# Manage the mouse cursor
+	if new_pause_state:
+		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	else:
+		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func quit_to_menu():
+	# ALWAYS unpause before changing scenes, or the main menu will be frozen!
+	get_tree().paused = false
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

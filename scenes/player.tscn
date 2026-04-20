@@ -82,3 +82,55 @@ offset_right = 79.0
 grow_vertical = 0
 text = "HP: 5"
 label_settings = SubResource("LabelSettings_3vyb7")
+
+[node name="PauseMenu" type="Control" parent="HUD" unique_id=845286292]
+process_mode = 3
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="HUD/PauseMenu" unique_id=739471156]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="HUD/PauseMenu" unique_id=1319353274]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="HUD/PauseMenu/VBoxContainer" unique_id=1233857150]
+layout_mode = 2
+theme_override_font_sizes/font_size = 128
+text = "PAUSED"
+horizontal_alignment = 1
+
+[node name="ResumeButton" type="Button" parent="HUD/PauseMenu/VBoxContainer" unique_id=514750130]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "RESUME"
+
+[node name="QuitButton" type="Button" parent="HUD/PauseMenu/VBoxContainer" unique_id=236232046]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "QUIT TO MENU"
+
+[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
+[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
