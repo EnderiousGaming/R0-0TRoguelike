@@ -5,7 +5,7 @@ script/source = "extends Control
 
 func _on_start_button_pressed():
 	# Teleport the player into the digital void
-	get_tree().change_scene_to_file(\"res://scenes/world.tscn\")
+	get_tree().change_scene_to_file(\"res://scenes/hub.tscn\")
 
 func _on_quit_button_pressed():
 	# Close the application
@@ -47,7 +47,7 @@ grow_vertical = 2
 [node name="Label" type="Label" parent="VBoxContainer" unique_id=1014888646]
 layout_mode = 2
 theme_override_font_sizes/font_size = 64
-text = "Glitched Horizons v0.3.0-alpha"
+text = "Glitched Horizons v0.4.0-alpha"
 
 [node name="StartButton" type="Button" parent="VBoxContainer" unique_id=1886776590]
 layout_mode = 2

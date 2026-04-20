@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dlkwhw8pso5si"]
+
+[ext_resource type="Script" uid="uid://cumqd4xhyng28" path="res://scenes/game_over.gd" id="1_xeevv"]
+
+[node name="GameOver" type="Control" unique_id=694748295]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xeevv")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=884428535]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.31400958, 4.2716042e-07, 1.3235956e-07, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=883927832]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Label" type="Label" parent="VBoxContainer" unique_id=1421137956]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "CRITICAL SYSTEM FAILURE"
+
+[node name="Button" type="Button" parent="VBoxContainer" unique_id=924035143]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "REBOOT TO HUB"
+
+[connection signal="pressed" from="VBoxContainer/Button" to="." method="_on_button_pressed"]

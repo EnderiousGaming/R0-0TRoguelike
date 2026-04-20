@@ -117,8 +117,8 @@ func take_damage(amount):
 
 func die():
 	print("CRITICAL FAILURE: R0-0T Offline.")
-	# This instantly resets the current level back to the beginning!
-	get_tree().reload_current_scene()
+	# DEFERRED: Wait for the enemy's bite physics to finish, THEN load the Game Over screen!
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/game_over.tscn")
 	
 func toggle_pause():
 	# Flip the pause state
