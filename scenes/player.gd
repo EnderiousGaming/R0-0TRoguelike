@@ -16,6 +16,7 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- WEAPON VARIABLES ---
 @onready var aim_raycast = $Head/Camera3D/RayCast3D
+@onready var laser_pivot = $Head/Camera3D/BlasterMesh/LaserPivot
 
 # --- INITIALIZATION ---
 func _ready():
@@ -70,14 +71,31 @@ func _physics_process(delta):
 # --- CUSTOM FUNCTIONS ---
 # Custom function to handle what happens when we pull the trigger
 func fire_weapon():
+	var hit_distance = 50.0 
+	
 	if aim_raycast.is_colliding():
 		var target = aim_raycast.get_collider()
+		hit_distance = aim_raycast.global_position.distance_to(aim_raycast.get_collision_point())
 		
-		# Check if the thing we hit has the 'take_damage' script attached
+		# DEBUG: Tell us what we hit and how far away it is!
+		print("Target hit: ", target.name, " | Distance: ", hit_distance)
+		
 		if target.has_method("take_damage"):
-			target.take_damage(1) # Deal 1 damage!
-		else:
-			print("PEW! You hit a wall: ", target.name)
+			target.take_damage(1) 
+	else:
+		# DEBUG: Tell us if we missed everything
+		print("Fired into the void. Defaulting to 50m.")
+
+	# --- THE COMBAT JUICE ---
+	# Safety Net: Force the laser to be at least 0.5 meters long so it never vanishes
+	hit_distance = max(hit_distance, 0.5)
+	
+	laser_pivot.scale.z = hit_distance
+	laser_pivot.visible = true
+	
+	await get_tree().create_timer(0.05).timeout
+	
+	laser_pivot.visible = false
 
 # --- PLAYER SURVIVAL LOGIC ---
 func take_damage(amount):

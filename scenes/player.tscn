@@ -8,6 +8,16 @@
 
 [sub_resource type="BoxMesh" id="BoxMesh_3vyb7"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3vyb7"]
+albedo_color = Color(0, 1, 0, 1)
+emission_enabled = true
+emission = Color(0, 1, 0, 1)
+emission_energy_multiplier = 5.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_g2els"]
+material = SubResource("StandardMaterial3D_3vyb7")
+size = Vector3(0.2, 0.2, 1)
+
 [sub_resource type="LabelSettings" id="LabelSettings_3vyb7"]
 font_size = 32
 
@@ -29,6 +39,15 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.971586, 0)
 [node name="BlasterMesh" type="MeshInstance3D" parent="Head/Camera3D" unique_id=978324385]
 transform = Transform3D(0.2, 0, 0, 0, 0.2, 0, 0, 0, 1, 0.4, -0.3, -0.6)
 mesh = SubResource("BoxMesh_3vyb7")
+
+[node name="LaserPivot" type="Node3D" parent="Head/Camera3D/BlasterMesh" unique_id=36387525]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+visible = false
+
+[node name="LaserBeam" type="MeshInstance3D" parent="Head/Camera3D/BlasterMesh/LaserPivot" unique_id=1005020577]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
+cast_shadow = 0
+mesh = SubResource("BoxMesh_g2els")
 
 [node name="RayCast3D" type="RayCast3D" parent="Head/Camera3D" unique_id=1732086380]
 target_position = Vector3(0, 0, -50)
