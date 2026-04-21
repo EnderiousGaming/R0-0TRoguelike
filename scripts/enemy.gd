@@ -43,8 +43,11 @@ func take_damage(amount):
 
 func die():
 	print("Enemy destroyed!")
+	
+	RunManager.score += 200 # Currency for the shop
+	RunManager.enemies_defeated_this_room += 1 # Progression for the portal
+	
 	queue_free()
-
 
 func _on_hitbox_body_entered(body):
 	# Did the thing that touched us have the "player" tag?

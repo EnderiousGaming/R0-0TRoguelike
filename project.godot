@@ -16,6 +16,10 @@ config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/show_image=false
 config/icon="res://icon.svg"
 
+[autoload]
+
+RunManager="*uid://ioa61y40s8q1"
+
 [display]
 
 window/size/viewport_width=1280

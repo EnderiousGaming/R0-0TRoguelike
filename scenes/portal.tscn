@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://il4prkm7s6oo"]
+
+[ext_resource type="Script" uid="uid://cqvhc1rklv1up" path="res://scripts/portal.gd" id="1_v0xau"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w6xti"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_7wvbm"]
+
+[node name="Portal" type="Area3D" unique_id=1907718005]
+script = ExtResource("1_v0xau")
+
+[node name="CSGCylinder3D" type="CSGCylinder3D" parent="." unique_id=184023210]
+material = SubResource("StandardMaterial3D_w6xti")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1591606741]
+shape = SubResource("CylinderShape3D_7wvbm")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://b1xtj1of64pis"]
 
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="1_qssp3"]
-[ext_resource type="Script" uid="uid://cqvhc1rklv1up" path="res://scripts/portal.gd" id="2_d1od2"]
+[ext_resource type="Script" uid="uid://ca2i1qfb50ghw" path="res://scripts/hub.gd" id="1_w6xti"]
+[ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="3_w6xti"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_d1od2"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -16,12 +17,8 @@ sky = SubResource("Sky_w6xti")
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w6xti"]
-albedo_color = Color(0, 1, 0, 1)
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_7wvbm"]
-
 [node name="Hub" type="Node3D" unique_id=320873723]
+script = ExtResource("1_w6xti")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=437083401]
 environment = SubResource("Environment_7wvbm")
@@ -38,15 +35,5 @@ omni_range = 20.0
 [node name="Player" parent="." unique_id=665301636 instance=ExtResource("1_qssp3")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.6213646, 6.8386908)
 
-[node name="CSGCylinder3D" type="CSGCylinder3D" parent="." unique_id=1204194881]
+[node name="Portal" parent="." unique_id=1907718005 instance=ExtResource("3_w6xti")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035, 1.5, -6.29097)
-material = SubResource("StandardMaterial3D_w6xti")
-
-[node name="Portal" type="Area3D" parent="." unique_id=1148653944]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.035, 1.5, -6.29097)
-script = ExtResource("2_d1od2")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Portal" unique_id=121187953]
-shape = SubResource("CylinderShape3D_7wvbm")
-
-[connection signal="body_entered" from="Portal" to="Portal" method="_on_body_entered"]

@@ -8,6 +8,9 @@ var current_health = max_health
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- UI REFERENCES ---
+@onready var announcement_label = $HUD/AnnouncementLabel
+@onready var kills_display = $HUD/KillsDisplay
+@onready var score_display = $HUD/ScoreDisplay
 @onready var pause_menu = $HUD/PauseMenu
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
@@ -27,6 +30,7 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	laser_pivot.visible = false
+	announcement_label.text = "" # Wipes any old messages
 	
 	# Connect the pause menu buttons via code
 	resume_button.pressed.connect(toggle_pause)
@@ -138,3 +142,10 @@ func quit_to_menu():
 	# ALWAYS unpause before changing scenes, or the main menu will be frozen!
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
+	
+func _process(_delta):
+	score_display.text = "SCORE: " + str(RunManager.score)
+	kills_display.text = "CLEARED: " + str(RunManager.enemies_defeated_this_room)
+
+func announce(message: String):
+	announcement_label.text = message
