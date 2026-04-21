@@ -2,7 +2,7 @@
 
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="2_rwgxs"]
-[ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scenes/wave_director.gd" id="3_4wyf3"]
+[ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scripts/wave_director.gd" id="3_4wyf3"]
 
 [sub_resource type="Environment" id="Environment_4wyf3"]
 background_mode = 1
