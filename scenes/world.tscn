@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://dbhrcwgu5wykn"]
 
-[ext_resource type="Script" uid="uid://1id7ip7uumi8" path="res://scenes/world.gd" id="1_71j4m"]
+[ext_resource type="Script" uid="uid://1id7ip7uumi8" path="res://scripts/world.gd" id="1_71j4m"]
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="1_nnsk1"]
 [ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="2_rwgxs"]
 [ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scripts/wave_director.gd" id="3_4wyf3"]

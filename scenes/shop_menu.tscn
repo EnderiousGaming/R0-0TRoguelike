@@ -1,0 +1,78 @@
+[gd_scene format=3 uid="uid://cifrqihdec76w"]
+
+[ext_resource type="Script" uid="uid://k2o2pwvm10jg" path="res://scripts/shop_menu.gd" id="1_uj65v"]
+
+[node name="ShopMenu" type="Control" unique_id=258848137]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_uj65v")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=1351829550]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.5882353)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="." unique_id=1088517316]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -31.0
+offset_top = -29.5
+offset_right = 31.0
+offset_bottom = 29.5
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShopDisplay" type="Label" parent="VBoxContainer" unique_id=1461773701]
+layout_mode = 2
+theme_override_font_sizes/font_size = 128
+text = "SHOP"
+horizontal_alignment = 1
+
+[node name="BankDisplay" type="Label" parent="VBoxContainer" unique_id=65926394]
+layout_mode = 2
+theme_override_font_sizes/font_size = 64
+text = "BANK: 0"
+horizontal_alignment = 1
+
+[node name="HealthDisplay" type="Label" parent="VBoxContainer" unique_id=275499220]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+
+[node name="DamageButton" type="Button" parent="VBoxContainer" unique_id=351408775]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "UPGRADE LASER (+1 DMG) - 1000 SCORE"
+
+[node name="SpeedButton" type="Button" parent="VBoxContainer" unique_id=240835041]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "OVERCLOCK LEGS (+10% SPD) - 800 SCORE"
+
+[node name="HealButton" type="Button" parent="VBoxContainer" unique_id=559825331]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "RESTORE SYSTEM (+1 HP) - 500 SCORE"
+
+[node name="CloseButton" type="Button" parent="VBoxContainer" unique_id=1734271355]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "CLOSE TERMINAL"
+
+[connection signal="pressed" from="VBoxContainer/DamageButton" to="." method="_on_damage_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/SpeedButton" to="." method="_on_speed_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/HealButton" to="." method="_on_heal_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]

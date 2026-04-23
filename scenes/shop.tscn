@@ -1,3 +1,62 @@
 [gd_scene format=3 uid="uid://dddip74m6j6jd"]
 
+[ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="1_lx5au"]
+[ext_resource type="Script" uid="uid://jhndxft4ymk8" path="res://scripts/shop_trigger.gd" id="2_1l46r"]
+[ext_resource type="PackedScene" uid="uid://cifrqihdec76w" path="res://scenes/shop_menu.tscn" id="3_032fp"]
+[ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="4_032fp"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_032fp"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_2fc2m"]
+sky_material = SubResource("ProceduralSkyMaterial_032fp")
+
+[sub_resource type="Environment" id="Environment_8r1wq"]
+background_mode = 2
+sky = SubResource("Sky_2fc2m")
+tonemap_mode = 2
+glow_enabled = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lx5au"]
+albedo_color = Color(0, 1, 1, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_lx5au"]
+
 [node name="Shop" type="Node3D" unique_id=634555919]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=748138808]
+environment = SubResource("Environment_8r1wq")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1801762407]
+use_collision = true
+size = Vector3(15, 1, 15)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=1046596485]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.7016516, 0)
+light_color = Color(0.13333334, 1, 1, 1)
+light_energy = 3.0
+omni_range = 50.0
+
+[node name="Portal" parent="." unique_id=1907718005 instance=ExtResource("1_lx5au")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.19231176, 1.539227, -5.5735116)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1983521935]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.3179398, 2.1010814, 0)
+size = Vector3(1.5, 3, 5)
+material = SubResource("StandardMaterial3D_lx5au")
+
+[node name="ShopTrigger" type="Area3D" parent="." unique_id=1676046672]
+script = ExtResource("2_1l46r")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ShopTrigger" unique_id=2093674783]
+transform = Transform3D(0.63593173, 0, 0, 0, 3.1571374, 0, 0, 0, 4.867738, -3.228, 2.1, 0)
+shape = SubResource("BoxShape3D_lx5au")
+
+[node name="ShopMenu" parent="." unique_id=258848137 instance=ExtResource("3_032fp")]
+visible = false
+
+[node name="Player" parent="." unique_id=665301636 instance=ExtResource("4_032fp")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03542614, 2.532146, 5.8755283)
+
+[connection signal="body_entered" from="ShopTrigger" to="ShopTrigger" method="_on_body_entered"]

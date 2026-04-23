@@ -3,8 +3,6 @@ extends CharacterBody3D
 # --- MOVEMENT VARIABLES ---
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
-var max_health = 5
-var current_health = max_health
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- UI REFERENCES ---
@@ -30,8 +28,8 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	laser_pivot.visible = false
-	announcement_label.text = "" # Wipes any old messages
-	
+	announcement_label.text = ""
+
 	# Connect the pause menu buttons via code
 	resume_button.pressed.connect(toggle_pause)
 	quit_button.pressed.connect(quit_to_menu)
@@ -42,6 +40,9 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+			
+	if event.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		fire_weapon()
 
 	# 2. LOOK AROUND: Only rotate the camera IF the mouse is currently locked
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -56,30 +57,28 @@ func _unhandled_input(event):
 
 # --- PHYSICS PROCESSING ---
 func _physics_process(delta):
-	# Add gravity.
+	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
 	# Handle jump.
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
 		velocity.y = JUMP_VELOCITY
-		
-	# --- SHOOTING LOGIC ---
-	if Input.is_action_just_pressed("shoot"):
-		fire_weapon()
 
-	# --- MOVEMENT LOGIC ---
-	# Get WASD input
+	# Get the input direction and handle the movement/deceleration.
 	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
+	# --- MOVEMENT LOGIC ---
+	var current_speed = SPEED * RunManager.player_speed_multiplier
+	
 	if direction:
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
+		velocity.x = direction.x * current_speed
+		velocity.z = direction.z * current_speed
 	else:
-		velocity.x = move_toward(velocity.x, 0, SPEED)
-		velocity.z = move_toward(velocity.z, 0, SPEED)
-
+		velocity.x = move_toward(velocity.x, 0, current_speed)
+		velocity.z = move_toward(velocity.z, 0, current_speed)
+		
 	move_and_slide()
 
 # --- CUSTOM FUNCTIONS ---
@@ -95,10 +94,11 @@ func fire_weapon():
 		print("Target hit: ", target.name, " | Distance: ", hit_distance)
 		
 		if target.has_method("take_damage"):
-			target.take_damage(1) 
-	else:
-		# DEBUG: Tell us if we missed everything
-		print("Fired into the void. Defaulting to 50m.")
+			# Shoot them with the global damage stat!
+			target.take_damage(RunManager.laser_damage) 
+		else:
+			# DEBUG: Tell us if we missed everything
+			print("Fired into the void. Defaulting to 50m.")
 
 	# --- THE COMBAT JUICE ---
 	# Safety Net: Force the laser to be at least 0.5 meters long so it never vanishes
@@ -113,10 +113,10 @@ func fire_weapon():
 
 # --- PLAYER SURVIVAL LOGIC ---
 func take_damage(amount):
-	current_health -= amount
-	health_display.text = "HP: " + str(current_health) # Updates the HUD!
+	# Subtract from the global brain, not the local body!
+	RunManager.current_health -= amount
 
-	if current_health <= 0:
+	if RunManager.current_health <= 0:
 		die()
 
 func die():
@@ -146,6 +146,7 @@ func quit_to_menu():
 func _process(_delta):
 	score_display.text = "SCORE: " + str(RunManager.score)
 	kills_display.text = "CLEARED: " + str(RunManager.enemies_defeated_this_room)
+	health_display.text = "HP: " + str(RunManager.current_health)
 
 func announce(message: String):
 	announcement_label.text = message

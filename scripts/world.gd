@@ -25,9 +25,16 @@ func _process(_delta):
 
 func activate_portal():
 	portal_active = true
-	
 	portal.visible = true
 	portal_collision.call_deferred("set_disabled", false)
+	
+	wave_director_timer.stop()
+	
+	# --- THE CLEANUP PROTOCOL ---
+	# Find every remaining enemy in the room and instantly delete them
+	var remaining_enemies = get_tree().get_nodes_in_group("enemy")
+	for virus in remaining_enemies:
+		virus.queue_free()
 	
 	# 1. SHUT DOWN THE SPAWNER
 	wave_director_timer.stop()
