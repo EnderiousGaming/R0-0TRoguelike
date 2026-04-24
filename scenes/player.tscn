@@ -46,6 +46,10 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.5)
 cast_shadow = 0
 mesh = SubResource("BoxMesh_g2els")
 
+[node name="OmniLight3D" type="OmniLight3D" parent="Head/Camera3D/BlasterMesh/LaserPivot/LaserBeam" unique_id=1418915703]
+light_color = Color(0, 1, 0, 1)
+light_energy = 1.5
+
 [node name="RayCast3D" type="RayCast3D" parent="Head/Camera3D" unique_id=1732086380]
 target_position = Vector3(0, 0, -50)
 
@@ -158,6 +162,16 @@ offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
 theme_override_font_sizes/font_size = 64
+
+[node name="StageDisplay" type="Label" parent="HUD" unique_id=1897979022]
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_right = 20.0
+offset_bottom = 23.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
 
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
 [connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]

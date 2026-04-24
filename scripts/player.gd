@@ -6,6 +6,7 @@ const JUMP_VELOCITY = 4.5
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- UI REFERENCES ---
+@onready var stage_display = $HUD/StageDisplay
 @onready var announcement_label = $HUD/AnnouncementLabel
 @onready var kills_display = $HUD/KillsDisplay
 @onready var score_display = $HUD/ScoreDisplay
@@ -146,7 +147,16 @@ func quit_to_menu():
 func _process(_delta):
 	score_display.text = "SCORE: " + str(RunManager.score)
 	kills_display.text = "CLEARED: " + str(RunManager.enemies_defeated_this_room)
-	health_display.text = "HP: " + str(RunManager.current_health)
+	
+	# THE NEW STAGE TRACKER
+	if RunManager.current_stage == 0:
+		stage_display.text = "-- HUB --"
+	else:
+		stage_display.text = "STAGE: " + str(RunManager.current_stage) + " / 10"
 
 func announce(message: String):
 	announcement_label.text = message
+	
+	# Wait 4 seconds, then erase the text
+	await get_tree().create_timer(4.0).timeout
+	announcement_label.text = ""
