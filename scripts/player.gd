@@ -114,9 +114,13 @@ func fire_weapon():
 
 # --- PLAYER SURVIVAL LOGIC ---
 func take_damage(amount):
-	# Subtract from the global brain, not the local body!
+	# 1. Subtract the damage from the GLOBAL health pool
 	RunManager.current_health -= amount
-
+	
+	# 2. Instantly force the HUD to show the new global number
+	health_display.text = "HP: " + str(RunManager.current_health)
+	
+	# 3. Check for system failure
 	if RunManager.current_health <= 0:
 		die()
 
