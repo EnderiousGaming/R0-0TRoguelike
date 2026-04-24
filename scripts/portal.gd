@@ -16,8 +16,17 @@ func _on_body_entered(body):
 		var next_scene_path = ""
 		
 		match stage:
-			1, 2, 4, 5, 7, 8:
-				next_scene_path = "res://scenes/world.tscn" 
+			# THE COMBAT ROOMS
+			1, 2, 5, 7, 8:
+				# The array of our 4 new level designs
+				var combat_maps = [
+					"res://scenes/world_a.tscn",
+					"res://scenes/world_b.tscn",
+					"res://scenes/world_c.tscn",
+					"res://scenes/world_d.tscn"
+				]
+				# Randomly pick one of the strings from the array!
+				next_scene_path = combat_maps.pick_random() 
 			3, 6, 9:
 				next_scene_path = "res://scenes/shop.tscn"
 			10:

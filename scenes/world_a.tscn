@@ -1,0 +1,96 @@
+[gd_scene format=3 uid="uid://dse8vb0af4bul"]
+
+[ext_resource type="Script" uid="uid://1id7ip7uumi8" path="res://scripts/world.gd" id="1_r4xtf"]
+[ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="2_vlmdm"]
+[ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scripts/wave_director.gd" id="3_3stig"]
+[ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="4_nghof"]
+[ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="5_jrenj"]
+
+[sub_resource type="Environment" id="Environment_4wyf3"]
+background_mode = 1
+ambient_light_source = 2
+glow_enabled = true
+glow_intensity = 0.75
+glow_strength = 1.5
+volumetric_fog_enabled = true
+volumetric_fog_albedo = Color(0.2062256, 0.00012639136, 0.66189396, 1)
+
+[node name="World" type="Node3D" unique_id=928174374]
+script = ExtResource("1_r4xtf")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=857040349]
+environment = SubResource("Environment_4wyf3")
+
+[node name="Floor" type="CSGBox3D" parent="." unique_id=96458215]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.52477455, 0)
+use_collision = true
+size = Vector3(30, 1, 30)
+
+[node name="Wall1" type="CSGBox3D" parent="." unique_id=1877503622]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 15)
+use_collision = true
+size = Vector3(30, 10, 1)
+
+[node name="Wall2" type="CSGBox3D" parent="." unique_id=1936209788]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -15)
+use_collision = true
+size = Vector3(30, 10, 1)
+
+[node name="Wall3" type="CSGBox3D" parent="." unique_id=610390899]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 15, 5, 0)
+use_collision = true
+size = Vector3(30, 10, 1)
+
+[node name="Wall4" type="CSGBox3D" parent="." unique_id=1473611356]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -15, 5, 0)
+use_collision = true
+size = Vector3(30, 10, 1)
+
+[node name="Player" parent="." unique_id=665301636 instance=ExtResource("2_vlmdm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.9011092, 1.6220384, 4.196512)
+mouse_sensitivity = null
+
+[node name="SpawnPoint1" type="Marker3D" parent="." unique_id=920363747 groups=["spawn_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.23715, 1.1726885, -11.881229)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="SpawnPoint1" unique_id=1048650695]
+light_color = Color(0, 1, 1, 1)
+light_energy = 2.5
+omni_range = 7.5
+
+[node name="SpawnPoint2" type="Marker3D" parent="." unique_id=1351586185 groups=["spawn_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.23715, 1.1726885, 12.727886)
+
+[node name="OmniLight3D2" type="OmniLight3D" parent="SpawnPoint2" unique_id=1258567554]
+light_color = Color(0, 1, 1, 1)
+light_energy = 2.5
+omni_range = 7.5
+
+[node name="SpawnPoint3" type="Marker3D" parent="." unique_id=1738373226 groups=["spawn_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.204111, 1.1726885, -11.881229)
+
+[node name="OmniLight3D3" type="OmniLight3D" parent="SpawnPoint3" unique_id=1425842088]
+light_color = Color(0, 1, 1, 1)
+light_energy = 2.5
+omni_range = 7.5
+
+[node name="SpawnPoint4" type="Marker3D" parent="." unique_id=1129416828 groups=["spawn_point"]]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.802603, 1.1726885, 9.608738)
+
+[node name="OmniLight3D4" type="OmniLight3D" parent="SpawnPoint4" unique_id=1971272187]
+light_color = Color(0, 1, 1, 1)
+light_energy = 2.5
+omni_range = 7.5
+
+[node name="WaveDirector" type="Node3D" parent="." unique_id=1922651044]
+script = ExtResource("3_3stig")
+enemy_scene = ExtResource("4_nghof")
+
+[node name="Timer" type="Timer" parent="WaveDirector" unique_id=1185196142]
+wait_time = 2.0
+autostart = true
+
+[node name="Portal" parent="." unique_id=1907718005 instance=ExtResource("5_jrenj")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 1, 13.444528)
+
+[connection signal="timeout" from="WaveDirector/Timer" to="WaveDirector" method="_on_timer_timeout"]
