@@ -15,6 +15,12 @@ glow_strength = 1.5
 volumetric_fog_enabled = true
 volumetric_fog_albedo = Color(0.2062256, 0.00012639136, 0.66189396, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r4xtf"]
+albedo_color = Color(0, 0, 0, 1)
+emission_enabled = true
+emission = Color(0.1999056, 0.00031718164, 0.53090954, 1)
+emission_energy_multiplier = 0.5
+
 [node name="World" type="Node3D" unique_id=928174374]
 script = ExtResource("1_r4xtf")
 
@@ -97,61 +103,73 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 1, 13.444528)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.074635, 3.7271252, 0)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower2" type="CSGBox3D" parent="." unique_id=265350851]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.0873847, 3.7271252, 0)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower3" type="CSGBox3D" parent="." unique_id=1704292965]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8580198, 3.7271252, 0)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower4" type="CSGBox3D" parent="." unique_id=1008681332]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.535864, 3.7271252, 0)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower5" type="CSGBox3D" parent="." unique_id=1347887190]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.535864, 3.7271252, 8.239609)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower6" type="CSGBox3D" parent="." unique_id=750522319]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.535864, 3.7271252, -7.792078)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower7" type="CSGBox3D" parent="." unique_id=1948104010]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.918392, 3.7271252, -7.792078)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower8" type="CSGBox3D" parent="." unique_id=1825617376]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9875417, 3.7271252, -7.792078)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower9" type="CSGBox3D" parent="." unique_id=1609708637]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7978525, 3.7271252, -7.792078)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower10" type="CSGBox3D" parent="." unique_id=409289203]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.7978525, 3.7271252, 8.355383)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower11" type="CSGBox3D" parent="." unique_id=1255059786]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.1814733, 3.7271252, 8.355383)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="ServerTower12" type="CSGBox3D" parent="." unique_id=1560277827]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.8273098, 3.7271252, 8.355383)
 use_collision = true
 size = Vector3(3, 8, 4)
+material = SubResource("StandardMaterial3D_r4xtf")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=93069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25411558, 4.5813313, 0)

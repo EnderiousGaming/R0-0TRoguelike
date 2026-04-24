@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://brf32bxx2jhxk"]
+
+[ext_resource type="Script" uid="uid://bb7obuv1c5qt1" path="res://scripts/hazard_area.gd" id="1_xygd1"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_d38ia"]
+size = Vector3(200, 1, 200)
+
+[node name="KillPlane" type="Node3D" unique_id=1321934473]
+
+[node name="HazardArea" type="Area3D" parent="." unique_id=107388141]
+script = ExtResource("1_xygd1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HazardArea" unique_id=1219182335]
+shape = SubResource("BoxShape3D_d38ia")
+
+[connection signal="body_entered" from="HazardArea" to="HazardArea" method="_on_body_entered"]
