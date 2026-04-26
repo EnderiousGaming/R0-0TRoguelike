@@ -16,6 +16,7 @@ material = SubResource("StandardMaterial3D_4ra3w")
 [sub_resource type="BoxShape3D" id="BoxShape3D_7p1mj"]
 
 [node name="Enemy" type="CharacterBody3D" unique_id=1355696254 groups=["enemy"]]
+collision_layer = 5
 script = ExtResource("1_7p1mj")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2085275426]
@@ -29,9 +30,12 @@ light_color = Color(1, 0, 0, 1)
 light_energy = 1.5
 
 [node name="Hitbox" type="Area3D" parent="." unique_id=401828642]
+collision_mask = 3
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hitbox" unique_id=226766134]
 transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
 shape = SubResource("BoxShape3D_7p1mj")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1811071572]
 
 [connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]

@@ -6,6 +6,10 @@
 [ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="4_0ki1l"]
 [ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="5_7dwsv"]
 
+[sub_resource type="NavigationMesh" id="NavigationMesh_418nc"]
+vertices = PackedVector3Array(-13.75, 0.25, -13.750001, -13.75, 6.25, 13.999999, 14, 6.25, 13.999999, 14, 0.25, -13.750001, -13.75, 0.25, -10.828948, -13.75, 0.75, -9.368422, -13.75, 5, -2.0657902, -13.75, 6.25, 0.8552618, 14, 6.25, 0.8552618, 14, 5, -2.0657902, 14, 0.75, -9.368422, 14, 0.25, -10.828948, 9.991917, 6, -0.4780531, -12.483263, 6, -0.4928589, 13.011942, 6, -0.5060787, 8.475603, 0.75, -9.475645, 1.0203266, 0.25, -10.978349, 1.0005436, 0.75, -9.480581, 9.980398, 0.25, -11.012426, -13.75, 0.25, -4.750001, -13.75, 0.25, -0.50000095, 14, 0.25, -0.50000095, 14, 0.25, -4.750001, -13.75, 0.25, 0.74999905, -13.75, 0.25, 13.999999, 14, 0.25, 13.999999, 14, 0.25, 0.74999905)
+polygons = [PackedInt32Array(11, 18, 3), PackedInt32Array(3, 16, 0), PackedInt32Array(0, 16, 4), PackedInt32Array(4, 17, 5), PackedInt32Array(5, 13, 6), PackedInt32Array(6, 13, 7), PackedInt32Array(7, 13, 1), PackedInt32Array(1, 12, 2), PackedInt32Array(2, 12, 8), PackedInt32Array(8, 14, 9), PackedInt32Array(9, 15, 10), PackedInt32Array(10, 18, 11), PackedInt32Array(18, 16, 3), PackedInt32Array(16, 17, 4), PackedInt32Array(17, 13, 5), PackedInt32Array(13, 12, 1), PackedInt32Array(12, 14, 8), PackedInt32Array(14, 12, 9), PackedInt32Array(15, 18, 10), PackedInt32Array(9, 12, 15), PackedInt32Array(18, 15, 16), PackedInt32Array(16, 15, 17), PackedInt32Array(17, 12, 13), PackedInt32Array(12, 17, 15), PackedInt32Array(22, 21, 19), PackedInt32Array(19, 21, 20), PackedInt32Array(26, 25, 23), PackedInt32Array(23, 25, 24)]
+
 [sub_resource type="Environment" id="Environment_4wyf3"]
 background_mode = 1
 ambient_light_source = 2
@@ -18,13 +22,42 @@ volumetric_fog_albedo = Color(0.2062256, 0.00012639136, 0.66189396, 1)
 [node name="World" type="Node3D" unique_id=928174374]
 script = ExtResource("1_418nc")
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=857040349]
-environment = SubResource("Environment_4wyf3")
+[node name="NavigationRegion3D" type="NavigationRegion3D" parent="." unique_id=857591302]
+navigation_mesh = SubResource("NavigationMesh_418nc")
 
-[node name="Floor" type="CSGBox3D" parent="." unique_id=96458215]
+[node name="Floor" type="CSGBox3D" parent="NavigationRegion3D" unique_id=96458215]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.52477455, 0)
 use_collision = true
 size = Vector3(30, 1, 30)
+
+[node name="UpperFloor" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1091335927]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, 7.5)
+use_collision = true
+size = Vector3(30, 6, 15)
+
+[node name="Ramp" type="CSGBox3D" parent="NavigationRegion3D" unique_id=947758044]
+transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.325, -4.911)
+use_collision = true
+size = Vector3(30, 1, 12)
+
+[node name="Wall1" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1088182799]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
+size = Vector3(1, 20, 30)
+
+[node name="Wall2" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1402591512]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 0)
+size = Vector3(1, 20, 30)
+
+[node name="Wall3" type="CSGBox3D" parent="NavigationRegion3D" unique_id=936696102]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 15)
+size = Vector3(1, 20, 30)
+
+[node name="Wall4" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1925919719]
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -15)
+size = Vector3(1, 20, 30)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=857040349]
+environment = SubResource("Environment_4wyf3")
 
 [node name="Player" parent="." unique_id=665301636 instance=ExtResource("2_m73k7")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.9011092, 1.6220384, -11.597945)
@@ -72,31 +105,5 @@ autostart = true
 
 [node name="Portal" parent="." unique_id=1907718005 instance=ExtResource("5_7dwsv")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 6.7281494, 12.098251)
-
-[node name="UpperFloor" type="CSGBox3D" parent="." unique_id=1091335927]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.75, 7.5)
-use_collision = true
-size = Vector3(30, 6, 15)
-
-[node name="Ramp" type="CSGBox3D" parent="." unique_id=947758044]
-transform = Transform3D(1, 0, 0, 0, 0.8660254, 0.5, 0, -0.5, 0.8660254, 0, 2.325, -4.911)
-use_collision = true
-size = Vector3(30, 1, 12)
-
-[node name="Wall1" type="CSGBox3D" parent="." unique_id=1088182799]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0, 0)
-size = Vector3(1, 20, 30)
-
-[node name="Wall2" type="CSGBox3D" parent="." unique_id=1402591512]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 0, 0)
-size = Vector3(1, 20, 30)
-
-[node name="Wall3" type="CSGBox3D" parent="." unique_id=936696102]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, 15)
-size = Vector3(1, 20, 30)
-
-[node name="Wall4" type="CSGBox3D" parent="." unique_id=1925919719]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 0, 0, -15)
-size = Vector3(1, 20, 30)
 
 [connection signal="timeout" from="WaveDirector/Timer" to="WaveDirector" method="_on_timer_timeout"]
