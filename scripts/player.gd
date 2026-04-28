@@ -25,6 +25,10 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 @onready var aim_raycast = $Head/Camera3D/RayCast3D
 @onready var laser_pivot = $Head/Camera3D/BlasterMesh/LaserPivot
 
+# NEW: Auto-fire tracking
+var fire_cooldown = 0.0
+var fire_rate = 0.25 # How many seconds between shots. (0.25 is 4 shots per second)
+
 # --- INITIALIZATION ---
 func _ready():
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
@@ -41,9 +45,6 @@ func _unhandled_input(event):
 	if event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT and event.pressed:
 			Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-			
-	if event.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		fire_weapon()
 
 	# 2. LOOK AROUND: Only rotate the camera IF the mouse is currently locked
 	if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -155,7 +156,7 @@ func quit_to_menu():
 	get_tree().paused = false
 	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")
 	
-func _process(_delta):
+func _process(delta): # Removed the underscore from delta!
 	score_display.text = "SCORE: " + str(RunManager.score)
 	kills_display.text = "CLEARED: " + str(RunManager.enemies_defeated_this_room)
 	
@@ -164,6 +165,17 @@ func _process(_delta):
 		stage_display.text = "-- HUB --"
 	else:
 		stage_display.text = "STAGE: " + str(RunManager.current_stage) + " / 10"
+
+	# --- AUTO-FIRE LOGIC ---
+	# 1. Count down the cooldown timer
+	if fire_cooldown > 0.0:
+		fire_cooldown -= delta
+		
+	# 2. Check if the player is holding the trigger AND the gun is ready
+	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		if fire_cooldown <= 0.0:
+			fire_weapon()
+			fire_cooldown = fire_rate # Reset the timer!
 
 func announce(message: String):
 	announcement_label.text = message
