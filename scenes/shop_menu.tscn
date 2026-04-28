@@ -57,6 +57,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "UPGRADE LASER (+1 DMG) - 1000 SCORE"
 
+[node name="FireRateButton" type="Button" parent="VBoxContainer" unique_id=1667258068]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "UPGRADE FIRE RATE (+25%) - 1000"
+
 [node name="SpeedButton" type="Button" parent="VBoxContainer" unique_id=240835041]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
@@ -78,6 +83,7 @@ theme_override_font_sizes/font_size = 32
 text = "CLOSE TERMINAL"
 
 [connection signal="pressed" from="VBoxContainer/DamageButton" to="." method="_on_damage_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/FireRateButton" to="." method="_on_fire_rate_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/SpeedButton" to="." method="_on_speed_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HealButton" to="." method="_on_heal_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/MaxHealthButton" to="." method="_on_max_health_button_pressed"]

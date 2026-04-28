@@ -1,5 +1,7 @@
 shader_type canvas_item;
 
+uniform float vignette_multiplier : hint_range(1.0, 100.0) = 50.0;
+
 // Grab the screen texture
 uniform sampler2D screen_texture : hint_screen_texture, filter_linear_mipmap;
 
@@ -28,8 +30,8 @@ void fragment() {
 
         // 5. Apply a slight vignette (darken the corners)
         float vignette = uv.x * uv.y * (1.0 - uv.x) * (1.0 - uv.y);
-        color.rgb *= clamp(vignette * 20.0, 0.0, 1.0);
+        color.rgb *= clamp(vignette * vignette_multiplier, 0.0, 1.0);
 
-        COLOR = color;
+        COLOR = vec4(color.rgb, 1.0);
     }
 }

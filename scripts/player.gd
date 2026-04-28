@@ -27,7 +27,6 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # NEW: Auto-fire tracking
 var fire_cooldown = 0.0
-var fire_rate = 0.25 # How many seconds between shots. (0.25 is 4 shots per second)
 
 # --- INITIALIZATION ---
 func _ready():
@@ -187,7 +186,8 @@ func _process(delta): # Removed the underscore from delta!
 	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		if fire_cooldown <= 0.0:
 			fire_weapon()
-			fire_cooldown = fire_rate # Reset the timer!
+			# Pull the current upgraded speed from the RunManager!
+			fire_cooldown = RunManager.fire_rate
 
 func announce(message: String):
 	announcement_label.text = message

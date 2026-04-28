@@ -17,6 +17,9 @@ var current_health = max_health
 var laser_damage = 1
 var player_speed_multiplier = 1.0
 
+var fire_rate = 0.25
+var fire_rate_cost = 1000
+
 func reset_run():
 	print("SYSTEM: Resetting run variables...")
 	current_stage = 0 
@@ -29,3 +32,5 @@ func reset_run():
 	speed_cost = 800
 	damage_cost = 1000
 	max_health_cost = 1200
+	fire_rate = 0.25
+	fire_rate_cost = 1000

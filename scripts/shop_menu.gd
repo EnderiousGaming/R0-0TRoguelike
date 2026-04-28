@@ -8,6 +8,7 @@ extends Control
 @onready var speed_button = $VBoxContainer/SpeedButton
 @onready var damage_button = $VBoxContainer/DamageButton
 @onready var max_health_button = $VBoxContainer/MaxHealthButton
+@onready var fire_rate_button = $VBoxContainer/FireRateButton
 
 func _ready():
 	update_ui()
@@ -17,10 +18,11 @@ func update_ui():
 	health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
 	
 	# Dynamically update the button text to show the current inflated price
+	fire_rate_button.text = "OVERCLOCK BLASTER (+FIRE RATE) - " + str(RunManager.fire_rate_cost) + " SCORE"
 	heal_button.text = "RESTORE HEALTH (+1 HP) - " + str(RunManager.heal_cost) + " SCORE"
 	speed_button.text = "OVERCLOCK LEGS (+10% SPD) - " + str(RunManager.speed_cost) + " SCORE"
 	damage_button.text = "UPGRADE LASER (+1 DMG) - " + str(RunManager.damage_cost) + " SCORE"
-	max_health_button.text = "UPGRADE CHASSIS (+1 MAX HP) - " + str(RunManager.max_health_cost) + " SCORE"
+	max_health_button.text = "UPGRADE MAX HP (+1 MAX HP) - " + str(RunManager.max_health_cost) + " SCORE"
 
 func _on_heal_button_pressed():
 	if RunManager.current_health >= RunManager.max_health:
@@ -80,3 +82,24 @@ func _on_close_button_pressed():
 	visible = false
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	get_tree().paused = false
+
+
+func _on_fire_rate_button_pressed():
+	# Hard cap the fire rate so the engine doesn't crash from infinite loops
+	if RunManager.fire_rate <= 0.05: 
+		print("SYSTEM: Blaster Overclock at maximum capacity!")
+		return
+		
+	if RunManager.score >= RunManager.fire_rate_cost:
+		RunManager.score -= RunManager.fire_rate_cost
+		
+		# Lower the cooldown by 0.05 seconds per upgrade, with a hard minimum limit of 0.05
+		RunManager.fire_rate = max(0.05, RunManager.fire_rate - 0.05)
+		
+		# Inflate the cost
+		RunManager.fire_rate_cost = int(RunManager.fire_rate_cost * 1.5)
+		
+		print("SYSTEM: Fire rate upgraded to ", RunManager.fire_rate)
+		update_ui()
+	else:
+		print("ERROR: INSUFFICIENT FUNDS")
