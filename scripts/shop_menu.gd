@@ -8,8 +8,8 @@ func _ready():
 
 func update_ui():
 	bank_display.text = "AVAILABLE SCORE: " + str(RunManager.score)
-	# Show the player their vitals while shopping
-	health_display.text = "SYSTEM INTEGRITY: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
+	# Show the player their vitals while shopping, using the matching HUD terminology
+	health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
 
 func _on_heal_button_pressed():
 	# 1. Check if we even need healing

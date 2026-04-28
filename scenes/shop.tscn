@@ -47,6 +47,7 @@ size = Vector3(1.5, 3, 5)
 material = SubResource("StandardMaterial3D_lx5au")
 
 [node name="ShopTrigger" type="Area3D" parent="." unique_id=1676046672]
+collision_mask = 3
 script = ExtResource("2_1l46r")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="ShopTrigger" unique_id=2093674783]

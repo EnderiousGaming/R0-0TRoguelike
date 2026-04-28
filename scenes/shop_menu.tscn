@@ -65,7 +65,7 @@ text = "OVERCLOCK LEGS (+10% SPD) - 800 SCORE"
 [node name="HealButton" type="Button" parent="VBoxContainer" unique_id=559825331]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "RESTORE SYSTEM (+1 HP) - 500 SCORE"
+text = "RESTORE HEALTH (+1 HP) - 500 SCORE"
 
 [node name="CloseButton" type="Button" parent="VBoxContainer" unique_id=1734271355]
 layout_mode = 2

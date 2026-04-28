@@ -1,7 +1,7 @@
 extends CharacterBody3D
 
 var health = 3
-const SPEED = 3.0
+const speed = 3.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var player = null
 
@@ -24,27 +24,25 @@ func _physics_process(delta):
 		
 	# 2. Pathfinding
 	if player:
-		# Tell the GPS where R0-0T currently is
-		nav_agent.target_position = player.global_position
+		# Check how close we are to R0-0T first
+		var distance_to_player = global_position.distance_to(player.global_position)
 		
-		# Ask the GPS: "Where is the very next step I need to take to get around this wall?"
-		var next_path_position = nav_agent.get_next_path_position()
-		
-		# Calculate the direction to that specific step, NOT directly to the player
-		var direction = global_position.direction_to(next_path_position)
-		
-		# Move along the path
-		velocity.x = direction.x * SPEED
-		velocity.z = direction.z * SPEED
-		
-		# THE FIX: Only turn if we are actively moving horizontally
-		var flat_direction = Vector3(direction.x, 0, direction.z)
-		if flat_direction.length() > 0.01:
-			look_at(global_position + flat_direction, Vector3.UP)
-		
-		# Make the enemy face where it's walking
-		if direction.length() > 0.1:
-			look_at(global_position + Vector3(direction.x, 0, direction.z), Vector3.UP)
+		# Only move and turn if we are further than 1 meter away
+		if distance_to_player > 1.0:
+			nav_agent.target_position = player.global_position
+			var next_path_position = nav_agent.get_next_path_position()
+			var direction = global_position.direction_to(next_path_position)
+			
+			velocity.x = direction.x * speed
+			velocity.z = direction.z * speed
+			
+			var flat_direction = Vector3(direction.x, 0, direction.z)
+			if flat_direction.length() > 0.05:
+				look_at(global_position + flat_direction, Vector3.UP)
+		else:
+			# We are close enough to bite! Stop pushing forward.
+			velocity.x = 0
+			velocity.z = 0
 	
 	move_and_slide()
 
