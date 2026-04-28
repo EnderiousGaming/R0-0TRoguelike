@@ -45,24 +45,24 @@ light_energy = 5.0
 omni_range = 10.0
 
 [node name="Wall1" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1877503622]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, 20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 49, 20)
 use_collision = true
-size = Vector3(40, 10, 1)
+size = Vector3(40, 100, 1)
 
 [node name="Wall2" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1936209788]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5, -20)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 49, -20)
 use_collision = true
-size = Vector3(40, 10, 1)
+size = Vector3(40, 100, 1)
 
 [node name="Wall3" type="CSGBox3D" parent="NavigationRegion3D" unique_id=610390899]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 5, 0)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, 20, 49, 0)
 use_collision = true
-size = Vector3(40, 10, 1)
+size = Vector3(40, 100, 1)
 
 [node name="Wall4" type="CSGBox3D" parent="NavigationRegion3D" unique_id=1473611356]
-transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20, 5, 0)
+transform = Transform3D(-4.371139e-08, 0, 1, 0, 1, 0, -1, 0, -4.371139e-08, -20, 49, 0)
 use_collision = true
-size = Vector3(40, 10, 1)
+size = Vector3(40, 100, 1)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=857040349]
 environment = SubResource("Environment_4wyf3")
