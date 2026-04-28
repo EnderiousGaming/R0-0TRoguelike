@@ -1,0 +1,10 @@
+[gd_scene format=3 uid="uid://bq6l7d7sl3wk6"]
+
+[ext_resource type="Script" uid="uid://l07d0ve7qnoc" path="res://scripts/damage_number.gd" id="1_aie4f"]
+
+[node name="DamageNumber" type="Label3D" unique_id=966419938]
+billboard = 1
+no_depth_test = true
+modulate = Color(1, 1, 0, 1)
+text = "100"
+script = ExtResource("1_aie4f")

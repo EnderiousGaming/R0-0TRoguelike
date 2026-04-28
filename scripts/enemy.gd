@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
+
 var health = 3
 const speed = 3.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
@@ -50,6 +52,16 @@ func _physics_process(delta):
 func take_damage(amount):
 	health -= amount
 	print("Enemy hit! Health remaining: ", health)
+	
+	# --- SPAWN DAMAGE NUMBER ---
+	var dmg_text = DAMAGE_NUMBER.instantiate()
+	get_parent().add_child(dmg_text)
+	dmg_text.global_position = global_position + Vector3(0, 1.5, 0)
+	dmg_text.text = str(amount)
+	
+	# NEW: Tell it to start floating NOW, after it has been teleported!
+	dmg_text.animate()
+	# ---------------------------
 	
 	velocity = -velocity * 2 
 	
