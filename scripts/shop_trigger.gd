@@ -4,6 +4,9 @@ extends Area3D
 
 func _on_body_entered(body):
 	if body.is_in_group("player"):
+		# NEW: Hide the player's standard HUD
+		body.get_node("HUD").visible = false
+		
 		# Freeze the room, free the mouse, show the catalog!
 		get_tree().paused = true
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)

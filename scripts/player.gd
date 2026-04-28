@@ -142,8 +142,17 @@ func toggle_pause():
 	var new_pause_state = not get_tree().paused
 	get_tree().paused = new_pause_state
 	
-	# Show/Hide the menu
+	# Show/Hide the pause menu itself
 	pause_menu.visible = new_pause_state
+	
+	# NEW: Hide the gameplay HUD elements when paused, show them when unpaused
+	var show_hud = not new_pause_state
+	$HUD/Crosshair.visible = show_hud
+	health_display.visible = show_hud
+	score_display.visible = show_hud
+	kills_display.visible = show_hud
+	stage_display.visible = show_hud
+	announcement_label.visible = show_hud
 	
 	# Manage the mouse cursor
 	if new_pause_state:
@@ -159,6 +168,9 @@ func quit_to_menu():
 func _process(delta): # Removed the underscore from delta!
 	score_display.text = "SCORE: " + str(RunManager.score)
 	kills_display.text = "CLEARED: " + str(RunManager.enemies_defeated_this_room)
+	
+	# NEW: Always keep the HP perfectly formatted and synced!
+	health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
 	
 	# THE NEW STAGE TRACKER
 	if RunManager.current_stage == 0:

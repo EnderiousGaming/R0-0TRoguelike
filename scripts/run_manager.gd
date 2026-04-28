@@ -1,5 +1,11 @@
 extends Node
 
+# --- SHOP ECONOMY ---
+var heal_cost = 500
+var speed_cost = 800
+var damage_cost = 1000
+var max_health_cost = 1200 # New upgrade!
+
 # --- RUN STATE ---
 var current_stage = 0
 var score = 0
@@ -19,3 +25,7 @@ func reset_run():
 	current_health = max_health
 	laser_damage = 1
 	player_speed_multiplier = 1.0
+	heal_cost = 500
+	speed_cost = 800
+	damage_cost = 1000
+	max_health_cost = 1200

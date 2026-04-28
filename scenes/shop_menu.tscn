@@ -67,6 +67,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "RESTORE HEALTH (+1 HP) - 500 SCORE"
 
+[node name="MaxHealthButton" type="Button" parent="VBoxContainer" unique_id=1511640935]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "INCREASE MAX HEALTH (+1 HP) - 1200 SCORE"
+
 [node name="CloseButton" type="Button" parent="VBoxContainer" unique_id=1734271355]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
@@ -75,4 +80,5 @@ text = "CLOSE TERMINAL"
 [connection signal="pressed" from="VBoxContainer/DamageButton" to="." method="_on_damage_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/SpeedButton" to="." method="_on_speed_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/HealButton" to="." method="_on_heal_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/MaxHealthButton" to="." method="_on_max_health_button_pressed"]
 [connection signal="pressed" from="VBoxContainer/CloseButton" to="." method="_on_close_button_pressed"]
