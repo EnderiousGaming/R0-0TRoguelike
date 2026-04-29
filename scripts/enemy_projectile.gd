@@ -12,10 +12,22 @@ func _physics_process(delta):
 	# Move forward in local space
 	position -= transform.basis.z * SPEED * delta
 
+var deflected = false
+
+func deflect(player_aim_direction: Vector3):
+	deflected = true
+	# Point the projectile exactly where R0-0T is looking
+	look_at(global_position + player_aim_direction, Vector3.UP)
+	
+	# Stop looking for Player (Layer 2), Start looking for Enemies (Layer 3)
+	set_collision_mask_value(2, false)
+	set_collision_mask_value(3, true)
+
 func _on_body_entered(body):
-	# Did we hit R0-0T?
-	if body.is_in_group("player") and body.has_method("take_damage"):
+	if deflected and body.is_in_group("enemy") and body.has_method("take_damage"):
+		body.take_damage(DAMAGE * 5) # Deflected shots deal massive damage!
+		
+	elif not deflected and body.is_in_group("player") and body.has_method("take_damage"):
 		body.take_damage(DAMAGE)
 	
-	# Destroy the projectile regardless of whether it hit the player or a wall
 	queue_free()

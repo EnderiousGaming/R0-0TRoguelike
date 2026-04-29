@@ -1,8 +1,8 @@
 extends CharacterBody3D
 
 # --- SWORD VARIABLES ---
-@onready var sword_mesh = $Head/Camera3D/SwordMesh
-@onready var sword_hitbox = $Head/Camera3D/SwordMesh/SwordHitbox
+@onready var sword_pivot = $Head/Camera3D/SwordPivot # NEW!
+@onready var sword_hitbox = $Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox # Updated path!
 @onready var anim_player = $AnimationPlayer
 
 var sword_damage = 3
@@ -42,7 +42,7 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var fire_cooldown = 0.0
 
 # --- INITIALIZATION ---
-func _ready():
+func _ready():	
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	laser_pivot.visible = false
 	announcement_label.text = ""
@@ -250,15 +250,35 @@ func announce(message: String):
 func update_weapon_loadout():
 	if RunManager.equipped_weapon == "blaster":
 		$Head/Camera3D/BlasterMesh.visible = true
-		sword_mesh.visible = false
+		sword_pivot.visible = false
 	elif RunManager.equipped_weapon == "sword":
 		$Head/Camera3D/BlasterMesh.visible = false
-		sword_mesh.visible = true
+		sword_pivot.visible = true
+		
+		# FORCE THE DEFAULT RESTING POSE!
+		sword_pivot.position = Vector3(0.5, -0.4, -0.8)
+		sword_pivot.rotation_degrees = Vector3(45, 0, -15)
 
 func swing_sword():
 	is_swinging = true
-	enemies_hit_this_swing.clear() # Reset the memory of who we hit
+	enemies_hit_this_swing.clear() 
 	anim_player.play("swing")
+	
+	# --- INSTANT HIT DETECTION ---
+	# 1. Instantly deflect any projectiles currently touching the blade
+	for area in sword_hitbox.get_overlapping_areas():
+		if area.is_in_group("projectile") and area.has_method("deflect"):
+			var aim_dir = -$Head/Camera3D.global_transform.basis.z
+			area.deflect(aim_dir)
+			print("SYSTEM: INSTANT PARRY!")
+			
+	# 2. Instantly slash any enemies currently touching the blade
+	for body in sword_hitbox.get_overlapping_bodies():
+		if body.is_in_group("enemy") and body.has_method("take_damage"):
+			if not body in enemies_hit_this_swing:
+				body.take_damage(sword_damage)
+				enemies_hit_this_swing.append(body)
+				print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
 
 
 func _on_sword_hitbox_body_entered(body):
@@ -276,3 +296,12 @@ func _on_sword_hitbox_body_entered(body):
 func _on_animation_player_animation_finished(anim_name):
 	if anim_name == "swing":
 		is_swinging = false # The swing is over, we can attack again!
+
+
+func _on_sword_hitbox_area_entered(area):
+	# Are we swinging? Is it a projectile? Can it be deflected?
+	if is_swinging and area.is_in_group("projectile") and area.has_method("deflect"):
+		# Calculate the exact direction the camera is facing
+		var aim_dir = -$Head/Camera3D.global_transform.basis.z
+		area.deflect(aim_dir)
+		print("SYSTEM: PARRIED PROJECTILE!")

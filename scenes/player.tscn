@@ -33,30 +33,18 @@ shader_parameter/scanline_count = 350.000016625
 shader_parameter/scanline_intensity = 0.050000002375
 
 [sub_resource type="Animation" id="Animation_qhqgy"]
-length = 0.001
+length = 0.4
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Head/Camera3D/SwordMesh:rotation")
+tracks/0/path = NodePath("Head/Camera3D/SwordPivot:rotation")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 0.1, 0.4),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 0,
-"values": [Vector3(-0.38475785, 0, 0)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Head/Camera3D/SwordMesh:position")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector3(0.6, -0.5, -1.4)]
+"values": [Vector3(0.2617994, 0, -0.2617994), Vector3(0.2617994, 1.3962634, -1.3962634), Vector3(0.2617994, 0, -0.2617994)]
 }
 
 [sub_resource type="Animation" id="Animation_g2els"]
@@ -65,7 +53,7 @@ length = 0.4
 tracks/0/type = "value"
 tracks/0/imported = false
 tracks/0/enabled = true
-tracks/0/path = NodePath("Head/Camera3D/SwordMesh:position")
+tracks/0/path = NodePath("Head/Camera3D/SwordPivot/SwordMesh:position")
 tracks/0/interp = 1
 tracks/0/loop_wrap = true
 tracks/0/keys = {
@@ -77,7 +65,7 @@ tracks/0/keys = {
 tracks/1/type = "value"
 tracks/1/imported = false
 tracks/1/enabled = true
-tracks/1/path = NodePath("Head/Camera3D/SwordMesh:rotation")
+tracks/1/path = NodePath("Head/Camera3D/SwordPivot/SwordMesh:rotation")
 tracks/1/interp = 1
 tracks/1/loop_wrap = true
 tracks/1/keys = {
@@ -135,15 +123,18 @@ shadow_enabled = true
 spot_range = 30.0
 spot_angle = 35.0
 
-[node name="SwordMesh" type="MeshInstance3D" parent="Head/Camera3D" unique_id=1290456949]
-transform = Transform3D(1, 0, 0, 0, 0.9268893, 0.37533468, 0, -0.37533468, 0.9268893, 0.6, -0.5, -1.4)
+[node name="SwordPivot" type="Node3D" parent="Head/Camera3D" unique_id=813942415]
+transform = Transform3D(0.9659258, 0.25881904, 0, -0.25, 0.93301266, -0.25881904, -0.0669873, 0.25, 0.9659258, 0.6, -0.4, -0.8)
+
+[node name="SwordMesh" type="MeshInstance3D" parent="Head/Camera3D/SwordPivot" unique_id=1290456949]
+transform = Transform3D(1, 0, 0, 0, 0.99999994, 0, 0, 0, 0.99999994, 0, 0.8, 0)
 mesh = SubResource("BoxMesh_qhqgy")
 
-[node name="SwordHitbox" type="Area3D" parent="Head/Camera3D/SwordMesh" unique_id=427118511]
+[node name="SwordHitbox" type="Area3D" parent="Head/Camera3D/SwordPivot/SwordMesh" unique_id=427118511]
 collision_layer = 0
-collision_mask = 4
+collision_mask = 5
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Head/Camera3D/SwordMesh/SwordHitbox" unique_id=1964407621]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" unique_id=1964407621]
 shape = SubResource("BoxShape3D_g2els")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=961869898]
@@ -283,5 +274,6 @@ mouse_filter = 2
 [node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1583491240]
 libraries/ = SubResource("AnimationLibrary_qhqgy")
 
-[connection signal="body_entered" from="Head/Camera3D/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_body_entered"]
+[connection signal="area_entered" from="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_area_entered"]
+[connection signal="body_entered" from="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_body_entered"]
 [connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]

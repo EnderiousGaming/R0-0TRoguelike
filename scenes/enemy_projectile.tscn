@@ -13,8 +13,7 @@ material = SubResource("StandardMaterial3D_lofwd")
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_j7vux"]
 
-[node name="EnemyProjectile" type="Area3D" unique_id=580240598]
-collision_layer = 0
+[node name="EnemyProjectile" type="Area3D" unique_id=580240598 groups=["projectile"]]
 collision_mask = 3
 script = ExtResource("1_lofwd")
 
