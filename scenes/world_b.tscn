@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="2_e5qi3"]
 [ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scripts/wave_director.gd" id="3_itj5i"]
 [ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="4_dtts8"]
+[ext_resource type="PackedScene" uid="uid://qi6wxh3ktkd7" path="res://scenes/artillery_enemy.tscn" id="4_itj5i"]
 [ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="5_q43ju"]
 [ext_resource type="PackedScene" uid="uid://brf32bxx2jhxk" path="res://scenes/kill_plane.tscn" id="6_e5qi3"]
 
@@ -135,7 +136,7 @@ omni_range = 7.5
 
 [node name="WaveDirector" type="Node3D" parent="." unique_id=1922651044]
 script = ExtResource("3_itj5i")
-enemy_scene = ExtResource("4_dtts8")
+enemy_types = Array[PackedScene]([ExtResource("4_itj5i"), ExtResource("4_dtts8")])
 
 [node name="Timer" type="Timer" parent="WaveDirector" unique_id=1185196142]
 wait_time = 2.0

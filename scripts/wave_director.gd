@@ -1,6 +1,6 @@
 extends Node3D
 
-@export var enemy_scene: PackedScene
+@export var enemy_types: Array[PackedScene]
 var spawn_points = []
 
 func _ready():
@@ -14,14 +14,13 @@ func _ready():
 
 # This function will trigger every time the Timer hits 0
 func _on_timer_timeout():
-	if spawn_points.is_empty() or enemy_scene == null:
+	if spawn_points.is_empty() or enemy_types.is_empty():
 		return
 		
 	var random_spawn = spawn_points.pick_random()
-	var new_enemy = enemy_scene.instantiate()
 	
-	# 1. Add it to the physical game world FIRST
+	# Pick a random enemy from the list and instantiate it
+	var new_enemy = enemy_types.pick_random().instantiate()
+	
 	get_parent().add_child(new_enemy)
-	
-	# 2. NOW move it to the correct coordinates
 	new_enemy.global_position = random_spawn.global_position

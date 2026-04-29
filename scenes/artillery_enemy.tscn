@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://qi6wxh3ktkd7"]
+
+[ext_resource type="Script" uid="uid://b4v58x68kilhm" path="res://scripts/artillery_enemy.gd" id="1_fff5f"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_md0e3"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4ra3w"]
+albedo_color = Color(0.28247806, 0.0009852365, 0.5304442, 1)
+emission_enabled = true
+emission = Color(0.28235295, 0, 0.5294118, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_5uy6h"]
+material = SubResource("StandardMaterial3D_4ra3w")
+
+[node name="Enemy" type="CharacterBody3D" unique_id=1355696254 groups=["enemy"]]
+collision_layer = 4
+collision_mask = 5
+script = ExtResource("1_fff5f")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2085275426]
+shape = SubResource("BoxShape3D_md0e3")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=442172353]
+mesh = SubResource("BoxMesh_5uy6h")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="MeshInstance3D" unique_id=545117938]
+light_color = Color(0.28235295, 0, 0.5294118, 1)
+light_energy = 1.5
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1811071572]
+
+[node name="Timer" type="Timer" parent="." unique_id=26171303]
+wait_time = 2.5
+autostart = true
+
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="2_vlmdm"]
 [ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scripts/wave_director.gd" id="3_3stig"]
 [ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="4_nghof"]
+[ext_resource type="PackedScene" uid="uid://qi6wxh3ktkd7" path="res://scenes/artillery_enemy.tscn" id="4_vlmdm"]
 [ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="5_jrenj"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_r4xtf"]
@@ -169,7 +170,7 @@ omni_range = 7.5
 
 [node name="WaveDirector" type="Node3D" parent="." unique_id=1922651044]
 script = ExtResource("3_3stig")
-enemy_scene = ExtResource("4_nghof")
+enemy_types = Array[PackedScene]([ExtResource("4_vlmdm"), ExtResource("4_nghof")])
 
 [node name="Timer" type="Timer" parent="WaveDirector" unique_id=1185196142]
 wait_time = 2.0

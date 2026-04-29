@@ -187,7 +187,7 @@ func _process(delta): # Removed the underscore from delta!
 		if fire_cooldown <= 0.0:
 			fire_weapon()
 			# Pull the current upgraded speed from the RunManager!
-			fire_cooldown = RunManager.fire_rate2
+			fire_cooldown = RunManager.fire_rate
 
 func announce(message: String):
 	announcement_label.text = message

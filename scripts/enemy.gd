@@ -82,3 +82,7 @@ func _on_hitbox_body_entered(body):
 		# Does the player have a way to take damage?
 		if body.has_method("take_damage"):
 			body.take_damage(1) # Bite them for 1 HP!
+
+
+func _on_timer_timeout() -> void:
+	pass # Replace with function body.

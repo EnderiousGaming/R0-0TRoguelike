@@ -3,6 +3,11 @@ extends Area3D
 const SPEED = 15.0
 const DAMAGE = 1
 
+func _ready():
+	# NEW: The self-destruct timer!
+	await get_tree().create_timer(3.0).timeout
+	queue_free()
+
 func _physics_process(delta):
 	# Move forward in local space
 	position -= transform.basis.z * SPEED * delta

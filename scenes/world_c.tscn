@@ -4,6 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="2_m73k7"]
 [ext_resource type="Script" uid="uid://kdlyvtmm25uf" path="res://scripts/wave_director.gd" id="3_e7edo"]
 [ext_resource type="PackedScene" uid="uid://cxcouiuwfd02w" path="res://scenes/enemy.tscn" id="4_0ki1l"]
+[ext_resource type="PackedScene" uid="uid://qi6wxh3ktkd7" path="res://scenes/artillery_enemy.tscn" id="4_m73k7"]
 [ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="5_7dwsv"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_418nc"]
@@ -61,7 +62,6 @@ environment = SubResource("Environment_4wyf3")
 
 [node name="Player" parent="." unique_id=665301636 instance=ExtResource("2_m73k7")]
 transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, -0.9011092, 1.6220384, -11.597945)
-mouse_sensitivity = null
 
 [node name="SpawnPoint1" type="Marker3D" parent="." unique_id=920363747 groups=["spawn_point"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.23715, 1.1726885, -11.881229)
@@ -97,7 +97,7 @@ omni_range = 7.5
 
 [node name="WaveDirector" type="Node3D" parent="." unique_id=1922651044]
 script = ExtResource("3_e7edo")
-enemy_scene = ExtResource("4_0ki1l")
+enemy_types = Array[PackedScene]([ExtResource("4_m73k7"), ExtResource("4_0ki1l")])
 
 [node name="Timer" type="Timer" parent="WaveDirector" unique_id=1185196142]
 wait_time = 2.0

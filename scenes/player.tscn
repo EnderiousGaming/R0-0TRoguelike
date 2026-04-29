@@ -201,6 +201,3 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-
-[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/ResumeButton" to="." method="_on_resume_button_pressed"]
-[connection signal="pressed" from="HUD/PauseMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
