@@ -3,7 +3,6 @@ extends CharacterBody3D
 # --- SWORD VARIABLES ---
 @onready var sword_pivot = $Head/Camera3D/SwordPivot # NEW!
 @onready var sword_hitbox = $Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox # Updated path!
-@onready var anim_player = $AnimationPlayer
 
 var sword_damage = 3
 var is_swinging = false
@@ -257,12 +256,26 @@ func update_weapon_loadout():
 		
 		# FORCE THE DEFAULT RESTING POSE!
 		sword_pivot.position = Vector3(0.5, -0.4, -0.8)
-		sword_pivot.rotation_degrees = Vector3(45, 0, -15)
+		sword_pivot.rotation_degrees = Vector3(15, 0, -15) # Changed 45 to 15!
 
 func swing_sword():
 	is_swinging = true
 	enemies_hit_this_swing.clear() 
-	anim_player.play("swing")
+	
+	# --- THE TWEEN WORKAROUND ---
+	var tween = create_tween()
+	
+	# 1. Whip the sword into the center of the screen AND push it forward
+	tween.tween_property(sword_pivot, "position", Vector3(0.0, -0.4, -1.0), 0.1)
+	tween.parallel().tween_property(sword_pivot, "rotation_degrees", Vector3(15, 80, -80), 0.1)
+	
+	# 2. Smoothly bring it back to the resting pose on the right side
+	tween.tween_property(sword_pivot, "position", Vector3(0.5, -0.4, -0.8), 0.3)
+	tween.parallel().tween_property(sword_pivot, "rotation_degrees", Vector3(15, 0, -15), 0.3)
+	
+	# 3. Tell the game we are done swinging!
+	tween.tween_callback(func(): is_swinging = false)
+	# -----------------------------
 	
 	# --- INSTANT HIT DETECTION ---
 	# 1. Instantly deflect any projectiles currently touching the blade
@@ -280,7 +293,6 @@ func swing_sword():
 				enemies_hit_this_swing.append(body)
 				print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
 
-
 func _on_sword_hitbox_body_entered(body):
 	# If the sword isn't actively swinging, it's harmless!
 	if not is_swinging:
@@ -292,11 +304,6 @@ func _on_sword_hitbox_body_entered(body):
 			body.take_damage(sword_damage)
 			enemies_hit_this_swing.append(body)
 			print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
-
-func _on_animation_player_animation_finished(anim_name):
-	if anim_name == "swing":
-		is_swinging = false # The swing is over, we can attack again!
-
 
 func _on_sword_hitbox_area_entered(area):
 	# Are we swinging? Is it a projectile? Can it be deflected?

@@ -24,8 +24,13 @@ func deflect(player_aim_direction: Vector3):
 	set_collision_mask_value(3, true)
 
 func _on_body_entered(body):
+	# THE MISSING SAFETY CHECK!
+	# If deflected, completely ignore the player so it doesn't delete itself!
+	if deflected and body.is_in_group("player"):
+		return 
+
 	if deflected and body.is_in_group("enemy") and body.has_method("take_damage"):
-		body.take_damage(DAMAGE * 5) # Deflected shots deal massive damage!
+		body.take_damage(DAMAGE * 5)
 		
 	elif not deflected and body.is_in_group("player") and body.has_method("take_damage"):
 		body.take_damage(DAMAGE)

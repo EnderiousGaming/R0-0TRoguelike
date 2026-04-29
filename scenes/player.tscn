@@ -23,7 +23,7 @@ size = Vector3(0.2, 0.2, 1)
 size = Vector3(0.1, 1.2, 0.1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_g2els"]
-size = Vector3(0.3, 2.4, 0.3)
+size = Vector3(2, 2, 2)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qhqgy"]
 shader = ExtResource("2_g2els")
@@ -31,55 +31,6 @@ shader_parameter/vignette_multiplier = 100.0
 shader_parameter/curvature = 5.00000019
 shader_parameter/scanline_count = 350.000016625
 shader_parameter/scanline_intensity = 0.050000002375
-
-[sub_resource type="Animation" id="Animation_qhqgy"]
-length = 0.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Head/Camera3D/SwordPivot:rotation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector3(0.2617994, 0, -0.2617994), Vector3(0.2617994, 1.3962634, -1.3962634), Vector3(0.2617994, 0, -0.2617994)]
-}
-
-[sub_resource type="Animation" id="Animation_g2els"]
-resource_name = "swing"
-length = 0.4
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Head/Camera3D/SwordPivot/SwordMesh:position")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector3(0.6, -0.4, -0.8), Vector3(-0.6, -0.5, -1.4), Vector3(0.6, -0.4, -0.8)]
-}
-tracks/1/type = "value"
-tracks/1/imported = false
-tracks/1/enabled = true
-tracks/1/path = NodePath("Head/Camera3D/SwordPivot/SwordMesh:rotation")
-tracks/1/interp = 1
-tracks/1/loop_wrap = true
-tracks/1/keys = {
-"times": PackedFloat32Array(0, 0.1, 0.4),
-"transitions": PackedFloat32Array(1, 1, 1),
-"update": 0,
-"values": [Vector3(0.7853982, 0, -0.2617994), Vector3(0.2617994, 1.0471976, -1.3962634), Vector3(0.7853982, 0, -0.2617994)]
-}
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_qhqgy"]
-_data = {
-&"RESET": SubResource("Animation_qhqgy"),
-&"swing": SubResource("Animation_g2els")
-}
 
 [node name="Player" type="CharacterBody3D" unique_id=665301636 groups=["player"]]
 collision_layer = 2
@@ -271,9 +222,5 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="." unique_id=1583491240]
-libraries/ = SubResource("AnimationLibrary_qhqgy")
-
 [connection signal="area_entered" from="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_area_entered"]
 [connection signal="body_entered" from="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_body_entered"]
-[connection signal="animation_finished" from="AnimationPlayer" to="." method="_on_animation_player_animation_finished"]
