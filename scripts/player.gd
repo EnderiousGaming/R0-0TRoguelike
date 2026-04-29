@@ -1,5 +1,18 @@
 extends CharacterBody3D
 
+# --- SWORD VARIABLES ---
+@onready var sword_mesh = $Head/Camera3D/SwordMesh
+@onready var sword_hitbox = $Head/Camera3D/SwordMesh/SwordHitbox
+@onready var anim_player = $AnimationPlayer
+
+var sword_damage = 3
+var is_swinging = false
+var enemies_hit_this_swing = [] # Prevents hitting the same enemy 60 times a frame!
+
+# --- MODIFIER VARIABLES ---
+var drain_timer = 0.0
+var radiation_timer = 0.0
+
 # --- MOVEMENT VARIABLES ---
 const SPEED = 5.0
 const JUMP_VELOCITY = 4.5
@@ -37,6 +50,8 @@ func _ready():
 	# Connect the pause menu buttons via code
 	resume_button.pressed.connect(toggle_pause)
 	quit_button.pressed.connect(quit_to_menu)
+	
+	update_weapon_loadout()
 
 # --- INPUT HANDLING ---
 func _unhandled_input(event):
@@ -65,27 +80,39 @@ func _unhandled_input(event):
 
 # --- PHYSICS PROCESSING ---
 func _physics_process(delta):
-	# Add the gravity.
+	# --- CALCULATE MODIFIED PHYSICS ---
+	var current_gravity = gravity
+	var current_jump = JUMP_VELOCITY
+	var current_accel = 10.0 # Standard snappy acceleration
+	var current_speed = SPEED * RunManager.player_speed_multiplier
+	
+	if RunManager.has_moon_jump:
+		# Changed to half gravity and a slightly boosted jump!
+		current_gravity = gravity * 0.5
+		current_jump = JUMP_VELOCITY * 1.2
+		
+	if RunManager.has_ice_physics:
+		current_accel = 1.0 # Super low acceleration makes it slippery!
+
+	# --- APPLY GRAVITY & JUMP ---
 	if not is_on_floor():
-		velocity.y -= gravity * delta
+		velocity.y -= current_gravity * delta
 
-	# Handle jump.
+	# Replaced "jump" with "ui_accept"
 	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
-		velocity.y = JUMP_VELOCITY
+		velocity.y = current_jump
 
-	# Get the input direction and handle the movement/deceleration.
+	# Replaced the move directions with the UI defaults
 	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
-	# --- MOVEMENT LOGIC ---
-	var current_speed = SPEED * RunManager.player_speed_multiplier
-	
 	if direction:
-		velocity.x = direction.x * current_speed
-		velocity.z = direction.z * current_speed
+		# Lerp smoothly transitions current speed to target speed based on our acceleration
+		velocity.x = lerp(velocity.x, direction.x * current_speed, current_accel * delta)
+		velocity.z = lerp(velocity.z, direction.z * current_speed, current_accel * delta)
 	else:
-		velocity.x = move_toward(velocity.x, 0, current_speed)
-		velocity.z = move_toward(velocity.z, 0, current_speed)
+		velocity.x = lerp(velocity.x, 0.0, current_accel * delta)
+		velocity.z = lerp(velocity.z, 0.0, current_accel * delta)
 		
 	move_and_slide()
 
@@ -183,11 +210,35 @@ func _process(delta): # Removed the underscore from delta!
 		fire_cooldown -= delta
 		
 	# 2. Check if the player is holding the trigger AND the gun is ready
+	# --- WEAPON TRIGGERS ---
 	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		if fire_cooldown <= 0.0:
-			fire_weapon()
-			# Pull the current upgraded speed from the RunManager!
-			fire_cooldown = RunManager.fire_rate
+		if RunManager.equipped_weapon == "blaster":
+			if fire_cooldown <= 0.0:
+				fire_weapon()
+				fire_cooldown = RunManager.fire_rate
+				
+		elif RunManager.equipped_weapon == "sword":
+			# Only swing if we aren't already swinging!
+			if not is_swinging:
+				swing_sword()
+			
+	# --- MODIFIER: HEALTH DRAIN ---
+	if RunManager.has_health_drain:
+		drain_timer += delta
+		if drain_timer >= 30.0:
+			drain_timer = 0.0
+			take_damage(1) # Uses your normal damage function so the screen still flashes!
+
+	# --- MODIFIER: RADIATION AURA ---
+	if RunManager.has_radiation_aura:
+		radiation_timer += delta
+		if radiation_timer >= 1.0: # Tick once per second
+			radiation_timer = 0.0
+			# Find every enemy in the room and check their distance
+			for enemy in get_tree().get_nodes_in_group("enemy"):
+				if global_position.distance_to(enemy.global_position) <= 8.0:
+					if enemy.has_method("take_damage"):
+						enemy.take_damage(1)
 
 func announce(message: String):
 	announcement_label.text = message
@@ -195,3 +246,33 @@ func announce(message: String):
 	# Wait 4 seconds, then erase the text
 	await get_tree().create_timer(4.0).timeout
 	announcement_label.text = ""
+	
+func update_weapon_loadout():
+	if RunManager.equipped_weapon == "blaster":
+		$Head/Camera3D/BlasterMesh.visible = true
+		sword_mesh.visible = false
+	elif RunManager.equipped_weapon == "sword":
+		$Head/Camera3D/BlasterMesh.visible = false
+		sword_mesh.visible = true
+
+func swing_sword():
+	is_swinging = true
+	enemies_hit_this_swing.clear() # Reset the memory of who we hit
+	anim_player.play("swing")
+
+
+func _on_sword_hitbox_body_entered(body):
+	# If the sword isn't actively swinging, it's harmless!
+	if not is_swinging:
+		return
+		
+	if body.is_in_group("enemy") and body.has_method("take_damage"):
+		# Make sure we haven't already sliced this specific enemy during this specific swing
+		if not body in enemies_hit_this_swing:
+			body.take_damage(sword_damage)
+			enemies_hit_this_swing.append(body)
+			print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
+
+func _on_animation_player_animation_finished(anim_name):
+	if anim_name == "swing":
+		is_swinging = false # The swing is over, we can attack again!

@@ -1,5 +1,7 @@
 extends Node3D
 
+const UPGRADE_SCENE = preload("res://scenes/upgrade_pickup.tscn")
+
 @onready var wave_director_timer = $WaveDirector/Timer
 @onready var portal = $Portal
 @onready var portal_collision = $Portal/CollisionShape3D
@@ -45,5 +47,26 @@ func activate_portal():
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("announce"):
 		player.announce("AREA SECURED.\nPROCEED TO UPLINK.")
+		
+	spawn_upgrades()
 	
 	print("UPLINK AVAILABLE: Area secured!")
+	
+func spawn_upgrades():
+	# 1. Create a deck of 10 cards and shuffle them
+	var pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+	pool.shuffle()
+	
+	# 2. Define a triangle of positions around the portal
+	var offsets = [Vector3(-3, 0, 2), Vector3(3, 0, 2), Vector3(0, 0, -3)]
+	
+	# 3. Spawn the first 3 upgrades from the shuffled deck
+	for i in range(3):
+		var upgrade = UPGRADE_SCENE.instantiate()
+		add_child(upgrade)
+		
+		# Place them using the offsets
+		upgrade.global_position = $Portal.global_position + offsets[i]
+		
+		# Tell the box which upgrade it is!
+		upgrade.setup(pool[i])

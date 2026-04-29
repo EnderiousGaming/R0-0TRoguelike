@@ -109,7 +109,7 @@ wait_time = 2.0
 autostart = true
 
 [node name="Portal" parent="." unique_id=1907718005 instance=ExtResource("5_7dwsv")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 6.7281494, 12.098251)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 6.7281494, 8.847174)
 
 [node name="KillPlane" parent="." unique_id=1321934473 instance=ExtResource("2_e7edo")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)

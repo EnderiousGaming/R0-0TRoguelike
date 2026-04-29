@@ -1,0 +1,37 @@
+extends Area3D
+
+@onready var label = $Label3D
+var my_upgrade_id = 1
+
+# A dictionary to look up the text descriptions
+var upgrade_texts = {
+	1: "HEAVY BARREL\n+Damage, -Fire Rate",
+	2: "FRICTIONLESS COATING\n+Speed, Ice Physics",
+	3: "TITANIUM PLATING\n+Max HP, -Speed",
+	4: "OVERCLOCKED EMITTER\n+Fire Rate, -Damage",
+	5: "CURSED CHASSIS\n++Max HP, Health slowly drains",
+	6: "VAMPIRIC ALGORITHM\nHeal on kill, Health slowly drains",
+	7: "MOON BOOTS\nHigh Jump, Low Gravity",
+	8: "SHOTGUN LOGIC\n+Damage when close to targets",
+	9: "SNIPER LOGIC\n+Damage when far from targets",
+	10: "RADIATION AURA\nNearby enemies take damage"
+}
+
+func _ready():
+	# You can delete the text update from here!
+	pass
+
+func setup(id: int):
+	my_upgrade_id = id
+	# Update the text AFTER the box receives its new random ID!
+	label.text = upgrade_texts[my_upgrade_id]
+
+func _on_body_entered(body):
+	if body.is_in_group("player"):
+		print("SYSTEM: Upgrade ", my_upgrade_id, " acquired.")
+		
+		# 1. Apply the stats globally
+		RunManager.apply_upgrade(my_upgrade_id)
+		
+		# 2. Tell every other upgrade in the room to self-destruct!
+		get_tree().call_group("upgrades", "queue_free")

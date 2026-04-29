@@ -50,14 +50,26 @@ func _physics_process(delta):
 
 # --- COMBAT LOGIC ---
 func take_damage(amount):
-	health -= amount
-	print("Enemy hit! Health remaining: ", health)
+	var final_damage = amount
+	
+	# Check distance to player for Sniper/Shotgun modifiers
+	if player:
+		var dist = global_position.distance_to(player.global_position)
+		if RunManager.has_close_combat and dist < 6.0:
+			final_damage += 2
+		elif RunManager.has_sniper_combat and dist > 15.0:
+			final_damage += 2
+
+	health -= final_damage
+	
+	# ... (Keep your normal damage number spawning logic below here, 
+	# but make sure dmg_text.text = str(final_damage) so the numbers are accurate!)
 	
 	# --- SPAWN DAMAGE NUMBER ---
 	var dmg_text = DAMAGE_NUMBER.instantiate()
 	get_parent().add_child(dmg_text)
 	dmg_text.global_position = global_position + Vector3(0, 1.5, 0)
-	dmg_text.text = str(amount)
+	dmg_text.text = str(final_damage)
 	
 	# NEW: Tell it to start floating NOW, after it has been teleported!
 	dmg_text.animate()
@@ -69,11 +81,13 @@ func take_damage(amount):
 		die()
 
 func die():
-	print("Enemy destroyed!")
+	RunManager.score += 100
+	RunManager.enemies_defeated_this_room += 1 
 	
-	RunManager.score += 200 # Currency for the shop
-	RunManager.enemies_defeated_this_room += 1 # Progression for the portal
-	
+	# MODIFIER: LIFESTEAL
+	if RunManager.has_lifesteal and RunManager.current_health < RunManager.max_health:
+		RunManager.current_health += 1
+		
 	queue_free()
 
 func _on_hitbox_body_entered(body):

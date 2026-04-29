@@ -177,7 +177,7 @@ wait_time = 2.0
 autostart = true
 
 [node name="Portal" parent="." unique_id=1907718005 instance=ExtResource("5_jrenj")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 1, 13.444528)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 1, 4.1827393)
 
 [node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=93069]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.25411558, 4.5813313, 0)
