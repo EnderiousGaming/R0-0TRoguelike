@@ -14,7 +14,14 @@ var upgrade_texts = {
 	7: "MOON BOOTS\nHigh Jump, Low Gravity",
 	8: "SHOTGUN LOGIC\n+Damage when close to targets",
 	9: "SNIPER LOGIC\n+Damage when far from targets",
-	10: "RADIATION AURA\nNearby enemies take damage"
+	10: "RADIATION AURA\nNearby enemies take damage",
+	11: "EXTENDED MAG\n+10 Max Ammo",
+	12: "SLEIGHT OF HAND\nFaster Reload Speed",
+	13: "CARBON-FIBER HILT\nFaster Sword Swing",
+	14: "EXTENDED BLADE\nMassive Melee Hitbox",
+	15: "KINETIC DEFLECTOR\nParrying grants a burst of speed",
+	16: "HYDRAULIC SERVOS\nShorter Dash Cooldown",
+	17: "KINETIC PLATING\n+2 Max Health"
 }
 
 func _ready():

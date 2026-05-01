@@ -12,6 +12,19 @@ var has_close_combat = false
 var has_sniper_combat = false
 var has_radiation_aura = false
 
+# --- BLASTER STATS ---
+var max_ammo = 15
+var current_ammo = 15
+var reload_time = 1.5
+
+# --- SWORD STATS ---
+var sword_swing_speed = 1.0
+var sword_range_multiplier = 1.0
+var has_deflect_boost = false
+
+# --- R0-0T STATS ---
+var dash_cooldown = 1.5
+
 # --- SHOP ECONOMY ---
 var heal_cost = 500
 var speed_cost = 800
@@ -34,6 +47,7 @@ var fire_rate_cost = 1000
 
 func reset_run():
 	print("SYSTEM: Resetting run variables...")
+	max_health = 5
 	current_stage = 0 
 	score = 0
 	enemies_defeated_this_room = 0 # Reset this!
@@ -54,6 +68,13 @@ func reset_run():
 	has_sniper_combat = false
 	has_radiation_aura = false
 	equipped_weapon = "blaster"
+	max_ammo = 15
+	current_ammo = 15
+	reload_time = 1.5
+	sword_swing_speed = 1.0
+	sword_range_multiplier = 1.0
+	has_deflect_boost = false
+	dash_cooldown = 1.5
 
 func apply_upgrade(upgrade_id: int):
 	match upgrade_id:
@@ -85,3 +106,25 @@ func apply_upgrade(upgrade_id: int):
 			has_sniper_combat = true
 		10: # Radiation Aura
 			has_radiation_aura = true
+			
+		# --- BLASTER UPGRADES ---
+		11: # Extended Mag
+			max_ammo += 10
+			current_ammo += 10
+		12: # Sleight of Hand
+			reload_time = max(0.5, reload_time - 0.5)
+		
+		# --- SWORD UPGRADES ---
+		13: # Carbon-Fiber Hilt
+			sword_swing_speed += 0.5
+		14: # Extended Blade
+			sword_range_multiplier += 0.5
+		15: # Kinetic Deflection
+			has_deflect_boost = true
+			
+		# --- R0-0T UPGRADES ---
+		16: # Hydraulic Servos
+			dash_cooldown = max(0.5, dash_cooldown - 0.5)
+		17: # Kinetic Plating
+			max_health += 2
+			current_health += 2

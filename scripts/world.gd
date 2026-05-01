@@ -53,20 +53,25 @@ func activate_portal():
 	print("UPLINK AVAILABLE: Area secured!")
 	
 func spawn_upgrades():
-	# 1. Create a deck of 10 cards and shuffle them
-	var pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-	pool.shuffle()
+	var valid_pool = []
 	
-	# 2. Define a triangle of positions around the portal
+	# 1. Add General R0-0T Upgrades (Always available)
+	valid_pool.append_array([2, 3, 5, 7, 16, 17])
+	
+	# 2. Add Weapon Specific Upgrades
+	if RunManager.equipped_weapon == "blaster":
+		valid_pool.append_array([1, 4, 11, 12])
+	elif RunManager.equipped_weapon == "sword":
+		valid_pool.append_array([13, 14, 15])
+		
+	# 3. Shuffle the deck so it's random every time!
+	valid_pool.shuffle()
+	
 	var offsets = [Vector3(-3, 0, 2), Vector3(3, 0, 2), Vector3(0, 0, -3)]
 	
-	# 3. Spawn the first 3 upgrades from the shuffled deck
+	# Spawn 3 upgrades from the top of the shuffled deck
 	for i in range(3):
 		var upgrade = UPGRADE_SCENE.instantiate()
 		add_child(upgrade)
-		
-		# Place them using the offsets
 		upgrade.global_position = $Portal.global_position + offsets[i]
-		
-		# Tell the box which upgrade it is!
-		upgrade.setup(pool[i])
+		upgrade.setup(valid_pool[i])

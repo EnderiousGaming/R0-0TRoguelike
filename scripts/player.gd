@@ -1,5 +1,17 @@
 extends CharacterBody3D
 
+# --- DASH VARIABLES ---
+var is_dashing = false
+var dash_timer = 0.0
+var dash_cooldown_timer = 0.0
+var dash_direction = Vector3.ZERO
+const DASH_SPEED = 25.0
+const DASH_DURATION = 0.15
+
+# --- RELOAD VARIABLES ---
+var is_reloading = false
+var reload_timer = 0.0
+
 # --- SWORD VARIABLES ---
 @onready var sword_pivot = $Head/Camera3D/SwordPivot # NEW!
 @onready var sword_hitbox = $Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox # Updated path!
@@ -82,37 +94,59 @@ func _physics_process(delta):
 	# --- CALCULATE MODIFIED PHYSICS ---
 	var current_gravity = gravity
 	var current_jump = JUMP_VELOCITY
-	var current_accel = 10.0 # Standard snappy acceleration
+	var current_accel = 10.0
 	var current_speed = SPEED * RunManager.player_speed_multiplier
 	
 	if RunManager.has_moon_jump:
-		# Changed to half gravity and a slightly boosted jump!
 		current_gravity = gravity * 0.5
 		current_jump = JUMP_VELOCITY * 1.2
 		
 	if RunManager.has_ice_physics:
-		current_accel = 1.0 # Super low acceleration makes it slippery!
+		current_accel = 1.0
 
 	# --- APPLY GRAVITY & JUMP ---
 	if not is_on_floor():
 		velocity.y -= current_gravity * delta
 
-	# Replaced "jump" with "ui_accept"
-	if Input.is_action_just_pressed("ui_accept") and is_on_floor():
+	if Input.is_action_just_pressed("jump") and is_on_floor():
 		velocity.y = current_jump
 
-	# Replaced the move directions with the UI defaults
-	var input_dir = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down")
+	# --- DASH COOLDOWN ---
+	if dash_cooldown_timer > 0.0:
+		dash_cooldown_timer -= delta
+
+	# --- MOVEMENT INPUT (Declared ONLY ONCE here!) ---
+	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
-	if direction:
-		# Lerp smoothly transitions current speed to target speed based on our acceleration
-		velocity.x = lerp(velocity.x, direction.x * current_speed, current_accel * delta)
-		velocity.z = lerp(velocity.z, direction.z * current_speed, current_accel * delta)
-	else:
-		velocity.x = lerp(velocity.x, 0.0, current_accel * delta)
-		velocity.z = lerp(velocity.z, 0.0, current_accel * delta)
+	# --- DASH TRIGGER ---
+	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0 and not is_dashing:
+		# Only dash if we are actively walking in a direction!
+		if direction != Vector3.ZERO:
+			is_dashing = true
+			dash_timer = DASH_DURATION
+			dash_cooldown_timer = RunManager.dash_cooldown
+			dash_direction = direction
+			print("SYSTEM: DASH!")
+
+	# --- APPLY FINAL MOVEMENT ---
+	if is_dashing:
+		# If dashing, override all normal movement and lock speed forward!
+		velocity.x = dash_direction.x * DASH_SPEED
+		velocity.z = dash_direction.z * DASH_SPEED
 		
+		dash_timer -= delta
+		if dash_timer <= 0.0:
+			is_dashing = false
+	else:
+		# Normal walking/ice physics logic
+		if direction:
+			velocity.x = lerp(velocity.x, direction.x * current_speed, current_accel * delta)
+			velocity.z = lerp(velocity.z, direction.z * current_speed, current_accel * delta)
+		else:
+			velocity.x = lerp(velocity.x, 0.0, current_accel * delta)
+			velocity.z = lerp(velocity.z, 0.0, current_accel * delta)
+			
 	move_and_slide()
 
 # --- CUSTOM FUNCTIONS ---
@@ -210,14 +244,38 @@ func _process(delta): # Removed the underscore from delta!
 		
 	# 2. Check if the player is holding the trigger AND the gun is ready
 	# --- WEAPON TRIGGERS ---
-	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-		if RunManager.equipped_weapon == "blaster":
-			if fire_cooldown <= 0.0:
-				fire_weapon()
-				fire_cooldown = RunManager.fire_rate
+	if RunManager.equipped_weapon == "blaster":
+		# 1. Handle Active Reloading
+		if is_reloading:
+			reload_timer -= delta
+			if reload_timer <= 0:
+				is_reloading = false
+				RunManager.current_ammo = RunManager.max_ammo
+				print("SYSTEM: Reloaded!")
+		else:
+			# 2. Manual Reload Input
+			if Input.is_action_just_pressed("reload") and RunManager.current_ammo < RunManager.max_ammo:
+				is_reloading = true
+				reload_timer = RunManager.reload_time
+				print("SYSTEM: Reloading...")
 				
-		elif RunManager.equipped_weapon == "sword":
-			# Only swing if we aren't already swinging!
+			# 3. Firing the Blaster
+			elif Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+				if RunManager.current_ammo > 0:
+					if fire_cooldown <= 0.0:
+						fire_weapon()
+						fire_cooldown = RunManager.fire_rate
+						RunManager.current_ammo -= 1 # Spend 1 ammo!
+				else:
+					# Auto-reload if we try to shoot while empty!
+					is_reloading = true
+					reload_timer = RunManager.reload_time
+					print("SYSTEM: Auto-Reloading...")
+					
+	# --- NEW: RE-WIRING THE SWORD ---
+	elif RunManager.equipped_weapon == "sword":
+		# 4. Swinging the Sword
+		if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			if not is_swinging:
 				swing_sword()
 			
@@ -253,6 +311,7 @@ func update_weapon_loadout():
 	elif RunManager.equipped_weapon == "sword":
 		$Head/Camera3D/BlasterMesh.visible = false
 		sword_pivot.visible = true
+		sword_hitbox.scale = Vector3.ONE * RunManager.sword_range_multiplier
 		
 		# FORCE THE DEFAULT RESTING POSE!
 		sword_pivot.position = Vector3(0.5, -0.4, -0.8)
@@ -265,13 +324,13 @@ func swing_sword():
 	# --- THE TWEEN WORKAROUND ---
 	var tween = create_tween()
 	
-	# 1. Whip the sword into the center of the screen AND push it forward
-	tween.tween_property(sword_pivot, "position", Vector3(0.0, -0.4, -1.0), 0.1)
-	tween.parallel().tween_property(sword_pivot, "rotation_degrees", Vector3(15, 80, -80), 0.1)
+	# 1. Whip the sword into the center
+	tween.tween_property(sword_pivot, "position", Vector3(0.0, -0.4, -1.0), 0.1 / RunManager.sword_swing_speed)
+	tween.parallel().tween_property(sword_pivot, "rotation_degrees", Vector3(15, 80, -80), 0.1 / RunManager.sword_swing_speed)
 	
-	# 2. Smoothly bring it back to the resting pose on the right side
-	tween.tween_property(sword_pivot, "position", Vector3(0.5, -0.4, -0.8), 0.3)
-	tween.parallel().tween_property(sword_pivot, "rotation_degrees", Vector3(15, 0, -15), 0.3)
+	# 2. Smoothly bring it back
+	tween.tween_property(sword_pivot, "position", Vector3(0.5, -0.4, -0.8), 0.3 / RunManager.sword_swing_speed)
+	tween.parallel().tween_property(sword_pivot, "rotation_degrees", Vector3(15, 0, -15), 0.3 / RunManager.sword_swing_speed)
 	
 	# 3. Tell the game we are done swinging!
 	tween.tween_callback(func(): is_swinging = false)
@@ -306,9 +365,16 @@ func _on_sword_hitbox_body_entered(body):
 			print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
 
 func _on_sword_hitbox_area_entered(area):
-	# Are we swinging? Is it a projectile? Can it be deflected?
+	# Make sure we are swinging AND the thing we hit is actually a projectile!
 	if is_swinging and area.is_in_group("projectile") and area.has_method("deflect"):
+		
 		# Calculate the exact direction the camera is facing
 		var aim_dir = -$Head/Camera3D.global_transform.basis.z
 		area.deflect(aim_dir)
 		print("SYSTEM: PARRIED PROJECTILE!")
+		
+		# --- KINETIC DEFLECTION BOOST ---
+		if RunManager.has_deflect_boost:
+			RunManager.player_speed_multiplier += 0.4
+			await get_tree().create_timer(1.5).timeout
+			RunManager.player_speed_multiplier -= 0.4
