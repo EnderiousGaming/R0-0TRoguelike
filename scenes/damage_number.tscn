@@ -5,6 +5,8 @@
 [node name="DamageNumber" type="Label3D" unique_id=966419938]
 billboard = 1
 no_depth_test = true
+fixed_size = true
 modulate = Color(1, 1, 0, 1)
 text = "100"
+font_size = 16
 script = ExtResource("1_aie4f")

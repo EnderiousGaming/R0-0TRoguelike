@@ -22,6 +22,7 @@ var dash_direction = Vector3.ZERO
 var fire_cooldown = 0.0
 var is_reloading = false
 var reload_timer = 0.0
+const BULLET = preload("res://scenes/player_projectile.tscn")
 
 # --- SWORD COMBAT ---
 var sword_damage = 3
@@ -257,25 +258,23 @@ func _process_sword():
 			swing_sword()
 
 func fire_weapon():
-	var hit_distance = 50.0 
-	
+	# 1. Figure out exactly what the center crosshair is looking at
+	var target_point = Vector3.ZERO
 	if aim_raycast.is_colliding():
-		var target = aim_raycast.get_collider()
-		hit_distance = aim_raycast.global_position.distance_to(aim_raycast.get_collision_point())
-		
-		print("Target hit: ", target.name, " | Distance: ", hit_distance)
-		
-		if target.has_method("take_damage"):
-			target.take_damage(RunManager.laser_damage) 
-		else:
-			print("Fired into the void. Defaulting to 50m.")
+		target_point = aim_raycast.get_collision_point()
+	else:
+		# If pointing at the sky, just aim 50 meters straight ahead
+		target_point = aim_raycast.global_position - aim_raycast.global_transform.basis.z * 50.0
 
-	# Render the laser beam
-	hit_distance = max(hit_distance, 0.5) # Minimum length safety net
-	laser_pivot.scale.z = hit_distance
-	laser_pivot.visible = true
-	await get_tree().create_timer(0.05).timeout
-	laser_pivot.visible = false
+	# 2. Spawn the physical bullet
+	var bullet = BULLET.instantiate()
+	get_parent().add_child(bullet)
+	
+	# 3. Position the bullet at the tip of the gun
+	bullet.global_position = blaster_mesh.global_position
+	
+	# 4. Aim the bullet perfectly at the crosshair's target
+	bullet.look_at(target_point, Vector3.UP)
 
 func swing_sword():
 	is_swinging = true
