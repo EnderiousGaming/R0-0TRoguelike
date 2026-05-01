@@ -1,9 +1,13 @@
 extends Area3D
 
+# ==========================================
+# VARIABLES & REFERENCES
+# ==========================================
+
 @onready var label = $Label3D
 var my_upgrade_id = 1
 
-# A dictionary to look up the text descriptions
+# Dictionary for upgrade text descriptions
 var upgrade_texts = {
 	1: "HEAVY BARREL\n+Damage, -Fire Rate",
 	2: "FRICTIONLESS COATING\n+Speed, Ice Physics",
@@ -24,21 +28,28 @@ var upgrade_texts = {
 	17: "KINETIC PLATING\n+2 Max Health"
 }
 
+# ==========================================
+# INITIALIZATION
+# ==========================================
+
 func _ready():
-	# You can delete the text update from here!
 	pass
 
 func setup(id: int):
+	"""Initializes the pickup with a specific ID and updates its visual label."""
 	my_upgrade_id = id
-	# Update the text AFTER the box receives its new random ID!
 	label.text = upgrade_texts[my_upgrade_id]
+
+# ==========================================
+# INTERACTION LOGIC
+# ==========================================
 
 func _on_body_entered(body):
 	if body.is_in_group("player"):
 		print("SYSTEM: Upgrade ", my_upgrade_id, " acquired.")
 		
-		# 1. Apply the stats globally
+		# Apply the stats globally
 		RunManager.apply_upgrade(my_upgrade_id)
 		
-		# 2. Tell every other upgrade in the room to self-destruct!
+		# Destroy all other upgrades in the room to enforce a single choice
 		get_tree().call_group("upgrades", "queue_free")
