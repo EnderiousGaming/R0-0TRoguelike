@@ -210,6 +210,43 @@ offset_bottom = 75.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 32
 
+[node name="AmmoDisplay" type="Label" parent="HUD" unique_id=2094050331]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -238.0
+offset_top = -75.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "AMMO: 15/15"
+
+[node name="ReloadBar" type="ProgressBar" parent="HUD" unique_id=1988487152]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 34.5
+offset_right = 100.0
+offset_bottom = 49.5
+grow_horizontal = 2
+grow_vertical = 2
+show_percentage = false
+
+[node name="ReloadText" type="Label" parent="HUD/ReloadBar" unique_id=1002794112]
+layout_mode = 0
+offset_top = -22.25
+offset_right = 200.0
+offset_bottom = 0.75
+text = "RELOADING..."
+horizontal_alignment = 1
+
 [node name="CRTFilter" type="CanvasLayer" parent="." unique_id=333146233]
 layer = 100
 

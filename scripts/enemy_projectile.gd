@@ -1,38 +1,50 @@
 extends Area3D
 
+# --- PROJECTILE STATS ---
 const SPEED = 15.0
 const DAMAGE = 1
+var deflected = false
+
+
+# ==========================================
+# CORE LOOP
+# ==========================================
 
 func _ready():
-	# NEW: The self-destruct timer!
+	# Self-destruct timer: destroy the projectile after 3 seconds if it misses everything
 	await get_tree().create_timer(3.0).timeout
 	queue_free()
 
 func _physics_process(delta):
-	# Move forward in local space
+	# Always move forward in local space
 	position -= transform.basis.z * SPEED * delta
 
-var deflected = false
+
+# ==========================================
+# COMBAT & COLLISION LOGIC
+# ==========================================
 
 func deflect(player_aim_direction: Vector3):
 	deflected = true
-	# Point the projectile exactly where R0-0T is looking
+	
+	# Point the projectile exactly where R0-0T is currently looking
 	look_at(global_position + player_aim_direction, Vector3.UP)
 	
-	# Stop looking for Player (Layer 2), Start looking for Enemies (Layer 3)
+	# Swap Collision Masks: Stop hitting the Player (Layer 2), start hitting Enemies (Layer 3)
 	set_collision_mask_value(2, false)
 	set_collision_mask_value(3, true)
 
 func _on_body_entered(body):
-	# THE MISSING SAFETY CHECK!
-	# If deflected, completely ignore the player so it doesn't delete itself!
+	# SAFETY CHECK: If deflected, completely ignore the player's body so it doesn't instantly delete itself!
 	if deflected and body.is_in_group("player"):
 		return 
 
+	# Apply damage based on who gets hit
 	if deflected and body.is_in_group("enemy") and body.has_method("take_damage"):
-		body.take_damage(DAMAGE * 5)
+		body.take_damage(DAMAGE * 5) # Deflected shots deal 5x massive damage!
 		
 	elif not deflected and body.is_in_group("player") and body.has_method("take_damage"):
-		body.take_damage(DAMAGE)
+		body.take_damage(DAMAGE) # Normal hit on the player
 	
+	# Delete the projectile after hitting a valid target
 	queue_free()

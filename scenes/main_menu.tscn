@@ -3,12 +3,34 @@
 [sub_resource type="GDScript" id="GDScript_vue75"]
 script/source = "extends Control
 
+
+# ==========================================
+# CORE LOGIC
+# ==========================================
+
+func _ready():
+	# CRUCIAL: Free the mouse cursor so the player can actually click the menu buttons!
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+
+func _process(_delta):
+	# (Optional: Any dynamic background or UI animations can be updated here)
+	pass
+
+
+# ==========================================
+# UI EVENTS
+# ==========================================
+
+# (When you add your Start/Quit buttons, their signal functions will go down here!)
+# Example:
+# func _on_start_button_pressed():
+#     get_tree().change_scene_to_file(\"res://scenes/hub.tscn\")
+
+
 func _on_start_button_pressed():
-	# Teleport the player into the digital void
 	get_tree().change_scene_to_file(\"res://scenes/hub.tscn\")
 
 func _on_quit_button_pressed():
-	# Close the application
 	get_tree().quit()
 "
 
