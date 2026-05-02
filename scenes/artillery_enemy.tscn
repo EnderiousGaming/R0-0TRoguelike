@@ -32,7 +32,7 @@ omni_range = 6.5
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1811071572]
 
 [node name="Timer" type="Timer" parent="." unique_id=26171303]
-wait_time = 2.5
+wait_time = 1.5
 autostart = true
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

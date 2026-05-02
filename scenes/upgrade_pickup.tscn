@@ -29,3 +29,4 @@ billboard = 1
 no_depth_test = true
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="body_exited" from="." to="." method="_on_body_exited"]

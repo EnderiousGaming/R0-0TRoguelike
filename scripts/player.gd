@@ -141,6 +141,7 @@ func _physics_process(delta):
 				swing_sword()
 
 	# --- APPLY FINAL MOVEMENT ---
+	# --- APPLY FINAL MOVEMENT ---
 	if is_dashing:
 		# Override standard movement and lock velocity forward
 		velocity.x = dash_direction.x * DASH_SPEED
@@ -149,6 +150,7 @@ func _physics_process(delta):
 		dash_timer -= delta
 		if dash_timer <= 0.0:
 			is_dashing = false
+			is_invulnerable = false # Turn off invincibility!
 	else:
 		# Standard walking and ice physics interpolation
 		if direction:
@@ -321,6 +323,11 @@ func swing_sword():
 # ==========================================
 
 func take_damage(amount):
+	# SAFETY CHECK: If we are dashing, ignore all damage!
+	if is_invulnerable:
+		print("SYSTEM: Damage deflected by Dash!")
+		return
+
 	RunManager.current_health -= amount
 	health_display.text = "HP: " + str(RunManager.current_health)
 	

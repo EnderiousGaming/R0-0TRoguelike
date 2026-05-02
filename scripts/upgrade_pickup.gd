@@ -6,6 +6,7 @@ extends Area3D
 
 @onready var label = $Label3D
 var my_upgrade_id = 1
+var player_in_range = false # Tracks if R0-0T is standing close enough
 
 # Dictionary for upgrade text descriptions
 var upgrade_texts = {
@@ -36,20 +37,26 @@ func _ready():
 	pass
 
 func setup(id: int):
-	"""Initializes the pickup with a specific ID and updates its visual label."""
 	my_upgrade_id = id
-	label.text = upgrade_texts[my_upgrade_id]
+	# Add a helpful prompt so the player knows what buttons to press!
+	label.text = upgrade_texts[my_upgrade_id] + "\n\n[Press E or F to Equip]"
 
 # ==========================================
 # INTERACTION LOGIC
 # ==========================================
 
+func _process(_delta):
+	# NEW: Check if the player is in range AND just pressed the interact button
+	if player_in_range and Input.is_action_just_pressed("interact"):
+		print("SYSTEM: Upgrade ", my_upgrade_id, " acquired.")
+		RunManager.apply_upgrade(my_upgrade_id)
+		get_tree().call_group("upgrades", "queue_free")
+
 func _on_body_entered(body):
 	if body.is_in_group("player"):
-		print("SYSTEM: Upgrade ", my_upgrade_id, " acquired.")
-		
-		# Apply the stats globally
-		RunManager.apply_upgrade(my_upgrade_id)
-		
-		# Destroy all other upgrades in the room to enforce a single choice
-		get_tree().call_group("upgrades", "queue_free")
+		player_in_range = true # R0-0T is close enough to buy it!
+
+# NEW: We need to know if the player walks away without grabbing it!
+func _on_body_exited(body):
+	if body.is_in_group("player"):
+		player_in_range = false

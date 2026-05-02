@@ -4,7 +4,7 @@ extends CharacterBody3D
 const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
 
 # --- ENEMY STATS ---
-var health = 3
+var health = 6
 const speed = 3.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 

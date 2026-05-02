@@ -1,7 +1,7 @@
 extends Area3D
 
 # --- PROJECTILE STATS ---
-const SPEED = 15.0
+const SPEED = 22.0
 const DAMAGE = 1
 var deflected = false
 
