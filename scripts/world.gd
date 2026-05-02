@@ -68,13 +68,13 @@ func spawn_upgrades():
 	var valid_pool = []
 	
 	# Add general movement and survival upgrades
-	valid_pool.append_array([2, 3, 5, 7, 16, 17])
+	valid_pool.append_array([2, 3, 5, 7, 17])
 	
 	# Add weapon-specific upgrades based on current loadout
 	if RunManager.equipped_weapon == "blaster":
 		valid_pool.append_array([1, 4, 11, 12])
 	elif RunManager.equipped_weapon == "sword":
-		valid_pool.append_array([13, 14, 15])
+		valid_pool.append_array([13, 14, 15, 16])
 		
 	# Shuffle the valid pool to ensure random selection
 	valid_pool.shuffle()

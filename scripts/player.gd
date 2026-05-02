@@ -30,6 +30,11 @@ var sword_damage = 3
 var is_swinging = false
 var enemies_hit_this_swing = [] 
 
+# --- GRAPPLE VARIABLES ---
+var is_grappling = false
+var grapple_target = Vector3.ZERO
+const GRAPPLE_SPEED = 35.0
+
 # --- MODIFIERS ---
 var drain_timer = 0.0
 var radiation_timer = 0.0
@@ -126,23 +131,49 @@ func _physics_process(delta):
 	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
-	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0 and not is_dashing:
-		# ONLY allow a dash if the player is actively moving AND holding the sword
-		if direction != Vector3.ZERO and RunManager.equipped_weapon == "sword":
-			is_dashing = true
-			is_invulnerable = true # Turn on invincibility!
-			dash_timer = DASH_DURATION
-			dash_cooldown_timer = RunManager.dash_cooldown
-			dash_direction = direction
-			print("SYSTEM: SWORD DASH!")
-			
-			# Automatically trigger a sword swing!
-			if not is_swinging:
-				swing_sword()
+	if Input.is_action_just_pressed("dash"):
+		# 1. SWORD DASH LOGIC
+		if RunManager.equipped_weapon == "sword" and dash_cooldown_timer <= 0.0 and not is_dashing:
+			if direction != Vector3.ZERO:
+				is_dashing = true
+				is_invulnerable = true 
+				dash_timer = DASH_DURATION
+				dash_cooldown_timer = RunManager.dash_cooldown
+				dash_direction = direction
+				print("SYSTEM: SWORD DASH!")
+				
+				if not is_swinging:
+					swing_sword()
+					
+		# 2. BLASTER GRAPPLE LOGIC
+		elif RunManager.equipped_weapon == "blaster" and not is_grappling:
+			# Only fire the hook if we are actually looking at a surface
+			if aim_raycast.is_colliding():
+				var target = aim_raycast.get_collider()
+				
+				# Make sure we don't accidentally grapple onto a virus or an upgrade box!
+				if not target.is_in_group("enemy") and not target.is_in_group("upgrades"):
+					is_grappling = true
+					grapple_target = aim_raycast.get_collision_point()
+					print("SYSTEM: GRAPPLE ATTACHED!")
 
 	# --- APPLY FINAL MOVEMENT ---
-	# --- APPLY FINAL MOVEMENT ---
-	if is_dashing:
+	if is_grappling:
+		# THE ACROBATICS CANCELLATION
+		# If the player hits the spacebar while grappling, cut the rope and launch them into the air!
+		if Input.is_action_just_pressed("jump"):
+			is_grappling = false
+			velocity.y = JUMP_VELOCITY * 1.5 
+		else:
+			# Pull R0-0T straight towards the target point
+			var pull_direction = (grapple_target - global_position).normalized()
+			velocity = pull_direction * GRAPPLE_SPEED
+			
+			# Detach automatically if we get close enough to the wall so we don't get stuck
+			if global_position.distance_to(grapple_target) < 2.5:
+				is_grappling = false
+
+	elif is_dashing:
 		# Override standard movement and lock velocity forward
 		velocity.x = dash_direction.x * DASH_SPEED
 		velocity.z = dash_direction.z * DASH_SPEED
@@ -150,7 +181,7 @@ func _physics_process(delta):
 		dash_timer -= delta
 		if dash_timer <= 0.0:
 			is_dashing = false
-			is_invulnerable = false # Turn off invincibility!
+			is_invulnerable = false 
 	else:
 		# Standard walking and ice physics interpolation
 		if direction:
