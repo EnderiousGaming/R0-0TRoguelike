@@ -28,7 +28,8 @@ const BULLET = preload("res://scenes/player_projectile.tscn")
 # --- SWORD COMBAT ---
 var sword_damage = 3
 var is_swinging = false
-var enemies_hit_this_swing = [] 
+var enemies_hit_this_swing = []
+var has_slammed_this_swing = false
 
 # --- GRAPPLE VARIABLES ---
 var is_grappling = false
@@ -297,27 +298,29 @@ func _process_sword():
 			swing_sword()
 
 func fire_weapon():
-	# 1. Figure out exactly what the center crosshair is looking at
 	var target_point = Vector3.ZERO
 	if aim_raycast.is_colliding():
 		target_point = aim_raycast.get_collision_point()
 	else:
-		# If pointing at the sky, just aim 50 meters straight ahead
 		target_point = aim_raycast.global_position - aim_raycast.global_transform.basis.z * 50.0
 
-	# 2. Spawn the physical bullet
-	var bullet = BULLET.instantiate()
-	get_parent().add_child(bullet)
-	
-	# 3. Position the bullet at the tip of the gun
-	bullet.global_position = blaster_mesh.global_position
-	
-	# 4. Aim the bullet perfectly at the crosshair's target
-	bullet.look_at(target_point, Vector3.UP)
+	# Loop through the spawn sequence based on how many Scatter upgrades R0-0T has
+	for i in range(RunManager.blaster_scatter_count):
+		var bullet = BULLET.instantiate()
+		get_parent().add_child(bullet)
+		bullet.global_position = blaster_mesh.global_position
+		bullet.look_at(target_point, Vector3.UP)
+		
+		# If Scatter Shot is active, apply randomized recoil to the bullet's flight path
+		if RunManager.blaster_scatter_count > 1:
+			var spread = 0.05 * (RunManager.blaster_scatter_count - 1)
+			bullet.rotate_x(randf_range(-spread, spread))
+			bullet.rotate_y(randf_range(-spread, spread))
 
 func swing_sword():
 	is_swinging = true
-	enemies_hit_this_swing.clear() 
+	enemies_hit_this_swing.clear()
+	has_slammed_this_swing = false
 	
 	# Tween Animation: Sweep the sword across the screen
 	var tween = create_tween()
@@ -422,15 +425,26 @@ func _update_weapon_ui():
 # ==========================================
 
 func _on_sword_hitbox_body_entered(body):
-	# Lingering Hitbox Detection (Enemies walking into the swing mid-animation)
 	if not is_swinging:
 		return
 		
+	# 1. Hitting an Enemy
 	if body.is_in_group("enemy") and body.has_method("take_damage"):
 		if not body in enemies_hit_this_swing:
 			body.take_damage(sword_damage)
 			enemies_hit_this_swing.append(body)
-			print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
+			
+	# 2. Hitting the Terrain (SEISMIC SLAM)
+	elif RunManager.sword_has_slam and not body.is_in_group("player"):
+		if not has_slammed_this_swing:
+			has_slammed_this_swing = true
+			print("SYSTEM: SEISMIC SLAM DETONATED!")
+			
+			# Find every enemy in the room and check if they are caught in the blast radius (6 meters)
+			for enemy in get_tree().get_nodes_in_group("enemy"):
+				if global_position.distance_to(enemy.global_position) <= 6.0:
+					if enemy.has_method("take_damage"):
+						enemy.take_damage(sword_damage)
 
 func _on_sword_hitbox_area_entered(area):
 	# Lingering Hitbox Detection (Projectiles flying into the swing mid-animation)

@@ -72,9 +72,9 @@ func spawn_upgrades():
 	
 	# Add weapon-specific upgrades based on current loadout
 	if RunManager.equipped_weapon == "blaster":
-		valid_pool.append_array([1, 4, 11, 12])
+		valid_pool.append_array([1, 4, 11, 12, 18, 19])
 	elif RunManager.equipped_weapon == "sword":
-		valid_pool.append_array([13, 14, 15, 16])
+		valid_pool.append_array([13, 14, 15, 16, 20])
 		
 	# Shuffle the valid pool to ensure random selection
 	valid_pool.shuffle()

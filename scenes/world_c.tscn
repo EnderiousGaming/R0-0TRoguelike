@@ -9,8 +9,9 @@
 [ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="5_7dwsv"]
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_418nc"]
-vertices = PackedVector3Array(-13.75, 0.25, -13.750001, -13.75, 6.25, 13.999999, 14, 6.25, 13.999999, 14, 0.25, -13.750001, -13.75, 0.25, -10.828948, -13.75, 0.75, -9.368422, -13.75, 5, -2.0657902, -13.75, 6.25, 0.8552618, 14, 6.25, 0.8552618, 14, 5, -2.0657902, 14, 0.75, -9.368422, 14, 0.25, -10.828948, 9.991917, 6, -0.4780531, -12.483263, 6, -0.4928589, 13.011942, 6, -0.5060787, 8.475603, 0.75, -9.475645, 1.0203266, 0.25, -10.978349, 1.0005436, 0.75, -9.480581, 9.980398, 0.25, -11.012426, -13.75, 0.25, -4.750001, -13.75, 0.25, -0.50000095, 14, 0.25, -0.50000095, 14, 0.25, -4.750001, -13.75, 0.25, 0.74999905, -13.75, 0.25, 13.999999, 14, 0.25, 13.999999, 14, 0.25, 0.74999905)
-polygons = [PackedInt32Array(11, 18, 3), PackedInt32Array(3, 16, 0), PackedInt32Array(0, 16, 4), PackedInt32Array(4, 17, 5), PackedInt32Array(5, 13, 6), PackedInt32Array(6, 13, 7), PackedInt32Array(7, 13, 1), PackedInt32Array(1, 12, 2), PackedInt32Array(2, 12, 8), PackedInt32Array(8, 14, 9), PackedInt32Array(9, 15, 10), PackedInt32Array(10, 18, 11), PackedInt32Array(18, 16, 3), PackedInt32Array(16, 17, 4), PackedInt32Array(17, 13, 5), PackedInt32Array(13, 12, 1), PackedInt32Array(12, 14, 8), PackedInt32Array(14, 12, 9), PackedInt32Array(15, 18, 10), PackedInt32Array(9, 12, 15), PackedInt32Array(18, 15, 16), PackedInt32Array(16, 15, 17), PackedInt32Array(17, 12, 13), PackedInt32Array(12, 17, 15), PackedInt32Array(22, 21, 19), PackedInt32Array(19, 21, 20), PackedInt32Array(26, 25, 23), PackedInt32Array(23, 25, 24)]
+vertices = PackedVector3Array(-13.5, 0.39198732, -13.500001, -13.5, 6.1419873, 13.749999, 13.75, 6.1419873, 13.749999, 13.75, 0.39198732, -13.500001, -13.5, 0.39198732, -10.63158, -13.5, 0.8919873, -9.19737, -13.5, 5.8919873, -0.59210587, 13.75, 5.8919873, -0.59210587, 13.75, 0.8919873, -9.19737, 13.75, 0.39198732, -10.63158, 2.5203266, 0.39198732, -10.978349, 1.0209293, 2.3919873, -6.4789944, 2.4867592, 5.8919873, -0.52088547, -13.5, 0.39198732, -4.250001, -13.5, 0.39198732, -0.75000095, 13.75, 0.39198732, -0.75000095, 13.75, 0.39198732, -4.250001, -13.5, 0.39198732, 0.99999905, -13.5, 0.39198732, 13.749999, 13.75, 0.39198732, 13.749999, 13.75, 0.39198732, 0.99999905)
+polygons = [PackedInt32Array(9, 10, 3), PackedInt32Array(3, 10, 0), PackedInt32Array(0, 10, 4), PackedInt32Array(4, 11, 5), PackedInt32Array(5, 11, 6), PackedInt32Array(6, 12, 1), PackedInt32Array(1, 12, 2), PackedInt32Array(2, 12, 7), PackedInt32Array(7, 12, 8), PackedInt32Array(8, 10, 9), PackedInt32Array(10, 11, 4), PackedInt32Array(11, 12, 6), PackedInt32Array(12, 11, 8), PackedInt32Array(8, 11, 10), PackedInt32Array(16, 15, 13), PackedInt32Array(13, 15, 14), PackedInt32Array(20, 19, 17), PackedInt32Array(17, 19, 18)]
+agent_radius = 0.75
 
 [sub_resource type="Environment" id="Environment_4wyf3"]
 background_mode = 1
@@ -112,6 +113,6 @@ autostart = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.17625761, 6.7281494, 8.847174)
 
 [node name="KillPlane" parent="." unique_id=1321934473 instance=ExtResource("2_e7edo")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -10, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -25, 0)
 
 [connection signal="timeout" from="WaveDirector/Timer" to="WaveDirector" method="_on_timer_timeout"]

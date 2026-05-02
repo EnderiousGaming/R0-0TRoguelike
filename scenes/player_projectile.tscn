@@ -33,5 +33,8 @@ omni_range = 1.0
 wait_time = 3.0
 autostart = true
 
+[node name="RayCast3D" type="RayCast3D" parent="." unique_id=1887761395]
+target_position = Vector3(0, 0, -1)
+
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

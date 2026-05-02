@@ -26,11 +26,14 @@ var fire_rate = 0.25
 var max_ammo = 15
 var current_ammo = 15
 var reload_time = 1.5
+var blaster_scatter_count = 1
+var blaster_bounces = 0
 
 # --- SWORD STATS ---
 var sword_swing_speed = 1.0
 var sword_range_multiplier = 1.0
 var has_deflect_boost = false
+var sword_has_slam = false
 
 
 # ==========================================
@@ -83,11 +86,14 @@ func reset_run():
 	max_ammo = 15
 	current_ammo = 15
 	reload_time = 1.5
+	blaster_scatter_count = 1
+	blaster_bounces = 0
 	
 	# Sword Defaults
 	sword_swing_speed = 1.0
 	sword_range_multiplier = 1.0
 	has_deflect_boost = false
+	sword_has_slam = false
 	
 	# Movement Defaults
 	dash_cooldown = 1.5
@@ -100,6 +106,13 @@ func reset_run():
 	has_close_combat = false
 	has_sniper_combat = false
 	has_radiation_aura = false
+	
+	# Shop Economy
+	heal_cost = 500
+	speed_cost = 800
+	damage_cost = 1000
+	fire_rate_cost = 1000
+	max_health_cost = 1200
 
 func apply_upgrade(upgrade_id: int):
 	"""Applies a specific upgrade modifier to the current run state."""
@@ -140,6 +153,10 @@ func apply_upgrade(upgrade_id: int):
 			current_ammo += 10
 		12: # Sleight of Hand
 			reload_time = max(0.5, reload_time - 0.5)
+		18: # Scatter Shot
+			blaster_scatter_count += 1
+		19: # Ricochet
+			blaster_bounces += 1
 		
 		# --- SWORD SPECIFIC ---
 		13: # Carbon-Fiber Hilt
@@ -148,6 +165,8 @@ func apply_upgrade(upgrade_id: int):
 			sword_range_multiplier += 0.5
 		15: # Kinetic Deflection
 			has_deflect_boost = true
+		20: # Seismic Slam
+			sword_has_slam = true
 			
 		# --- DASH & SURVIVAL ---
 		16: # Hydraulic Servos

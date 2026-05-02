@@ -26,7 +26,10 @@ var upgrade_texts = {
 	14: "EXTENDED BLADE\nMassive Melee Hitbox",
 	15: "KINETIC DEFLECTOR\nParrying grants a burst of speed",
 	16: "HYDRAULIC SERVOS\nShorter Dash Cooldown",
-	17: "KINETIC PLATING\n+2 Max Health"
+	17: "KINETIC PLATING\n+2 Max Health",
+	18: "SCATTER SHOT\nFires an extra projectile per trigger pull in a wide spread.",
+	19: "RICOCHET\nProjectiles violently bounce off walls and floors.",
+	20: "SEISMIC SLAM\nStriking the terrain with the sword creates a massive damaging shockwave."
 }
 
 # ==========================================
