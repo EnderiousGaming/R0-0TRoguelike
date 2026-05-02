@@ -13,6 +13,7 @@ const DASH_DURATION = 0.15
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 @export var mouse_sensitivity := 0.002
 
+var is_invulnerable = false
 var is_dashing = false
 var dash_timer = 0.0
 var dash_cooldown_timer = 0.0
@@ -126,13 +127,18 @@ func _physics_process(delta):
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 	
 	if Input.is_action_just_pressed("dash") and dash_cooldown_timer <= 0.0 and not is_dashing:
-		# Only allow a dash if the player is actively moving in a direction
-		if direction != Vector3.ZERO:
+		# ONLY allow a dash if the player is actively moving AND holding the sword
+		if direction != Vector3.ZERO and RunManager.equipped_weapon == "sword":
 			is_dashing = true
+			is_invulnerable = true # Turn on invincibility!
 			dash_timer = DASH_DURATION
 			dash_cooldown_timer = RunManager.dash_cooldown
 			dash_direction = direction
-			print("SYSTEM: DASH!")
+			print("SYSTEM: SWORD DASH!")
+			
+			# Automatically trigger a sword swing!
+			if not is_swinging:
+				swing_sword()
 
 	# --- APPLY FINAL MOVEMENT ---
 	if is_dashing:

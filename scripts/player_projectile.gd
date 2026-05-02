@@ -14,9 +14,12 @@ func _on_body_entered(body):
 	if body.is_in_group("player"):
 		return 
 		
-	# If we hit an enemy, deal damage based on our RunManager stats!
+	# DEBUG: Tell us exactly what the bullet touched!
+	print("Bullet hit: ", body.name)
+
+	# If we hit an enemy, deal damage!
 	if body.has_method("take_damage"):
 		body.take_damage(RunManager.laser_damage)
 		
-	# For now, delete the bullet the instant it hits ANYTHING else (walls, enemies, etc.)
+	# Delete the bullet the instant it hits ANYTHING else
 	queue_free()
