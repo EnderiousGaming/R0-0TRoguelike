@@ -10,11 +10,12 @@ config_version=5
 
 [application]
 
-config/name="R0-0T_Roguelike"
+config/name="Glitched Horizons (Alpha)"
+config/version="v0.10.0-alpha"
 run/main_scene="uid://dbd58g2wdp54u"
 config/features=PackedStringArray("4.6", "Forward Plus")
-boot_splash/show_image=false
-config/icon="res://icon.svg"
+boot_splash/image="uid://dft2t2pnedlja"
+config/icon="uid://dft2t2pnedlja"
 
 [autoload]
 
