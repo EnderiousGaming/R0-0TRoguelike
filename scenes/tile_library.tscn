@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://dkbbnwxthc2v2"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ficu2"]
+size = Vector3(4, 0.2, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_fnpah"]
+size = Vector3(4, 0.2, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kmo4i"]
+size = Vector3(4, 100, 4)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gy7xm"]
+size = Vector3(4, 100, 4)
+
+[sub_resource type="BoxMesh" id="BoxMesh_gy7xm"]
+size = Vector3(1.5, 100, 1.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_oymtw"]
+size = Vector3(1.5, 100, 1.5)
+
+[node name="TileLibrary" type="Node3D" unique_id=997107598]
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=94037092]
+mesh = SubResource("BoxMesh_ficu2")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=220041619]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=1581883716]
+shape = SubResource("BoxShape3D_fnpah")
+
+[node name="Wall" type="MeshInstance3D" parent="." unique_id=1782521302]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
+mesh = SubResource("BoxMesh_kmo4i")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Wall" unique_id=1097702675]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Wall/StaticBody3D" unique_id=697826874]
+shape = SubResource("BoxShape3D_gy7xm")
+
+[node name="Pillar" type="MeshInstance3D" parent="." unique_id=1819980064]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
+mesh = SubResource("BoxMesh_gy7xm")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Pillar" unique_id=886083287]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Pillar/StaticBody3D" unique_id=1071631946]
+shape = SubResource("BoxShape3D_oymtw")

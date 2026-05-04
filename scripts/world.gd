@@ -79,7 +79,8 @@ func spawn_upgrades():
 	# Shuffle the valid pool to ensure random selection
 	valid_pool.shuffle()
 	
-	var offsets = [Vector3(-3, 0, 2), Vector3(3, 0, 2), Vector3(0, 0, -3)]
+	# Changed from 3.0 offset down to 1.5 offset
+	var offsets = [Vector3(-1.5, 0, 1), Vector3(1.5, 0, 1), Vector3(0, 0, -1.5)]
 	
 	# Spawn the top 3 upgrades from the shuffled deck
 	for i in range(3):

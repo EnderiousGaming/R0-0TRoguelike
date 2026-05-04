@@ -26,6 +26,7 @@ func _on_body_entered(body):
 			# THE COMBAT ROOMS
 			1, 2, 4, 5, 7, 8:
 				var combat_maps = [
+					"res://scenes/world.tscn",
 					"res://scenes/world_a.tscn",
 					"res://scenes/world_b.tscn",
 					"res://scenes/world_c.tscn",
