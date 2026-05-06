@@ -11,7 +11,6 @@ config_version=5
 [application]
 
 config/name="Glitched Horizons (Alpha)"
-config/version="v0.10.0-alpha"
 run/main_scene="uid://dbd58g2wdp54u"
 config/features=PackedStringArray("4.6", "Forward Plus")
 boot_splash/show_image=false
