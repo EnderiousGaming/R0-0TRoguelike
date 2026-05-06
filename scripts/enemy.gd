@@ -8,6 +8,11 @@ var health = 4
 const speed = 3.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+# Add these three lines for the Daemons' attack stats:
+var attack_damage = 1
+var attack_cooldown = 1.0 
+var current_attack_timer = 0.0
+
 # --- REFERENCES ---
 var player = null
 @onready var nav_agent = $NavigationAgent3D
@@ -54,8 +59,24 @@ func _physics_process(delta):
 
 
 # ==========================================
-# COMBAT & DAMAGE LOGIC
+# DAEMON CONTACT DAMAGE LOGIC
 # ==========================================
+	
+	# 1. Tick down the attack cooldown
+	if current_attack_timer > 0.0:
+		current_attack_timer -= delta
+		
+	# 2. Check everything the Daemon physically bumped into this frame
+	for i in get_slide_collision_count():
+		var collision = get_slide_collision(i)
+		var collider = collision.get_collider()
+		
+		# 3. If it bumped into the player, bite them!
+		if collider and collider.is_in_group("player"):
+			if current_attack_timer <= 0.0 and collider.has_method("take_damage"):
+				collider.take_damage(attack_damage)
+				current_attack_timer = attack_cooldown
+				print("SYSTEM: Daemon inflicted ", attack_damage, " contact damage!")
 
 func take_damage(amount):
 	var final_damage = amount

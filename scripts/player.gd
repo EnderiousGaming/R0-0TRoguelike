@@ -32,9 +32,15 @@ var enemies_hit_this_swing = []
 var has_slammed_this_swing = false
 
 # --- GRAPPLE VARIABLES ---
-var is_grappling = false
-var grapple_target = Vector3.ZERO
+@onready var grapple_beam = $Head/Camera3D/GrappleBeam # Adjust path to match your tree
+@onready var blaster_muzzle = $Head/Camera3D/BlasterMesh # Where the beam starts
+
+var is_grappling: bool = false
+var grapple_target_point: Vector3 = Vector3.ZERO
 const GRAPPLE_SPEED = 35.0
+
+var grapple_cooldown_max: float = 1.5 
+var current_grapple_cooldown: float = 0.0
 
 # --- MODIFIERS ---
 var drain_timer = 0.0
@@ -59,6 +65,7 @@ var radiation_timer = 0.0
 @onready var pause_menu = $HUD/PauseMenu
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
+@onready var grapple_bar = $HUD/GrappleBar
 
 
 # ==========================================
@@ -147,7 +154,7 @@ func _physics_process(delta):
 					swing_sword()
 					
 		# 2. BLASTER GRAPPLE LOGIC
-		elif RunManager.equipped_weapon == "blaster" and not is_grappling:
+		elif RunManager.equipped_weapon == "blaster" and not is_grappling and current_grapple_cooldown <= 0.0:
 			# Only fire the hook if we are actually looking at a surface
 			if aim_raycast.is_colliding():
 				var target = aim_raycast.get_collider()
@@ -155,24 +162,25 @@ func _physics_process(delta):
 				# Make sure we don't accidentally grapple onto a virus or an upgrade box!
 				if not target.is_in_group("enemy") and not target.is_in_group("upgrades"):
 					is_grappling = true
-					grapple_target = aim_raycast.get_collision_point()
+					grapple_target_point = aim_raycast.get_collision_point()
 					print("SYSTEM: GRAPPLE ATTACHED!")
 
 	# --- APPLY FINAL MOVEMENT ---
 	if is_grappling:
 		# THE ACROBATICS CANCELLATION
-		# If the player hits the spacebar while grappling, cut the rope and launch them into the air!
 		if Input.is_action_just_pressed("jump"):
 			is_grappling = false
+			current_grapple_cooldown = grapple_cooldown_max # START COOLDOWN HERE
 			velocity.y = JUMP_VELOCITY * 1.5 
 		else:
 			# Pull R0-0T straight towards the target point
-			var pull_direction = (grapple_target - global_position).normalized()
+			var pull_direction = (grapple_target_point - global_position).normalized()
 			velocity = pull_direction * GRAPPLE_SPEED
 			
-			# Detach automatically if we get close enough to the wall so we don't get stuck
-			if global_position.distance_to(grapple_target) < 2.5:
+			# Detach automatically if we get close enough
+			if global_position.distance_to(grapple_target_point) < 2.5:
 				is_grappling = false
+				current_grapple_cooldown = grapple_cooldown_max # START COOLDOWN HERE
 
 	elif is_dashing:
 		# Override standard movement and lock velocity forward
@@ -231,6 +239,37 @@ func _process(delta):
 						enemy.take_damage(1)
 	
 	_update_weapon_ui()
+	
+	# 1. COOLDOWN LOGIC
+	if current_grapple_cooldown > 0.0:
+		current_grapple_cooldown -= delta
+		
+		# Update the UI Bar
+		grapple_bar.visible = true
+		grapple_bar.max_value = grapple_cooldown_max
+		grapple_bar.value = current_grapple_cooldown
+	else:
+		grapple_bar.visible = false
+		
+	# 2. VISUAL INDICATOR LOGIC
+	if is_grappling:
+		grapple_beam.visible = true
+		
+		var distance = blaster_muzzle.global_position.distance_to(grapple_target_point)
+		var midpoint = blaster_muzzle.global_position.lerp(grapple_target_point, 0.5)
+		
+		grapple_beam.global_position = midpoint
+		
+		# 1. Point the node at the target
+		grapple_beam.look_at(grapple_target_point, Vector3.UP)
+		
+		# 2. Tilt the cylinder 90 degrees so its Y-axis points at the wall
+		grapple_beam.rotate_x(deg_to_rad(90))
+		
+		# 3. Scale the Y-axis (the cylinder's height) to match the distance
+		grapple_beam.scale = Vector3(1.0, distance, 1.0)
+	else:
+		grapple_beam.visible = false
 
 
 # ==========================================
@@ -254,6 +293,10 @@ func update_weapon_loadout():
 		sword_pivot.rotation_degrees = Vector3(15, 0, -15) 
 
 func _process_blaster(delta):
+	# WEAPON LOCKOUT: Prevent firing or reloading if grappling
+	if is_grappling:
+		return 
+		
 	# 1. Handle Active Reloading
 	if is_reloading:
 		reload_timer -= delta
