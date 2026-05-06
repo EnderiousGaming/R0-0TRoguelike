@@ -1,3 +1,57 @@
 [gd_scene format=3 uid="uid://cgrnhyy83pgxh"]
 
-[node name="Boss" type="Node3D" unique_id=666931055]
+[ext_resource type="Script" uid="uid://bbklch3jb0jql" path="res://scripts/boss.gd" id="1_dlmty"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_xd8r6"]
+radius = 1.0
+height = 4.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xd8r6"]
+albedo_color = Color(1, 1, 0, 1)
+emission_enabled = true
+emission = Color(1, 1, 0, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_xd8r6"]
+material = SubResource("StandardMaterial3D_xd8r6")
+radius = 1.0
+height = 4.0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dlmty"]
+albedo_color = Color(1, 1, 0, 1)
+emission_enabled = true
+emission = Color(1, 1, 0, 1)
+emission_energy_multiplier = 1.5
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_xd8r6"]
+material = SubResource("StandardMaterial3D_dlmty")
+top_radius = 0.1
+bottom_radius = 0.1
+height = 30.0
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_xd8r6"]
+height = 30.0
+
+[node name="BossAureus" type="CharacterBody3D" unique_id=1587806139 groups=["boss", "enemy"]]
+script = ExtResource("1_dlmty")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=43029943]
+shape = SubResource("CapsuleShape3D_xd8r6")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CollisionShape3D" unique_id=1178598667]
+mesh = SubResource("CapsuleMesh_xd8r6")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1577384535]
+
+[node name="LaserPivot" type="Node3D" parent="." unique_id=633105696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="LaserPivot" unique_id=927957517]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
+mesh = SubResource("CylinderMesh_xd8r6")
+
+[node name="LaserHitbox" type="Area3D" parent="." unique_id=334441591]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="LaserHitbox" unique_id=1828451445]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 1, 0)
+shape = SubResource("CylinderShape3D_xd8r6")
