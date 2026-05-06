@@ -1,5 +1,7 @@
 extends GridMap
 
+@export var is_boss_arena: bool = false
+
 # --- CONFIGURATION ---
 var grid_width = 20
 var grid_depth = 20
@@ -25,6 +27,29 @@ var wave = {}
 # ==========================================
 
 func _ready():
+	# Automatically detect if this is the final encounter
+	if RunManager.current_stage == 10:
+		is_boss_arena = true
+		print("SYSTEM: Final Stage reached. Initializing Boss Arena protocols.")
+	# 1. Decide the weights right when the node loads!
+	if is_boss_arena:
+		# THE UNSTABLE CORE: No walls, lots of pillars, 20% hazard floor
+		tile_weights = {
+			TILE_FLOOR: 60,
+			TILE_WALL: 0, 
+			TILE_PILLAR: 20,
+			TILE_HAZARD: 20
+		}
+	else:
+		# STANDARD ROOM: Your normal weights
+		tile_weights = {
+			TILE_FLOOR: 80,
+			TILE_WALL: 5,
+			TILE_PILLAR: 10,
+			TILE_HAZARD: 5
+		}
+		
+	# 2. Proceed with generation
 	print("SYSTEM: Initializing Wave Function Collapse...")
 	generate_wfc()
 
@@ -84,7 +109,7 @@ func generate_wfc():
 			
 	print("SYSTEM: Map Generation Complete!")
 	
-	# # ==========================================
+	# ==========================================
 	# THE PILLAR PLASTER PASS (Filling the holes)
 	# ==========================================
 	
@@ -167,6 +192,14 @@ func generate_wfc():
 				
 		print("SYSTEM: ", lights_placed, " cyan light fixtures deployed.")
 		
+		# In generate_wfc() under Entity Spawn Logic:
+		if is_boss_arena:
+			var aureus_scene = preload("res://scenes/boss.tscn")
+			var boss_instance = aureus_scene.instantiate()
+			get_parent().add_child(boss_instance)
+			# Place him on a random floor tile 
+			boss_instance.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 2.0, 0)
+		
 	# ==========================================
 	# CORRUPTED DOMAIN DEPLOYMENT
 	# ==========================================
@@ -234,3 +267,47 @@ func propagate():
 			if locked_wall_neighbors >= 2:
 				if current_options.has(TILE_WALL):
 					current_options.erase(TILE_WALL)
+
+
+# ==========================================
+# DYNAMIC ARENA HAZARDS
+# ==========================================
+
+func _on_hazard_shift_timer_timeout():
+	if not is_boss_arena:
+		return # Only shift the room if we are fighting AUREUS
+		
+	print("SYSTEM: Arena Core unstable! Re-routing Corrupted Domains...")
+	
+	# 1. Destroy the old invisible damage hitboxes safely
+	for child in get_children():
+		if child.name.begins_with("DynamicHazard"):
+			child.queue_free()
+			
+	# 2. Gather every single walkable cell in the arena
+	var floor_cells = get_used_cells_by_item(TILE_FLOOR)
+	var hazard_cells = get_used_cells_by_item(TILE_HAZARD)
+	var all_walkable = floor_cells + hazard_cells
+	
+	# 3. Visually reset the entire floor to safe, standard concrete
+	for cell in all_walkable:
+		set_cell_item(cell, TILE_FLOOR)
+		
+	# 4. Shuffle the deck and pick new spots for the hazards
+	all_walkable.shuffle()
+	
+	# Make exactly 25% of the room a deadly hazard
+	var new_hazard_count = int(all_walkable.size() * 0.25) 
+	var hazard_scene = preload("res://scenes/hazard_zone.tscn")
+	
+	for i in range(new_hazard_count):
+		var cell = all_walkable[i]
+		
+		# Change the visual GridMap tile to the purple Hazard material
+		set_cell_item(cell, TILE_HAZARD)
+		
+		# Spawn the physical damage hitbox and lift it 1 meter up (like we fixed earlier!)
+		var zone = hazard_scene.instantiate()
+		zone.name = "DynamicHazard_" + str(i)
+		add_child(zone)
+		zone.global_position = to_global(map_to_local(cell)) + Vector3(0, 1.0, 0)

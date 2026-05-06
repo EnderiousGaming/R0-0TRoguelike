@@ -41,7 +41,7 @@ func _on_body_entered(body):
 				
 			# THE FINAL BOSS
 			10:
-				next_scene_path = "res://scenes/boss.tscn"
+				next_scene_path = "res://scenes/world.tscn"
 				
 			# SAFETY NET (If the stage goes over 10 or bugs out, return to the Hub)
 			_:

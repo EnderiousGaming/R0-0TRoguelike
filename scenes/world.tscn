@@ -68,4 +68,9 @@ cell_size = Vector3(4, 4, 4)
 script = ExtResource("4_k0juu")
 metadata/_editor_floor_ = Vector3(0, 0, 0)
 
+[node name="HazardShiftTimer" type="Timer" parent="." unique_id=688132250]
+wait_time = 8.0
+autostart = true
+
 [connection signal="timeout" from="WaveDirector/Timer" to="WaveDirector" method="_on_timer_timeout"]
+[connection signal="timeout" from="HazardShiftTimer" to="NavigationRegion3D/GridMap" method="_on_hazard_shift_timer_timeout"]
