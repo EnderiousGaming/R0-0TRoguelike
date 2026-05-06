@@ -173,9 +173,20 @@ func generate_wfc():
 		if portal:
 			portal.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.5, 0)
 			
-		# Enemies
-		for sp in get_tree().get_nodes_in_group("spawn_point"):
-			sp.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.0, 0)
+		# ==========================================
+		# DAEMON SPAWN LOGIC
+		# ==========================================
+		var spawn_points = get_tree().get_nodes_in_group("spawn_point")
+		
+		if is_boss_arena:
+			# Purge all daemon spawners so it is a strict 1v1 fight
+			for sp in spawn_points:
+				sp.queue_free()
+			print("SYSTEM: Standard Daemon spawners neutralized.")
+		else:
+			# Standard room: scatter the spawners
+			for sp in spawn_points:
+				sp.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.0, 0)
 
 		# PROCEDURAL LIGHTING PASS
 		var lights_placed = 0
@@ -190,15 +201,28 @@ func generate_wfc():
 				new_light.global_position = to_global(map_to_local(cell)) + Vector3(0, 4.0, 0)
 				lights_placed += 1
 				
+		# Enemies (Only spawn if this is NOT a boss arena!)
+		if not is_boss_arena:
+			for sp in get_tree().get_nodes_in_group("spawn_point"):
+				sp.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.0, 0)
+				
 		print("SYSTEM: ", lights_placed, " cyan light fixtures deployed.")
 		
-		# In generate_wfc() under Entity Spawn Logic:
+		# ==========================================
+		# BOSS SPAWN LOGIC
+		# ==========================================
 		if is_boss_arena:
 			var aureus_scene = preload("res://scenes/boss.tscn")
 			var boss_instance = aureus_scene.instantiate()
-			get_parent().add_child(boss_instance)
-			# Place him on a random floor tile 
-			boss_instance.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 2.0, 0)
+			
+			# 1. Queue the boss to be added safely
+			get_parent().call_deferred("add_child", boss_instance)
+			
+			# 2. Queue the position assignment so it waits until the boss is physically in the world
+			var spawn_pos = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 3.0, 0)
+			boss_instance.set_deferred("global_position", spawn_pos)
+			
+			print("SYSTEM: AUREUS has materialized.")
 		
 	# ==========================================
 	# CORRUPTED DOMAIN DEPLOYMENT

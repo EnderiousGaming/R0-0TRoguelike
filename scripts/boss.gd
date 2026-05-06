@@ -14,14 +14,14 @@ var current_state = State.HUNT
 var state_timer = 0.0
 
 # --- COMBAT VARIABLES ---
-var hunt_speed = 6.0
+var hunt_speed = 3.0
 var contact_damage = 2
 var contact_cooldown = 0.5
 var current_contact_timer = 0.0
 
 @onready var nav_agent = $NavigationAgent3D
 @onready var laser_pivot = $LaserPivot
-@onready var laser_mesh = $LaserPivot/LaserMesh # Adjust path
+@onready var laser_mesh = $LaserPivot/MeshInstance3D # Adjust path
 @onready var laser_hitbox = $LaserPivot/LaserHitbox/CollisionShape3D # Adjust path
 var player = null
 
@@ -61,19 +61,22 @@ func _physics_process(delta):
 func _state_hunt(delta):
 	state_timer += delta
 	
-	# Chase the player
+	# 1. Ask the NavAgent where to step next
 	nav_agent.target_position = player.global_position
 	var next_pos = nav_agent.get_next_path_position()
-	var dir = global_position.direction_to(next_pos)
+	
+	# 2. FLATTEN THE Y-AXIS: Tell Aureus to aim straight ahead, not down at the floor
+	var flat_next_pos = Vector3(next_pos.x, global_position.y, next_pos.z)
+	var dir = global_position.direction_to(flat_next_pos)
 	
 	velocity.x = dir.x * hunt_speed
 	velocity.z = dir.z * hunt_speed
 	
-	# Look at the player smoothly
+	# 3. Look at the player smoothly
 	var flat_player_pos = Vector3(player.global_position.x, global_position.y, player.global_position.z)
 	look_at(flat_player_pos, Vector3.UP)
 
-	# Transition to Barrage after 5 seconds of chasing
+	# 4. Transition to Barrage after 5 seconds of chasing
 	if state_timer >= 5.0:
 		transition_to(State.BARRAGE)
 
@@ -122,16 +125,18 @@ func transition_to(new_state):
 # ==========================================
 
 func fire_spread():
-	print("AUREUS fires a barrage!")
-	for i in range(5): # Fire 5 projectiles in an arc
+	for i in range(5): 
 		var proj = PROJECTILE.instantiate()
 		get_parent().add_child(proj)
-		proj.global_position = global_position + Vector3(0, 1.5, 0)
 		
-		var target_pos = player.global_position + Vector3(0, 1.0, 0)
+		# LOWER THE SPAWN POINT: Fire from waist-level instead of chest-level
+		proj.global_position = global_position + Vector3(0, 0.5, 0) 
+		
+		# LOWER THE TARGET: Aim closer to R0-0T's feet/base origin
+		var target_pos = player.global_position + Vector3(0, 0.2, 0) 
 		proj.look_at(target_pos, Vector3.UP)
 		
-		# Spread them out by rotating them slightly
+		# (Keep your existing spread rotation math down here)
 		var spread_angle = deg_to_rad(-30 + (i * 15))
 		proj.rotate_y(spread_angle)
 
@@ -157,4 +162,18 @@ func take_damage(amount):
 
 func die():
 	RunManager.score += 5000
-	queue_free()
+	print("SYSTEM: AUREUS DEFEATED. ALPHA CLEAR!")
+	
+	# 1. Hide the boss mesh and disable his hitboxes immediately so he stops fighting
+	visible = false
+	$CollisionShape3D.set_deferred("disabled", true)
+	laser_hitbox.set_deferred("disabled", true)
+	
+	# 2. Add a dramatic 3-second pause so the player sees the final damage number
+	await get_tree().create_timer(3.0).timeout
+	
+	# 3. Unlock the mouse cursor so the player can use the Main Menu buttons
+	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
+	
+	# 4. Boot to the title screen
+	get_tree().change_scene_to_file("res://scenes/main_menu.tscn")

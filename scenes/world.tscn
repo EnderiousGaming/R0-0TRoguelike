@@ -20,6 +20,7 @@ volumetric_fog_albedo = Color(0.2062256, 0.00012639136, 0.66189396, 1)
 
 [sub_resource type="NavigationMesh" id="NavigationMesh_qfnet"]
 geometry_parsed_geometry_type = 1
+agent_radius = 1.5
 
 [node name="World" type="Node3D" unique_id=928174374]
 script = ExtResource("1_71j4m")

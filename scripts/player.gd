@@ -116,18 +116,21 @@ func _unhandled_input(event):
 		force_level_clear()
 
 func force_level_clear():
-	print("DEBUG: Force clearing current stage...")
+	print("DEBUG: Sequence broken. Warping to The Golden Process...")
 	
-	# Set the kill count to the limit required for the current stage
-	# Assuming your limit is stored in RunManager
-	RunManager.enemies_defeated_this_room = 100 # Or your specific stage limit [cite: 19, 21]
+	# 1. Force the room clear condition
+	RunManager.enemies_defeated_this_room = 100 # (Or your max limit)
 	
-	# If your portal or UI needs a direct notification to update:
-	var portal = get_tree().current_scene.get_node_or_null("Portal") 
+	# 2. HIJACK THE STAGE COUNTER
+	# Set it to 9 so the next portal jump increments perfectly to 10!
+	RunManager.current_stage = 9 
+	
+	# 3. Force the portal open
+	var portal = get_tree().current_scene.get_node_or_null("Portal")
 	if portal and portal.has_method("open_portal"):
 		portal.open_portal()
-	
-	# Update the HUD immediately so you see the change 
+		
+	# Update the HUD
 	_process(0)
 
 func _physics_process(delta):

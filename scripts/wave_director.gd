@@ -33,18 +33,30 @@ func _on_timer_timeout():
 		
 	var camera = get_viewport().get_camera_3d()
 	var hidden_spawns = []
+	var valid_spawns = []
 	
 	if camera:
+		
 		for sp in spawn_points:
-			if not camera.is_position_in_frustum(sp.global_position):
-				hidden_spawns.append(sp)
+			if is_instance_valid(sp):
+				valid_spawns.append(sp) # Save it to our safe list
 				
+				# Now it's safe to check the global_position!
+				if not camera.is_position_in_frustum(sp.global_position):
+					hidden_spawns.append(sp)
+					
+		# 2. SAFETY ABORT: If no spawners survived (like in the Boss Arena), stop the function!
+		if valid_spawns.is_empty():
+			return
+			
 	var chosen_spawn = null
 	
+	# 3. Pick a spawn point safely
 	if hidden_spawns.size() > 0:
 		chosen_spawn = hidden_spawns.pick_random()
 	else:
-		chosen_spawn = spawn_points.pick_random()
+		# Fallback to our new safe list instead of the original broken array
+		chosen_spawn = valid_spawns.pick_random()
 		
 	var new_enemy = enemy_types.pick_random().instantiate()
 	get_parent().add_child(new_enemy)
