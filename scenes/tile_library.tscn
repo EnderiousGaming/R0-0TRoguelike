@@ -6,6 +6,15 @@ size = Vector3(4, 0.2, 4)
 [sub_resource type="BoxShape3D" id="BoxShape3D_fnpah"]
 size = Vector3(4, 0.2, 4)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ficu2"]
+albedo_color = Color(0.33333334, 0, 0.20784314, 1)
+emission_enabled = true
+emission = Color(0.33333334, 0, 0.20784314, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_fnpah"]
+material = SubResource("StandardMaterial3D_ficu2")
+size = Vector3(4, 0.2, 4)
+
 [sub_resource type="BoxMesh" id="BoxMesh_kmo4i"]
 size = Vector3(4, 100, 4)
 
@@ -27,6 +36,19 @@ mesh = SubResource("BoxMesh_ficu2")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=1581883716]
 shape = SubResource("BoxShape3D_fnpah")
+
+[node name="HazardFloor" type="MeshInstance3D" parent="." unique_id=763916867]
+mesh = SubResource("BoxMesh_fnpah")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="HazardFloor" unique_id=973323472]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="HazardFloor/StaticBody3D" unique_id=1347137509]
+shape = SubResource("BoxShape3D_fnpah")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="HazardFloor" unique_id=982224357]
+light_color = Color(0.33333334, 0, 0.20784314, 1)
+light_energy = 1.5
+omni_range = 3.0
 
 [node name="Wall" type="MeshInstance3D" parent="." unique_id=1782521302]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 50, 0)
