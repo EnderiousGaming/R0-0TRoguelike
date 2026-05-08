@@ -65,6 +65,7 @@ var radiation_timer = 0.0
 @onready var pause_menu = $HUD/PauseMenu
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
+@onready var save_button = $HUD/PauseMenu/VBoxContainer/SaveButton
 @onready var grapple_bar = $HUD/GrappleBar
 @onready var damage_overlay = $HUD/DamageOverlay
 
@@ -84,6 +85,7 @@ func _ready():
 	
 	# Connect UI button signals
 	resume_button.pressed.connect(toggle_pause)
+	save_button.pressed.connect(save_game_from_menu)
 	quit_button.pressed.connect(quit_to_menu)
 	
 	update_weapon_loadout()
@@ -486,6 +488,11 @@ func flash_damage_screen():
 
 func die():
 	print("CRITICAL FAILURE: R0-0T Offline.")
+	
+	# Trigger the Autosave right before the scene changes
+	SaveManager.save_game()
+	print("SYSTEM: Autosave complete.")
+	
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/game_over.tscn")
 	
 func toggle_pause():
@@ -507,6 +514,15 @@ func toggle_pause():
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
+
+func save_game_from_menu():
+	SaveManager.save_game()
+	print("SYSTEM: Manual save triggered from Pause Menu.")
+	
+	# Give the player visual feedback!
+	save_button.text = "Game Saved!"
+	await get_tree().create_timer(1.5).timeout
+	save_button.text = "Save Game"
 
 func quit_to_menu():
 	# Always unpause before changing scenes to prevent a frozen menu
