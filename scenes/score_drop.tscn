@@ -3,20 +3,18 @@
 [ext_resource type="Script" uid="uid://dhssd6s2u4rgf" path="res://scripts/score_drop.gd" id="1_ro78a"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bw4fo"]
-albedo_color = Color(0, 1, 1, 1)
+albedo_color = Color(0, 0.40392157, 0, 1)
 emission_enabled = true
-emission = Color(0, 1, 1, 1)
+emission = Color(0, 0.40392157, 0, 1)
 emission_energy_multiplier = 1.5
 
 [sub_resource type="SphereMesh" id="SphereMesh_e3vo6"]
 material = SubResource("StandardMaterial3D_bw4fo")
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_ro78a"]
-
 [sub_resource type="SphereShape3D" id="SphereShape3D_lwxkr"]
 
-[node name="ScoreDrop" type="RigidBody3D" unique_id=1948118805]
-collision_mask = 3
+[node name="ScoreDrop" type="Area3D" unique_id=67825462]
+collision_mask = 7
 script = ExtResource("1_ro78a")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=582218007]
@@ -24,18 +22,11 @@ transform = Transform3D(0.25, 0, 0, 0, 0.25, 0, 0, 0, 0.25, 0, 0, 0)
 mesh = SubResource("SphereMesh_e3vo6")
 
 [node name="OmniLight3D" type="OmniLight3D" parent="MeshInstance3D" unique_id=440980900]
-light_color = Color(0, 1, 1, 1)
+light_color = Color(1.311563e-06, 0.40455493, 0, 1)
 omni_range = 1.0
 
-[node name="PickupZone" type="Area3D" parent="." unique_id=2011802209]
-collision_mask = 3
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PickupZone" unique_id=1473478764]
-transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
-shape = SubResource("SphereShape3D_ro78a")
-
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1284496431]
-transform = Transform3D(0.33, 0, 0, 0, 0.33, 0, 0, 0, 0.33, 0, 0, 0)
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
 shape = SubResource("SphereShape3D_lwxkr")
 
-[connection signal="body_entered" from="PickupZone" to="." method="_on_pickup_zone_body_entered"]
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

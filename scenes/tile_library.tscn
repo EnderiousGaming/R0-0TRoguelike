@@ -30,6 +30,7 @@ size = Vector3(1.5, 100, 1.5)
 [node name="TileLibrary" type="Node3D" unique_id=997107598]
 
 [node name="Floor" type="MeshInstance3D" parent="." unique_id=94037092]
+layers = 7
 mesh = SubResource("BoxMesh_oymtw")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=220041619]
