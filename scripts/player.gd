@@ -66,6 +66,7 @@ var radiation_timer = 0.0
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
 @onready var grapple_bar = $HUD/GrappleBar
+@onready var damage_overlay = $HUD/DamageOverlay
 
 
 # ==========================================
@@ -428,10 +429,24 @@ func take_damage(amount):
 		return
 
 	RunManager.current_health -= amount
+	
 	health_display.text = "HP: " + str(RunManager.current_health)
+	
+	# 1. Trigger the Visual Flash
+	flash_damage_screen()
 	
 	if RunManager.current_health <= 0:
 		die()
+
+func flash_damage_screen():
+	# If a tween is already running from a previous hit, kill it so they don't fight
+	var tween = get_tree().create_tween()
+	
+	# 1. Instantly snap the overlay to 30% opacity red
+	damage_overlay.color.a = 0.3
+	
+	# 2. Smoothly fade it back to 0.0 over 0.4 seconds
+	tween.tween_property(damage_overlay, "color:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func die():
 	print("CRITICAL FAILURE: R0-0T Offline.")
