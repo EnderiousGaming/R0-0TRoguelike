@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://b4v58x68kilhm" path="res://scripts/artillery_enemy.gd" id="1_fff5f"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_md0e3"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_fff5f"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4ra3w"]
 albedo_color = Color(0.28247806, 0.0009852365, 0.5304442, 1)
@@ -19,7 +19,8 @@ collision_mask = 5
 script = ExtResource("1_fff5f")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=2085275426]
-shape = SubResource("BoxShape3D_md0e3")
+transform = Transform3D(1.4, 0, 0, 0, 1.4, 0, 0, 0, 1.4, 0, 0, 0)
+shape = SubResource("SphereShape3D_fff5f")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=442172353]
 mesh = SubResource("BoxMesh_5uy6h")

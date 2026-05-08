@@ -19,7 +19,7 @@ func _ready():
 	
 	# Pop the drop up slightly based on its TRUE global position
 	var tween = create_tween()
-	tween.tween_property(self, "global_position:y", global_position.y + 1.0, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	tween.tween_property(self, "global_position:y", global_position.y + 0.5, 0.3).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	
 	# Lock in that height as the center of our hover animation
 	await tween.finished
