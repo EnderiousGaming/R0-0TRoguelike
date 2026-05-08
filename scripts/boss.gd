@@ -2,6 +2,7 @@ extends CharacterBody3D
 
 const PROJECTILE = preload("res://scenes/enemy_projectile.tscn")
 const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
+const SCORE_DROP = preload("res://scenes/score_drop.tscn")
 
 # --- BOSS STATS ---
 var max_health = 100
@@ -161,13 +162,20 @@ func take_damage(amount):
 		die()
 
 func die():
-	RunManager.score += 5000
-	print("SYSTEM: AUREUS DEFEATED. ALPHA CLEAR!")
+	# 1. Spawn the physical drop
+	var drop_instance = SCORE_DROP.instantiate()
 	
-	# 1. Hide the boss mesh and disable his hitboxes immediately so he stops fighting
-	visible = false
-	$CollisionShape3D.set_deferred("disabled", true)
-	laser_hitbox.set_deferred("disabled", true)
+	# Pass any specific value you want (e.g., Bosses drop more)
+	drop_instance.point_value = 5000
+	
+	RunManager.enemies_defeated_this_room += 1
+	
+	# Use call_deferred to safely add it to the world, just like we did with Aureus
+	get_parent().call_deferred("add_child", drop_instance)
+	drop_instance.set_deferred("global_position", global_position + Vector3(0, 0.5, 0))
+	
+	# 2. Delete the enemy
+	queue_free()
 	
 	# 2. Add a dramatic 3-second pause so the player sees the final damage number
 	await get_tree().create_timer(3.0).timeout

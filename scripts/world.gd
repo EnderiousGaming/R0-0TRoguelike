@@ -51,8 +51,8 @@ func activate_portal():
 	
 	# 2. Vaporize remaining enemies to clear the arena
 	var remaining_enemies = get_tree().get_nodes_in_group("enemy")
-	for virus in remaining_enemies:
-		virus.queue_free()
+	for daemon in remaining_enemies:
+		daemon.queue_free()
 	
 	# 3. Broadcast the secure message to the player
 	var player = get_tree().get_first_node_in_group("player")

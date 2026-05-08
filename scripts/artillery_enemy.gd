@@ -3,6 +3,7 @@ extends CharacterBody3D
 # --- PRELOADS & CONSTANTS ---
 const PROJECTILE = preload("res://scenes/enemy_projectile.tscn")
 const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
+const SCORE_DROP = preload("res://scenes/score_drop.tscn")
 
 # --- ENEMY STATS ---
 var health = 2 # Weaker than the melee brutes
@@ -82,7 +83,17 @@ func take_damage(amount):
 		die()
 
 func die():
-	# Reward the player and notify the run manager
-	RunManager.score += 300 
-	RunManager.enemies_defeated_this_room += 1 
+	# 1. Spawn the physical drop
+	var drop_instance = SCORE_DROP.instantiate()
+	
+	# Pass any specific value you want (e.g., Bosses drop more)
+	drop_instance.point_value = 300
+	
+	RunManager.enemies_defeated_this_room += 1
+	
+	# Use call_deferred to safely add it to the world, just like we did with Aureus
+	get_parent().call_deferred("add_child", drop_instance)
+	drop_instance.set_deferred("global_position", global_position + Vector3(0, 0.5, 0))
+	
+	# 2. Delete the enemy
 	queue_free()

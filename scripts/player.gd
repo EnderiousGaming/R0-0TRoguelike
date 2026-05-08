@@ -115,6 +115,33 @@ func _unhandled_input(event):
 	# DEBUG: Immediate Level Clear
 	if OS.is_debug_build() and event.is_action_pressed("debug_clear_level"):
 		force_level_clear()
+		
+	# ==========================================
+	# UPLINK REROLL PROTOCOL
+	# ==========================================
+	if event.is_action_pressed("reroll_uplink"):
+		
+		# 1. Are there even upgrades nearby to reroll?
+		var active_upgrades = get_tree().get_nodes_in_group("upgrades")
+		
+		# We only want to allow rerolls on FREE Uplink items, not the 5000-point Shop items!
+		if active_upgrades.size() > 0 and active_upgrades[0].cost == 0:
+			
+			# 2. Do we have rerolls left?
+			if RunManager.uplink_rerolls > 0:
+				RunManager.uplink_rerolls -= 1
+				print("SYSTEM: Uplink Reroll accepted. ", RunManager.uplink_rerolls, " remaining.")
+				
+				# 3. Wipe the current free upgrades
+				get_tree().call_group("upgrades", "queue_free")
+				
+				# 4. Trigger the spawn logic again
+				var world_scene = get_tree().current_scene
+				if world_scene.has_method("spawn_upgrades"):
+					world_scene.spawn_upgrades()
+					
+			else:
+				print("SYSTEM: Reroll failed. No Uplink Rerolls available.")
 
 func force_level_clear():
 	print("DEBUG: Sequence broken. Warping to The Golden Process...")
@@ -429,13 +456,15 @@ func take_damage(amount):
 		return
 
 	RunManager.current_health -= amount
-	
 	health_display.text = "HP: " + str(RunManager.current_health)
 	
 	# 1. Trigger the Visual Flash
 	flash_damage_screen()
 	
-	# Add this alongside your take_damage() function
+	# 2. Check for critical failure (THIS WAS MISSING!)
+	if RunManager.current_health <= 0:
+		die()
+
 func apply_hazard_buff():
 	# Example 1: Healing
 	if RunManager.current_health < RunManager.max_health:
@@ -444,9 +473,6 @@ func apply_hazard_buff():
 		
 	# Example 2: You could also trigger a temporary fire-rate or speed multiplier here!
 	# (Just remember to set a timer to turn the buff off if they leave the hazard zone)
-	
-	if RunManager.current_health <= 0:
-		die()
 
 func flash_damage_screen():
 	# If a tween is already running from a previous hit, kill it so they don't fight
