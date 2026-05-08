@@ -39,11 +39,13 @@ func _on_timer_timeout():
 		
 		for sp in spawn_points:
 			if is_instance_valid(sp):
-				valid_spawns.append(sp) # Save it to our safe list
-				
-				# Now it's safe to check the global_position!
-				if not camera.is_position_in_frustum(sp.global_position):
-					hidden_spawns.append(sp)
+				# NEW: Only consider this spawner if no Daemons are standing on it!
+				if is_spawn_clear(sp.global_position):
+					valid_spawns.append(sp) # Save it to our safe list
+					
+					# Now check if it is off-camera
+					if camera and not camera.is_position_in_frustum(sp.global_position):
+						hidden_spawns.append(sp)
 					
 		# 2. SAFETY ABORT: If no spawners survived (like in the Boss Arena), stop the function!
 		if valid_spawns.is_empty():
@@ -63,3 +65,16 @@ func _on_timer_timeout():
 	new_enemy.global_position = chosen_spawn.global_position
 	
 	print("SYSTEM: Enemy successfully deployed at ", chosen_spawn.global_position)
+
+func is_spawn_clear(target_pos: Vector3) -> bool:
+	# Grab all currently active Daemons
+	var active_daemons = get_tree().get_nodes_in_group("enemy")
+	
+	for daemon in active_daemons:
+		if is_instance_valid(daemon):
+			# If a Daemon is standing within 1.5 meters of this point, it's blocked!
+			if daemon.global_position.distance_to(target_pos) < 1.5:
+				return false
+				
+	# If the loop finishes without finding anyone too close, the spot is safe
+	return true

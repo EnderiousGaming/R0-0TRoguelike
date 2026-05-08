@@ -168,7 +168,7 @@ func generate_wfc():
 	for x in range(grid_width):
 		for z in range(grid_depth):
 			# Places a ceiling tile directly above every single grid coordinate
-			set_cell_item(Vector3i(x, ceiling_height, z), TILE_FLOOR) # Swap to TILE_CEILING if you made one
+			set_cell_item(Vector3i(x, ceiling_height, z), TILE_CEILING) # Swap to TILE_CEILING if you made one
 	
 	# ==========================================
 	# ENTITY SPAWN LOGIC & LIGHTING
