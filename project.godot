@@ -20,6 +20,7 @@ config/icon="uid://dft2t2pnedlja"
 [autoload]
 
 RunManager="*uid://ioa61y40s8q1"
+SaveManager="*uid://c46fht7dq5iva"
 
 [display]
 

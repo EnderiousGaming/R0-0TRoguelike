@@ -86,6 +86,10 @@ func die():
 	# 1. Spawn the physical drop
 	var drop_instance = SCORE_DROP.instantiate()
 	
+	# 2. UPDATE THE LIFETIME STATS
+	SaveManager.save_data["stats"]["total_daemons_purged"] += 1
+	SaveManager.save_game() # Instantly write the new total to the hard drive
+	
 	# Pass any specific value you want (e.g., Bosses drop more)
 	drop_instance.point_value = 300
 	
