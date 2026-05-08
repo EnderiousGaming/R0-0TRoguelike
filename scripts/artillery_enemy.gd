@@ -35,8 +35,11 @@ func _ready():
 	
 	speed = base_speed * RunManager.DIFF_SPEED[diff]
 	
-	# IF THIS IS AN ARTILLERY ENEMY, adjust the timer limit:
-	fire_cooldown_max = base_fire_cooldown * RunManager.DIFF_FIRE_RATE[diff]
+	# Grab the Timer node and scale its wait_time! 
+	# (Make sure "Timer" matches the actual name of the node in your scene tree)
+	var fire_timer = $Timer 
+	if fire_timer:
+		fire_timer.wait_time = base_fire_cooldown * RunManager.DIFF_FIRE_RATE[diff]
 
 func _physics_process(delta):
 	# 1. Apply Gravity

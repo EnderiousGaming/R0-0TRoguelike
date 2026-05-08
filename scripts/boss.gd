@@ -172,6 +172,8 @@ func die():
 	drop_instance.point_value = 5000
 	
 	RunManager.enemies_defeated_this_room += 1
+	RunManager.bosses_purged += 1
+	SaveManager.bosses_purged += 1
 	
 	# Use call_deferred to safely add it to the world, just like we did with Aureus
 	get_parent().call_deferred("add_child", drop_instance)

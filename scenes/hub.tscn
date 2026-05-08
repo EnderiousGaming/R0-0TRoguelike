@@ -23,7 +23,7 @@ glow_enabled = true
 [sub_resource type="BoxShape3D" id="BoxShape3D_7wvbm"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_bfqb0"]
-size = Vector3(1.5, 2.5, 1.5)
+size = Vector3(2.5, 2.5, 2.5)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bfqb0"]
 albedo_color = Color(0, 1, 1, 1)
@@ -33,6 +33,7 @@ emission_energy_multiplier = 2.0
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_hlsmc"]
 material = SubResource("StandardMaterial3D_bfqb0")
+height = 1.0
 
 [node name="Hub" type="Node3D" unique_id=320873723]
 script = ExtResource("1_w6xti")
@@ -82,10 +83,12 @@ shape = SubResource("BoxShape3D_7wvbm")
 text = "EQUIP: SWORD"
 
 [node name="DifficultyTerminal" type="Area3D" parent="." unique_id=87924488]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 0.25, 0)
+collision_mask = 7
 script = ExtResource("6_hlsmc")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="DifficultyTerminal" unique_id=971070135]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 1.5, 0)
 shape = SubResource("BoxShape3D_bfqb0")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="DifficultyTerminal" unique_id=1487993991]
@@ -104,3 +107,5 @@ text = "Difficulty Select"
 
 [connection signal="body_entered" from="BlasterRack" to="BlasterRack" method="_on_body_entered"]
 [connection signal="body_entered" from="SwordRack" to="SwordRack" method="_on_body_entered"]
+[connection signal="body_entered" from="DifficultyTerminal" to="DifficultyTerminal" method="_on_body_entered"]
+[connection signal="body_exited" from="DifficultyTerminal" to="DifficultyTerminal" method="_on_body_exited"]
