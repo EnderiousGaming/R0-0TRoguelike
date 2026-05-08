@@ -6,8 +6,11 @@ const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
 const SCORE_DROP = preload("res://scenes/score_drop.tscn")
 
 # --- ENEMY STATS ---
+var base_max_health = 2
+var base_speed = 2.0
+var base_fire_cooldown = 3.0
 var health = 2 # Weaker than the melee brutes
-const speed = 2.0 # Slower movement
+var speed = 2.0 # Slower movement
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- REFERENCES ---
@@ -22,6 +25,18 @@ var player = null
 func _ready():
 	# Find and store the player reference upon spawning
 	player = get_tree().get_first_node_in_group("player")
+	
+	# 1. Grab the current difficulty index (0 through 4)
+	var diff = RunManager.current_difficulty
+	
+	# 2. Scale the stats before the Daemon takes its first step
+	base_max_health = int(base_max_health * RunManager.DIFF_HEALTH[diff])
+	health = base_max_health # Ensure they spawn with full scaled health
+	
+	speed = base_speed * RunManager.DIFF_SPEED[diff]
+	
+	# IF THIS IS AN ARTILLERY ENEMY, adjust the timer limit:
+	fire_cooldown_max = base_fire_cooldown * RunManager.DIFF_FIRE_RATE[diff]
 
 func _physics_process(delta):
 	# 1. Apply Gravity

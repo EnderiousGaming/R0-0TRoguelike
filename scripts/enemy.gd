@@ -5,8 +5,10 @@ const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
 const SCORE_DROP = preload("res://scenes/score_drop.tscn")
 
 # --- ENEMY STATS ---
+var base_max_health = 4
+var base_speed = 3.0
 var health = 4
-const speed = 3.0
+var speed = 3.0
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # Add these three lines for the Daemons' attack stats:
@@ -26,6 +28,15 @@ var player = null
 func _ready():
 	# Search for the lowercase "player" tag upon spawning
 	player = get_tree().get_first_node_in_group("player")
+	
+	# 1. Grab the current difficulty index (0 through 4)
+	var diff = RunManager.current_difficulty
+	
+	# 2. Scale the stats before the Daemon takes its first step
+	base_max_health = int(base_max_health * RunManager.DIFF_HEALTH[diff])
+	health = base_max_health # Ensure they spawn with full scaled health
+	
+	speed = base_speed * RunManager.DIFF_SPEED[diff]
 	
 	# DEBUGGING: Tell us if the search worked!
 	if player == null:

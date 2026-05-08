@@ -18,7 +18,8 @@ var save_data = {
 		"master_volume": 1.0,
 		"sfx_volume": 1.0,
 		"music_volume": 1.0,
-		"mouse_sensitivity": 0.002
+		"mouse_sensitivity": 0.002,
+		"difficulty": 1
 	},
 	"unlocks": {
 		"highest_shop_tier": 1
@@ -45,6 +46,8 @@ func load_game():
 		print("SYSTEM: No save file found. Initializing new memory core.")
 		return # Keep the default values
 
+	RunManager.current_difficulty = save_data["options"]["difficulty"]
+	
 	var file = FileAccess.open(SAVE_PATH, FileAccess.READ)
 	if file:
 		var json_string = file.get_as_text()

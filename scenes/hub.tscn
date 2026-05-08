@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://il4prkm7s6oo" path="res://scenes/portal.tscn" id="3_w6xti"]
 [ext_resource type="PackedScene" uid="uid://brf32bxx2jhxk" path="res://scenes/kill_plane.tscn" id="4_7wvbm"]
 [ext_resource type="Script" uid="uid://o4kkpjhrl3kf" path="res://scripts/weapon_rack.gd" id="5_bfqb0"]
+[ext_resource type="Script" uid="uid://csod4l1jotnr5" path="res://scripts/difficulty_terminal.gd" id="6_hlsmc"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_d1od2"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -20,6 +21,18 @@ tonemap_mode = 2
 glow_enabled = true
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_7wvbm"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_bfqb0"]
+size = Vector3(1.5, 2.5, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bfqb0"]
+albedo_color = Color(0, 1, 1, 1)
+emission_enabled = true
+emission = Color(0, 1, 1, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hlsmc"]
+material = SubResource("StandardMaterial3D_bfqb0")
 
 [node name="Hub" type="Node3D" unique_id=320873723]
 script = ExtResource("1_w6xti")
@@ -67,6 +80,27 @@ shape = SubResource("BoxShape3D_7wvbm")
 
 [node name="Label3D" type="Label3D" parent="SwordRack" unique_id=206996318]
 text = "EQUIP: SWORD"
+
+[node name="DifficultyTerminal" type="Area3D" parent="." unique_id=87924488]
+script = ExtResource("6_hlsmc")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DifficultyTerminal" unique_id=971070135]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+shape = SubResource("BoxShape3D_bfqb0")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DifficultyTerminal" unique_id=1487993991]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6398792, 0)
+mesh = SubResource("CylinderMesh_hlsmc")
+
+[node name="OmniLight3D" type="OmniLight3D" parent="DifficultyTerminal/MeshInstance3D" unique_id=1996257288]
+light_color = Color(0, 1, 1, 1)
+omni_range = 2.0
+
+[node name="Label3D" type="Label3D" parent="DifficultyTerminal" unique_id=824195028]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9964437, 0)
+billboard = 1
+no_depth_test = true
+text = "Difficulty Select"
 
 [connection signal="body_entered" from="BlasterRack" to="BlasterRack" method="_on_body_entered"]
 [connection signal="body_entered" from="SwordRack" to="SwordRack" method="_on_body_entered"]

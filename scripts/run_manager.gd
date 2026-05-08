@@ -67,6 +67,24 @@ var dash_cooldown = 1.5
 
 
 # ==========================================
+# DIFFICULTY SETTINGS
+# ==========================================
+# 0 = Easy, 1 = Normal, 2 = Hard, 3 = Extra Hard, 4 = YOU WILL DIE
+var current_difficulty: int = 1 
+
+# Array Index matches the difficulty integer
+const DIFF_NAMES = ["EASY", "NORMAL", "HARD", "EXTRA HARD", "YOU WILL DIE"]
+
+# Health Multiplier (Higher = Tankier)
+const DIFF_HEALTH = [0.5, 1.0, 1.5, 2.5, 5.0]
+
+# Speed Multiplier (Higher = Faster)
+const DIFF_SPEED = [0.75, 1.0, 1.25, 1.75, 3.0]
+
+# Fire Cooldown Multiplier (LOWER = Faster shooting!)
+const DIFF_FIRE_RATE = [1.5, 1.0, 0.75, 0.5, 0.1]
+
+# ==========================================
 # ECONOMY (SHOP COSTS)
 # ==========================================
 
