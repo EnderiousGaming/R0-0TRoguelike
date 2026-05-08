@@ -111,7 +111,7 @@ func reset_run():
 	has_radiation_aura = false
 	has_hazard_override = false
 	has_courier_protocol = false
-	uplink_rerolls = 0
+	uplink_rerolls = 0 
 	
 	# Shop Economy
 	heal_cost = 500
