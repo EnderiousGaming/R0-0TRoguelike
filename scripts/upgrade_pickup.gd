@@ -4,11 +4,15 @@ extends Area3D
 # VARIABLES & REFERENCES
 # ==========================================
 
+# Export variables allow you to configure shop items directly in the Inspector!
+@export var starting_upgrade_id: int = 1 
+@export var cost: int = 0 # 0 for Uplink, 5000 for Shop
+@export var is_shop_item: bool = false # Prevents deleting the whole shop when one is bought
+
 @onready var label = $Label3D
 var my_upgrade_id = 1
-var player_in_range = false # Tracks if R0-0T is standing close enough
+var player_in_range = false 
 
-# Dictionary for upgrade text descriptions
 var upgrade_texts = {
 	1: "HEAVY BARREL\n+Damage, -Fire Rate",
 	2: "FRICTIONLESS COATING\n+Speed, Ice Physics",
@@ -29,7 +33,12 @@ var upgrade_texts = {
 	17: "KINETIC PLATING\n+2 Max Health",
 	18: "SCATTER SHOT\nFires an extra projectile per trigger pull in a wide spread.",
 	19: "RICOCHET\nProjectiles violently bounce off walls and floors.",
-	20: "SEISMIC SLAM\nStriking the terrain with the sword creates a massive damaging shockwave."
+	20: "SEISMIC SLAM\nStriking the terrain with the sword creates a massive damaging shockwave.",
+	
+	# --- NEW PREMIUM SHOP UPGRADES ---
+	21: "HAZARD OVERRIDE\nCorrupted Domain heals instead of hurts",
+	22: "COURIER PROTOCOL\nDrops automatically fly to R0-0T",
+	23: "UPLINK REROLL\nGain an extra reroll at the Uplink"
 }
 
 # ==========================================
@@ -37,29 +46,48 @@ var upgrade_texts = {
 # ==========================================
 
 func _ready():
-	pass
+	# Automatically set up the item if it was manually placed in the Shop scene
+	setup(starting_upgrade_id, cost, is_shop_item)
 
-func setup(id: int):
+func setup(id: int, item_cost: int = 0, is_shop: bool = false):
 	my_upgrade_id = id
-	# Add a helpful prompt so the player knows what buttons to press!
-	label.text = upgrade_texts[my_upgrade_id] + "\n\n[Press E or F to Equip]"
+	cost = item_cost
+	is_shop_item = is_shop
+	
+	var price_text = "\nFREE"
+	if cost > 0:
+		price_text = "\nCOST: " + str(cost) + " PTS"
+		
+	# Combine the description, the price, and the interact prompt
+	label.text = upgrade_texts[my_upgrade_id] + price_text + "\n\n[Press E or F to Equip]"
 
 # ==========================================
 # INTERACTION LOGIC
 # ==========================================
 
 func _process(_delta):
-	# NEW: Check if the player is in range AND just pressed the interact button
 	if player_in_range and Input.is_action_just_pressed("interact"):
-		print("SYSTEM: Upgrade ", my_upgrade_id, " acquired.")
-		RunManager.apply_upgrade(my_upgrade_id)
-		get_tree().call_group("upgrades", "queue_free")
+		# 1. Check the wallet
+		if RunManager.score >= cost:
+			print("SYSTEM: Transaction approved. Upgrade ", my_upgrade_id, " acquired.")
+			
+			# 2. Charge the player and apply the upgrade
+			RunManager.score -= cost
+			RunManager.apply_upgrade(my_upgrade_id)
+			
+			# 3. Clean up the geometry
+			if is_shop_item:
+				queue_free() # Only destroy this specific shop item
+			else:
+				get_tree().call_group("upgrades", "queue_free") # Destroy all free Uplink options
+		else:
+			print("SYSTEM: Insufficient points. Need ", cost, " PTS.")
+			# TODO: You could play a negative "buzzer" sound effect here!
 
 func _on_body_entered(body):
 	if body.is_in_group("player"):
-		player_in_range = true # R0-0T is close enough to buy it!
+		player_in_range = true
 
-# NEW: We need to know if the player walks away without grabbing it!
 func _on_body_exited(body):
 	if body.is_in_group("player"):
 		player_in_range = false
