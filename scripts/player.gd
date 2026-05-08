@@ -66,6 +66,8 @@ var radiation_timer = 0.0
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
 @onready var save_button = $HUD/PauseMenu/VBoxContainer/SaveButton
+@onready var options_button = $HUD/PauseMenu/VBoxContainer/OptionsButton
+@onready var options_menu = $HUD/OptionsMenu # Assuming it's a child of the HUD
 @onready var grapple_bar = $HUD/GrappleBar
 @onready var damage_overlay = $HUD/DamageOverlay
 
@@ -87,6 +89,10 @@ func _ready():
 	resume_button.pressed.connect(toggle_pause)
 	save_button.pressed.connect(save_game_from_menu)
 	quit_button.pressed.connect(quit_to_menu)
+	options_button.pressed.connect(func():
+		pause_menu.visible = false
+		options_menu.visible = true
+)
 	
 	update_weapon_loadout()
 
@@ -608,3 +614,7 @@ func _on_sword_hitbox_area_entered(area):
 			await get_tree().create_timer(1.5).timeout
 			RunManager.player_speed_multiplier -= 0.4
 			
+
+
+func _on_options_button_pressed() -> void:
+	pass # Replace with function body.

@@ -18,8 +18,11 @@ var save_data = {
 		"master_volume": 1.0,
 		"sfx_volume": 1.0,
 		"music_volume": 1.0,
+		"fullscreen": false,
+		"resolution_index": 1, # We will use an index (0 = 1080p, 1 = 720p, etc.)
 		"mouse_sensitivity": 0.002,
-		"difficulty": 1
+		"difficulty": 1,
+		"crt_shader_enabled": true
 	},
 	"unlocks": {
 		"highest_shop_tier": 1
