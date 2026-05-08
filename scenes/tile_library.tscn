@@ -1,9 +1,16 @@
 [gd_scene format=3 uid="uid://dkbbnwxthc2v2"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_ficu2"]
+[sub_resource type="BoxMesh" id="BoxMesh_oymtw"]
 size = Vector3(4, 0.2, 4)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_fnpah"]
+size = Vector3(4, 0.2, 4)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fnpah"]
+albedo_color = Color(0.13088945, 0.00023701988, 0.29454005, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ficu2"]
+material = SubResource("StandardMaterial3D_fnpah")
 size = Vector3(4, 0.2, 4)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ficu2"]
@@ -30,11 +37,19 @@ size = Vector3(1.5, 100, 1.5)
 [node name="TileLibrary" type="Node3D" unique_id=997107598]
 
 [node name="Floor" type="MeshInstance3D" parent="." unique_id=94037092]
-mesh = SubResource("BoxMesh_ficu2")
+mesh = SubResource("BoxMesh_oymtw")
 
 [node name="StaticBody3D" type="StaticBody3D" parent="Floor" unique_id=220041619]
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Floor/StaticBody3D" unique_id=1581883716]
+shape = SubResource("BoxShape3D_fnpah")
+
+[node name="Cieling" type="MeshInstance3D" parent="." unique_id=2053811035]
+mesh = SubResource("BoxMesh_ficu2")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Cieling" unique_id=1532462251]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Cieling/StaticBody3D" unique_id=1916971639]
 shape = SubResource("BoxShape3D_fnpah")
 
 [node name="HazardFloor" type="MeshInstance3D" parent="." unique_id=763916867]

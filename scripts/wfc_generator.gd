@@ -11,6 +11,7 @@ const TILE_FLOOR = 0
 const TILE_WALL = 1
 const TILE_PILLAR = 3
 const TILE_HAZARD = 4
+const TILE_CEILING = 5 # Or whatever index your new tile ends up being
 
 # SPAWN WEIGHTS (Higher number = Spawns more often)
 var tile_weights = {
@@ -155,6 +156,19 @@ func generate_wfc():
 		patch_count += 1
 		
 	print("SYSTEM: ", patch_count, " Pillar holes plastered perfectly flush.")
+	
+	# ==========================================
+	# CEILING GENERATION PASS
+	# ==========================================
+	# Aureus is 4 meters tall, so the ceiling must be AT LEAST Y=5. 
+	# Y=6 or Y=7 is safer so his collision capsule doesn't scrape it.
+	var ceiling_height = 6 
+		
+	print("SYSTEM: Enclosing arena architecture...")
+	for x in range(grid_width):
+		for z in range(grid_depth):
+			# Places a ceiling tile directly above every single grid coordinate
+			set_cell_item(Vector3i(x, ceiling_height, z), TILE_FLOOR) # Swap to TILE_CEILING if you made one
 	
 	# ==========================================
 	# ENTITY SPAWN LOGIC & LIGHTING
