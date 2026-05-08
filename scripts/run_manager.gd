@@ -14,6 +14,9 @@ var has_moon_jump = false
 var has_close_combat = false
 var has_sniper_combat = false
 var has_radiation_aura = false
+var has_hazard_override: bool = false
+var has_courier_protocol: bool = false
+var uplink_rerolls: int = 0
 
 
 # ==========================================
@@ -106,6 +109,9 @@ func reset_run():
 	has_close_combat = false
 	has_sniper_combat = false
 	has_radiation_aura = false
+	has_hazard_override = false
+	has_courier_protocol = false
+	uplink_rerolls = 0
 	
 	# Shop Economy
 	heal_cost = 500
@@ -174,3 +180,11 @@ func apply_upgrade(upgrade_id: int):
 		17: # Kinetic Plating
 			max_health += 2
 			current_health += 2
+			
+		# --- SHOP UPGRADES ---
+		21: # Hazard Override
+			has_hazard_override = true
+		22: # Courier Protocol
+			has_courier_protocol = true
+		23: # Uplink Reroll
+			uplink_rerolls += 2

@@ -435,6 +435,16 @@ func take_damage(amount):
 	# 1. Trigger the Visual Flash
 	flash_damage_screen()
 	
+	# Add this alongside your take_damage() function
+func apply_hazard_buff():
+	# Example 1: Healing
+	if RunManager.current_health < RunManager.max_health:
+		RunManager.current_health += 1
+		print("SYSTEM: R0-0T cooling systems engaged. Health restored.")
+		
+	# Example 2: You could also trigger a temporary fire-rate or speed multiplier here!
+	# (Just remember to set a timer to turn the buff off if they leave the hazard zone)
+	
 	if RunManager.current_health <= 0:
 		die()
 
@@ -538,3 +548,4 @@ func _on_sword_hitbox_area_entered(area):
 			RunManager.player_speed_multiplier += 0.4
 			await get_tree().create_timer(1.5).timeout
 			RunManager.player_speed_multiplier -= 0.4
+			
