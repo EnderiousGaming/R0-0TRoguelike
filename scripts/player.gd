@@ -398,6 +398,8 @@ func fire_weapon():
 		target_point = aim_raycast.get_collision_point()
 	else:
 		target_point = aim_raycast.global_position - aim_raycast.global_transform.basis.z * 50.0
+		
+	RunManager.projectiles_fired += 1
 
 	# Loop through the spawn sequence based on how many Scatter upgrades R0-0T has
 	for i in range(RunManager.blaster_scatter_count):
@@ -489,9 +491,24 @@ func flash_damage_screen():
 func die():
 	print("CRITICAL FAILURE: R0-0T Offline.")
 	
-	# Trigger the Autosave right before the scene changes
+	# 1. Update standard accumulative lifetime stats
+	SaveManager.save_data["stats"]["r0_0t_deaths"] += 1
+	SaveManager.save_data["stats"]["total_daemons_purged"] += RunManager.daemons_purged
+	SaveManager.save_data["stats"]["projectiles_fired"] += RunManager.projectiles_fired
+	SaveManager.save_data["stats"]["damage_dealt"] += RunManager.damage_dealt
+	SaveManager.save_data["stats"]["bosses_purged"] += RunManager.bosses_purged
+	SaveManager.save_data["stats"]["points_spent"] += RunManager.points_spent
+	
+	# 2. Check for New Personal Bests!
+	if RunManager.score > SaveManager.save_data["stats"]["highest_score"]:
+		SaveManager.save_data["stats"]["highest_score"] = RunManager.score
+		
+	if RunManager.current_stage > SaveManager.save_data["stats"]["highest_stage_reached"]:
+		SaveManager.save_data["stats"]["highest_stage_reached"] = RunManager.current_stage
+	
+	# 3. NOW trigger the autosave
 	SaveManager.save_game()
-	print("SYSTEM: Autosave complete.")
+	print("SYSTEM: Autosave complete. Memory core updated.")
 	
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/game_over.tscn")
 	

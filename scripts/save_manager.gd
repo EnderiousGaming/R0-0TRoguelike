@@ -7,7 +7,12 @@ var save_data = {
 	"stats": {
 		"total_daemons_purged": 0,
 		"r0_0t_deaths": 0,
-		"highest_stage_reached": 0
+		"highest_stage_reached": 0,
+		"highest_score": 0,
+		"projectiles_fired": 0,
+		"damage_dealt": 0,
+		"bosses_purged": 0,
+		"points_spent": 0
 	},
 	"options": {
 		"master_volume": 1.0,

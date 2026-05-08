@@ -71,6 +71,8 @@ func _process(_delta):
 		if RunManager.score >= cost:
 			print("SYSTEM: Transaction approved. Upgrade ", my_upgrade_id, " acquired.")
 			
+			RunManager.points_spent += cost
+			
 			# 2. Charge the player and apply the upgrade
 			RunManager.score -= cost
 			RunManager.apply_upgrade(my_upgrade_id)

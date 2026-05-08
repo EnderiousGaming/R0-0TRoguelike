@@ -152,6 +152,9 @@ func _check_contact_damage():
 
 func take_damage(amount):
 	health -= amount
+	
+	RunManager.damage_dealt += amount
+	
 	var dmg_text = DAMAGE_NUMBER.instantiate()
 	get_parent().add_child(dmg_text)
 	dmg_text.global_position = global_position + Vector3(0, 4.0, 0)

@@ -82,6 +82,8 @@ func _physics_process(delta):
 func take_damage(amount):
 	var final_damage = amount
 	
+	RunManager.damage_dealt += amount
+	
 	# --- APPLY COMBAT MODIFIERS ---
 	# Check distance to player for Sniper/Shotgun modifiers
 	if player:
@@ -114,7 +116,8 @@ func die():
 	
 	# 2. UPDATE THE LIFETIME STATS
 	SaveManager.save_data["stats"]["total_daemons_purged"] += 1
-	SaveManager.save_game() # Instantly write the new total to the hard drive
+	
+	RunManager.daemons_purged += 1
 	
 	# Pass any specific value you want (e.g., Bosses drop more)
 	drop_instance.point_value = 100
@@ -125,5 +128,5 @@ func die():
 	get_parent().call_deferred("add_child", drop_instance)
 	drop_instance.set_deferred("global_position", global_position + Vector3(0, 0.5, 0))
 	
-	# 2. Delete the enemy
+	# 3. Delete the enemy
 	queue_free()

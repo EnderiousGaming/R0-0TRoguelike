@@ -69,6 +69,8 @@ func _on_timer_timeout():
 func take_damage(amount):
 	health -= amount
 	
+	RunManager.damage_dealt += amount
+	
 	# Spawn floating damage text
 	var dmg_text = DAMAGE_NUMBER.instantiate()
 	get_parent().add_child(dmg_text)

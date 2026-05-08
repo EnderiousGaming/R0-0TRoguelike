@@ -18,6 +18,15 @@ var has_hazard_override: bool = false
 var has_courier_protocol: bool = false
 var uplink_rerolls: int = 0
 
+# ==========================================
+# STAT TRACKING
+# ==========================================
+
+var daemons_purged: int = 0
+var projectiles_fired: int = 0
+var damage_dealt: int = 0
+var bosses_purged: int = 0
+var points_spent: int = 0
 
 # ==========================================
 # WEAPON STATS
@@ -82,6 +91,12 @@ func reset_run():
 	player_speed_multiplier = 1.0
 	score = 0
 	current_stage = 0
+	daemons_purged = 0
+	projectiles_fired = 0
+	damage_dealt = 0
+	bosses_purged = 0
+	points_spent = 0
+	
 	
 	# Weapon Defaults
 	laser_damage = 1
