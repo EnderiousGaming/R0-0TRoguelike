@@ -189,4 +189,9 @@ omni_range = 10.0
 [node name="KillPlane" parent="." unique_id=1321934473 instance=ExtResource("7_3stig")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -25, 0)
 
+[node name="Cieling" type="CSGBox3D" parent="." unique_id=1510300177]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 98.50795, 0)
+use_collision = true
+size = Vector3(30, 1, 30)
+
 [connection signal="timeout" from="WaveDirector/Timer" to="WaveDirector" method="_on_timer_timeout"]
