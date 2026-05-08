@@ -4,6 +4,7 @@
 [ext_resource type="Script" uid="uid://jhndxft4ymk8" path="res://scripts/shop_trigger.gd" id="2_1l46r"]
 [ext_resource type="PackedScene" uid="uid://cifrqihdec76w" path="res://scenes/shop_menu.tscn" id="3_032fp"]
 [ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="4_032fp"]
+[ext_resource type="Script" uid="uid://c3bm74y8trnbx" path="res://scripts/shop_void.gd" id="5_2fc2m"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_032fp"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -22,6 +23,8 @@ glow_enabled = true
 albedo_color = Color(0, 1, 1, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_lx5au"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_8r1wq"]
 
 [node name="Shop" type="Node3D" unique_id=634555919]
 
@@ -60,4 +63,18 @@ visible = false
 [node name="Player" parent="." unique_id=665301636 instance=ExtResource("4_032fp")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03542614, 2.532146, 5.8755283)
 
+[node name="RespawnPoint" type="Marker3D" parent="." unique_id=1409073178]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.1793752, 4.2701864)
+
+[node name="ShopVoid" type="Area3D" parent="." unique_id=178275300 node_paths=PackedStringArray("respawn_node")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -7.1513762, 0)
+collision_mask = 7
+script = ExtResource("5_2fc2m")
+respawn_node = NodePath("../RespawnPoint")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ShopVoid" unique_id=1395108922]
+transform = Transform3D(1000, 0, 0, 0, 1, 0, 0, 0, 1000, 0, 0, 0)
+shape = SubResource("BoxShape3D_8r1wq")
+
 [connection signal="body_entered" from="ShopTrigger" to="ShopTrigger" method="_on_body_entered"]
+[connection signal="body_entered" from="ShopVoid" to="ShopVoid" method="_on_body_entered"]
