@@ -87,18 +87,32 @@ func _on_crt_toggled(toggled_on: bool):
 func apply_fullscreen(is_full: bool):
 	if is_full:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		resolution_dropdown.disabled = true # Lock resolution when fullscreen
+		resolution_dropdown.disabled = true 
 	else:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
 		resolution_dropdown.disabled = false
+		
+		# NEW: Wait one frame for the OS to actually exit fullscreen before resizing
+		await get_tree().process_frame
+		
+		var saved_res_index = SaveManager.save_data["options"]["resolution_index"]
+		apply_resolution(saved_res_index)
 
 func apply_resolution(index: int):
-	if not SaveManager.save_data["options"]["fullscreen"]:
-		DisplayServer.window_set_size(RESOLUTIONS[index])
-		# Center the window on the player's monitor (Warning-free!)
+	var is_fullscreen = SaveManager.save_data["options"].get("fullscreen", false)
+	
+	if not is_fullscreen:
+		var target_size = RESOLUTIONS[index]
+		var window = get_window() # Grab the actual Godot Viewport Window
+		
+		# 1. Instantly resize both the OS window and the internal rendering canvas
+		window.size = target_size
+		
+		# 2. Calculate the screen center (We still use DisplayServer to read monitor stats)
 		var screen_center = DisplayServer.screen_get_position() + Vector2i(DisplayServer.screen_get_size() / 2.0)
-		var window_size = DisplayServer.window_get_size()
-		DisplayServer.window_set_position(screen_center - Vector2i(window_size / 2.0))
+		
+		# 3. Move the window flawlessly
+		window.position = screen_center - Vector2i(target_size / 2.0)
 
 func apply_crt(is_enabled: bool):
 	# Grab the root player node
