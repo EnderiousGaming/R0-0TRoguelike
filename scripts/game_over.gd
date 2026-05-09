@@ -25,6 +25,11 @@ func populate_run_stats():
 func populate_lifetime_stats():
 	var stats = SaveManager.save_data["stats"]
 	
+	# Translate the integer into the difficulty name
+	var threat_text = "NONE"
+	if stats["highest_threat_cleared"] >= 0:
+		threat_text = RunManager.DIFF_NAMES[stats["highest_threat_cleared"]]
+	
 	var text = "HIGHEST SCORE: %d\n" % stats["highest_score"]
 	text += "HIGHEST FLOOR: %d\n" % stats["highest_stage_reached"]
 	text += "TOTAL PURGED: %d\n" % stats["total_daemons_purged"]
@@ -32,7 +37,8 @@ func populate_lifetime_stats():
 	text += "TOTAL DAMAGE: %d\n" % stats["damage_dealt"]
 	text += "TOTAL BOSSES: %d\n" % stats["bosses_purged"]
 	text += "TOTAL SPENT: %d\n" % stats["points_spent"]
-	text += "R0-0T DEATHS: %d" % stats["r0_0t_deaths"]
+	text += "R0-0T DEATHS: %d\n" % stats["r0_0t_deaths"]
+	text += "MAX THREAT PURGED: %s\n" % threat_text
 	
 	lifetime_stats_label.text = text
 

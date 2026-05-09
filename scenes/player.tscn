@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://bnvka1t8uknl6" path="res://scripts/player.gd" id="1_3vyb7"]
 [ext_resource type="Shader" uid="uid://ck4x4uio6igdq" path="res://shaders/player.gdshader" id="2_g2els"]
-[ext_resource type="Script" uid="uid://dww8r6b8yekrq" path="res://scripts/options_menu.gd" id="2_qhqgy"]
+[ext_resource type="PackedScene" uid="uid://cpgvqce7hobrv" path="res://scenes/options_menu.tscn" id="2_qhqgy"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_g2els"]
 
@@ -352,72 +352,12 @@ grow_vertical = 2
 mouse_filter = 2
 color = Color(0.6666667, 0, 0, 0)
 
-[node name="OptionsMenu" type="Panel" parent="HUD" unique_id=1732998522]
-process_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-script = ExtResource("2_qhqgy")
+[node name="OptionsMenu" parent="HUD" unique_id=939318422 instance=ExtResource("2_qhqgy")]
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HUD/OptionsMenu" unique_id=867032943]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -20.0
-offset_top = -20.0
-offset_right = 20.0
-offset_bottom = 20.0
-grow_horizontal = 2
-grow_vertical = 2
-
-[node name="FullscreenToggle" type="CheckButton" parent="HUD/OptionsMenu/VBoxContainer" unique_id=1423146847]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Fullscreen"
-
-[node name="HBoxContainer" type="HBoxContainer" parent="HUD/OptionsMenu/VBoxContainer" unique_id=1525155243]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="HUD/OptionsMenu/VBoxContainer/HBoxContainer" unique_id=683369586]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Resolution"
-horizontal_alignment = 1
-
-[node name="ResolutionDropdown" type="OptionButton" parent="HUD/OptionsMenu/VBoxContainer/HBoxContainer" unique_id=1263014971]
-layout_mode = 2
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="HUD/OptionsMenu/VBoxContainer" unique_id=331079147]
-layout_mode = 2
-
-[node name="Label" type="Label" parent="HUD/OptionsMenu/VBoxContainer/HBoxContainer2" unique_id=782406517]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Mouse Sensitivity"
-
-[node name="SensitivitySlider" type="HSlider" parent="HUD/OptionsMenu/VBoxContainer/HBoxContainer2" unique_id=1417647546]
-custom_minimum_size = Vector2(200, 50)
-layout_mode = 2
-size_flags_horizontal = 3
-min_value = 0.005
-max_value = 0.05
-step = 0.001
-value = 0.005
-
-[node name="CRTToggle" type="CheckButton" parent="HUD/OptionsMenu/VBoxContainer" unique_id=13420126]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "CRT Shader"
-
-[node name="BackButton" type="Button" parent="HUD/OptionsMenu/VBoxContainer" unique_id=1909808677]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "Back"
+[node name="SaveIndicator" type="Label" parent="HUD" unique_id=2051580663]
+offset_right = 40.0
+offset_bottom = 23.0
+text = "Autosaving..."
 
 [node name="CRTFilter" type="CanvasLayer" parent="." unique_id=333146233]
 layer = 0

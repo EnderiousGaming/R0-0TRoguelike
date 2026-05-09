@@ -1,5 +1,7 @@
 extends CharacterBody3D
 
+@onready var save_indicator = $HUD/SaveIndicator
+
 # ==========================================
 # VARIABLES & REFERENCES
 # ==========================================
@@ -92,9 +94,24 @@ func _ready():
 	options_button.pressed.connect(func():
 		pause_menu.visible = false
 		options_menu.visible = true
-)
+	)
+	options_menu.back_pressed.connect(func():
+		pause_menu.visible = true
+	)
 	
 	update_weapon_loadout()
+	
+	save_indicator.modulate.a = 0.0 # Hide it by default
+	SaveManager.memory_synced.connect(flash_save_indicator)
+	
+func flash_save_indicator():
+	# Cancel any running tweens so it doesn't glitch if saved rapidly
+	var tween = create_tween()
+	
+	# Snap it to full visibility, wait 1.5 seconds, then fade out
+	save_indicator.modulate.a = 1.0
+	tween.tween_interval(1.5)
+	tween.tween_property(save_indicator, "modulate:a", 0.0, 0.5)
 
 func _unhandled_input(event):
 	# 1. Capture Mouse: Re-lock the mouse if the player clicks the game window

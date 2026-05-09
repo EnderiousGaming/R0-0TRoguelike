@@ -1,5 +1,7 @@
 extends Node
 
+signal memory_synced
+
 const SAVE_PATH = "user://save_data.json"
 
 # The master dictionary that holds everything we want to save
@@ -12,7 +14,8 @@ var save_data = {
 		"projectiles_fired": 0,
 		"damage_dealt": 0,
 		"bosses_purged": 0,
-		"points_spent": 0
+		"points_spent": 0,
+		"highest_threat_cleared": -1
 	},
 	"options": {
 		"master_volume": 1.0,
@@ -43,6 +46,8 @@ func save_game():
 		print("SYSTEM: Memory core synced. Save data written to disk.")
 	else:
 		print("CRITICAL ERROR: Failed to open save file for writing.")
+		
+	memory_synced.emit()
 
 func load_game():
 	if not FileAccess.file_exists(SAVE_PATH):

@@ -1,5 +1,7 @@
 extends Panel
 
+signal back_pressed
+
 # --- UI REFERENCES ---
 @onready var fullscreen_toggle = $VBoxContainer/FullscreenToggle
 @onready var resolution_dropdown = $VBoxContainer/HBoxContainer/ResolutionDropdown
@@ -125,4 +127,4 @@ func apply_crt(is_enabled: bool):
 
 func hide_options():
 	visible = false
-	get_parent().get_node("PauseMenu").visible = true
+	back_pressed.emit()

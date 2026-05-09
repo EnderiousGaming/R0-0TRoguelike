@@ -182,6 +182,13 @@ func die():
 	# 2. Delete the enemy
 	queue_free()
 	
+	# Check if their current difficulty beats their previous record
+	if RunManager.current_difficulty > SaveManager.save_data["stats"]["highest_threat_cleared"]:
+		SaveManager.save_data["stats"]["highest_threat_cleared"] = RunManager.current_difficulty
+		print("SYSTEM: New maximum threat level cleared!")
+		
+	SaveManager.save_game()
+	
 	# 2. Add a dramatic 3-second pause so the player sees the final damage number
 	await get_tree().create_timer(3.0).timeout
 	
