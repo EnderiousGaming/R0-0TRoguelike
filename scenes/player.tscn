@@ -359,6 +359,27 @@ offset_right = 40.0
 offset_bottom = 23.0
 text = "Autosaving..."
 
+[node name="TutorialOverlay" type="PanelContainer" parent="HUD" unique_id=487557014]
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 82.34
+offset_bottom = 148.34001
+grow_horizontal = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="HUD/TutorialOverlay" unique_id=744904416]
+layout_mode = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="DirectiveText" type="Label" parent="HUD/TutorialOverlay/MarginContainer" unique_id=1499198539]
+layout_mode = 2
+theme_override_font_sizes/font_size = 24
+text = "..."
+horizontal_alignment = 1
+autowrap_mode = 2
+
 [node name="CRTFilter" type="CanvasLayer" parent="." unique_id=333146233]
 layer = 0
 

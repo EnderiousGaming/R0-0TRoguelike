@@ -1,6 +1,39 @@
 extends Node
 
 # ==========================================
+# BOOT SEQUENCE (TUTORIAL) TRACKING
+# ==========================================
+var is_tutorial: bool = false
+var tutorial_room_index: int = 0
+
+const TUTORIAL_SCENES = [
+	"res://scenes/tutorial/tutorial_room_1.tscn", # Movement & Calibration
+	"res://scenes/tutorial/tutorial_room_2.tscn", # Sword Mechanics & Dash Deflection
+	"res://scenes/tutorial/tutorial_room_3.tscn", # Blaster Firing & Acrobatic Grappling
+	"res://scenes/tutorial/tutorial_room_4.tscn"  # Kinetic Deflection (Parry) & Extraction
+]
+
+func start_tutorial():
+	reset_run()
+	is_tutorial = true
+	tutorial_room_index = 0
+	current_stage = 0
+	get_tree().change_scene_to_file(TUTORIAL_SCENES[0])
+
+func advance_tutorial():
+	tutorial_room_index += 1
+	if tutorial_room_index < TUTORIAL_SCENES.size():
+		get_tree().change_scene_to_file(TUTORIAL_SCENES[tutorial_room_index])
+	else:
+		# Complete tutorial successfully
+		complete_tutorial()
+
+func complete_tutorial():
+	is_tutorial = false
+	print("SYSTEM: Boot sequence complete. Core functionality validated.")
+	get_tree().change_scene_to_file("res://scenes/hub.tscn")
+
+# ==========================================
 # GLOBAL LOADOUT & FLAGS
 # ==========================================
 

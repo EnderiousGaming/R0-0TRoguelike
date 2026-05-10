@@ -1,6 +1,8 @@
 extends CharacterBody3D
 
 @onready var save_indicator = $HUD/SaveIndicator
+@onready var tutorial_overlay = $HUD/TutorialOverlay
+@onready var directive_text = $HUD/TutorialOverlay/MarginContainer/DirectiveText
 
 # ==========================================
 # VARIABLES & REFERENCES
@@ -103,6 +105,10 @@ func _ready():
 	
 	save_indicator.modulate.a = 0.0 # Hide it by default
 	SaveManager.memory_synced.connect(flash_save_indicator)
+	
+	# Hide the overlay by default unless we are explicitly in the tutorial
+	if is_instance_valid(tutorial_overlay):
+		tutorial_overlay.visible = false
 	
 func flash_save_indicator():
 	# Cancel any running tweens so it doesn't glitch if saved rapidly
@@ -573,6 +579,20 @@ func announce(message: String):
 	announcement_label.text = message
 	await get_tree().create_timer(4.0).timeout
 	announcement_label.text = ""
+
+func show_tutorial_directive(message: String):
+	if not is_instance_valid(tutorial_overlay):
+		return
+		
+	tutorial_overlay.visible = true
+	directive_text.text = message
+	
+	# Optional: Play a subtle UI beep sound here to grab the player's attention
+	print("DIRECTIVE POSTED: ", message)
+
+func hide_tutorial_directive():
+	if is_instance_valid(tutorial_overlay):
+		tutorial_overlay.visible = false
 
 func _update_weapon_ui():
 	# Hide/Show HUD elements based on the equipped weapon
