@@ -1,3 +1,61 @@
 [gd_scene format=3 uid="uid://byntjanf6a2s0"]
 
+[ext_resource type="PackedScene" uid="uid://bjifcg4kkf0n6" path="res://scenes/player.tscn" id="1_4qp54"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_4qp54"]
+sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+ground_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
+
+[sub_resource type="Sky" id="Sky_smf6e"]
+sky_material = SubResource("ProceduralSkyMaterial_4qp54")
+
+[sub_resource type="Environment" id="Environment_fw6sp"]
+background_mode = 2
+sky = SubResource("Sky_smf6e")
+tonemap_mode = 2
+glow_enabled = true
+
 [node name="Chamber01Movement" type="Node3D" unique_id=1617753210]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=885896006]
+environment = SubResource("Environment_fw6sp")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="." unique_id=1506244982]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -8)
+use_collision = true
+flip_faces = true
+size = Vector3(3, 5, 20)
+
+[node name="Player" parent="." unique_id=665301636 instance=ExtResource("1_4qp54")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="OmniLight3D" type="OmniLight3D" parent="." unique_id=613849250]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, -8.208279)
+visible = false
+light_energy = 3.0
+
+[node name="SpotLight3D" type="SpotLight3D" parent="." unique_id=339256949]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, -2.3891053)
+light_color = Color(0, 1, 1, 1)
+light_energy = 20.0
+spot_range = 7.5
+spot_angle = 75.0
+
+[node name="SpotLight3D2" type="SpotLight3D" parent="." unique_id=14439783]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, -8.450573)
+light_color = Color(0, 1, 1, 1)
+light_energy = 20.0
+spot_range = 7.5
+spot_angle = 75.0
+
+[node name="SpotLight3D3" type="SpotLight3D" parent="." unique_id=161669232]
+transform = Transform3D(1, 0, 0, 0, -4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 5, -14.363572)
+light_color = Color(0, 1, 1, 1)
+light_energy = 20.0
+spot_range = 7.5
+spot_angle = 75.0
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="." unique_id=1342254696]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, -10)
+use_collision = true
+size = Vector3(4.435, 1, 1)
