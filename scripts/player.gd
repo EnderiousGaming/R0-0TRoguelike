@@ -548,6 +548,7 @@ func toggle_pause():
 	# Toggle UI visibility
 	pause_menu.visible = new_pause_state
 	var show_hud = not new_pause_state
+	
 	$HUD/Crosshair.visible = show_hud
 	health_display.visible = show_hud
 	score_display.visible = show_hud
@@ -555,8 +556,14 @@ func toggle_pause():
 	stage_display.visible = show_hud
 	announcement_label.visible = show_hud
 	
-	# Toggle mouse cursor
+	# --- NEW WEAPON UI FIX ---
+	ammo_display.visible = show_hud
+	
+	# Always hide these bars when paused. 
+	# When unpaused, your _process() loop will automatically turn them back on if needed!
 	if new_pause_state:
+		reload_bar.visible = false
+		grapple_bar.visible = false
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
