@@ -171,9 +171,14 @@ func die():
 	# Pass any specific value you want (e.g., Bosses drop more)
 	drop_instance.point_value = 5000
 	
-	RunManager.enemies_defeated_this_room += 1
+	# 1. Increment the temporary current session stat
 	RunManager.bosses_purged += 1
-	SaveManager.bosses_purged += 1
+	
+	# 2. Increment the permanent disk-based lifetime stat
+	SaveManager.save_data["stats"]["bosses_purged"] += 1
+	
+	# 3. Commit the updated memory core immediately to the hard drive
+	SaveManager.save_game()
 	
 	# Use call_deferred to safely add it to the world, just like we did with Aureus
 	get_parent().call_deferred("add_child", drop_instance)

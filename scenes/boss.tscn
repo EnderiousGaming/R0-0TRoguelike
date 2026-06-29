@@ -45,7 +45,6 @@ mesh = SubResource("CapsuleMesh_xd8r6")
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1577384535]
 path_desired_distance = 3.0
 target_desired_distance = 3.0
-debug_enabled = true
 debug_path_custom_color = Color(1, 0, 0, 1)
 
 [node name="LaserPivot" type="Node3D" parent="." unique_id=633105696]

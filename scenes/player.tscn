@@ -133,7 +133,6 @@ text = "HP: 5"
 
 [node name="PauseMenu" type="Control" parent="HUD" unique_id=845286292]
 process_mode = 3
-visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -201,6 +200,12 @@ offset_bottom = 559.0
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "Move: WASD"
+horizontal_alignment = 1
+
+[node name="Label8" type="Label" parent="HUD/PauseMenu/Controls" unique_id=1999246632]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Reload: R"
 horizontal_alignment = 1
 
 [node name="Label2" type="Label" parent="HUD/PauseMenu/Controls" unique_id=543418311]
