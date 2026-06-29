@@ -5,6 +5,10 @@ var tick_rate = 1.0 # Tick every 1 second
 var timer = 0.0
 
 func _physics_process(delta):
+	
+	if not monitoring:
+		return # Stop right here! Don't do the math below.
+	
 	timer += delta
 	
 	if timer >= tick_rate:
@@ -27,3 +31,11 @@ func _physics_process(delta):
 				if body.has_method("take_damage"):
 					body.take_damage(damage_amount)
 					# Optional: print("SYSTEM: Daemon taking Corrupted Domain damage.")
+					
+func set_hazard_active(is_active: bool):
+	$CollisionShape3D.set_deferred("disabled", not is_active)
+	set_deferred("monitoring", is_active)
+	visible = is_active
+	
+	# Tell Godot to stop running _physics_process for this node!
+	set_physics_process(is_active)

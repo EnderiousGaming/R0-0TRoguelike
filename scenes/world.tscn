@@ -73,5 +73,10 @@ metadata/_editor_floor_ = Vector3(0, 0, 0)
 wait_time = 8.0
 autostart = true
 
+[node name="UniversalFloor" type="CSGBox3D" parent="." unique_id=1634531523]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.59, 0)
+use_collision = true
+size = Vector3(250, 1, 250)
+
 [connection signal="timeout" from="WaveDirector/Timer" to="WaveDirector" method="_on_timer_timeout"]
 [connection signal="timeout" from="HazardShiftTimer" to="NavigationRegion3D/GridMap" method="_on_hazard_shift_timer_timeout"]

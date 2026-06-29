@@ -111,53 +111,6 @@ func generate_wfc():
 	print("SYSTEM: Map Generation Complete!")
 	
 	# ==========================================
-	# THE PILLAR PLASTER PASS (Filling the holes)
-	# ==========================================
-	
-	# 1. Clean up old patches from the last generation
-	for child in get_children():
-		if child.name.begins_with("PillarPatch"):
-			child.queue_free()
-			
-	# 2. Find every single Pillar on the map
-	var pillar_cells = get_used_cells_by_item(TILE_PILLAR)
-	var patch_count = 0
-	
-	for cell in pillar_cells:
-		# 3. Build a local 4x4 floor patch for this specific hole
-		var patch = StaticBody3D.new()
-		patch.name = "PillarPatch_" + str(patch_count)
-		
-		# Give it the exact dimensions of your standard floor tile (4x0.2x4)
-		var collision = CollisionShape3D.new()
-		var box_shape = BoxShape3D.new()
-		box_shape.size = Vector3(4.0, 0.2, 4.0) 
-		collision.shape = box_shape
-		patch.add_child(collision)
-		
-		# Build the visual mesh so it isn't an invisible bridge
-		var mesh_instance = MeshInstance3D.new()
-		var visual_mesh = BoxMesh.new()
-		visual_mesh.size = box_shape.size
-		mesh_instance.mesh = visual_mesh
-		
-		# Optional: Create a quick material to make it match your GridMap floor color!
-		var mat = StandardMaterial3D.new()
-		mat.albedo_color = Color(0.25, 0.25, 0.25) # Tweak this to match your floor
-		visual_mesh.material = mat
-		
-		patch.add_child(mesh_instance)
-		
-		# 4. Snap it to the exact same cell center as the Pillar
-		patch.position = map_to_local(cell)
-		
-		# 5. Add it to the world
-		add_child(patch)
-		patch_count += 1
-		
-	print("SYSTEM: ", patch_count, " Pillar holes plastered perfectly flush.")
-	
-	# ==========================================
 	# CEILING GENERATION PASS
 	# ==========================================
 	# Aureus is 4 meters tall, so the ceiling must be AT LEAST Y=5. 
@@ -210,7 +163,7 @@ func generate_wfc():
 				new_light.light_color = Color.CYAN
 				new_light.light_energy = 3.0 
 				new_light.omni_range = 15.0
-				new_light.shadow_enabled = true 
+				new_light.shadow_enabled = false 
 				add_child(new_light)
 				new_light.global_position = to_global(map_to_local(cell)) + Vector3(0, 4.0, 0)
 				lights_placed += 1

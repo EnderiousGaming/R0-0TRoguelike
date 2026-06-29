@@ -53,6 +53,9 @@ func activate_portal():
 	var remaining_enemies = get_tree().get_nodes_in_group("enemy")
 	for daemon in remaining_enemies:
 		daemon.queue_free()
+		
+	# --- NEW LINE: TURN OFF HAZARDS ---
+	get_tree().call_group("hazards", "set_hazard_active", false)
 	
 	# 3. Broadcast the secure message to the player
 	var player = get_tree().get_first_node_in_group("player")
