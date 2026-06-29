@@ -133,6 +133,7 @@ text = "HP: 5"
 
 [node name="PauseMenu" type="Control" parent="HUD" unique_id=845286292]
 process_mode = 3
+visible = false
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
