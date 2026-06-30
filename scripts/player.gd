@@ -69,7 +69,6 @@ var radiation_timer = 0.0
 @onready var pause_menu = $HUD/PauseMenu
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
-@onready var save_button = $HUD/PauseMenu/VBoxContainer/SaveButton
 @onready var options_button = $HUD/PauseMenu/VBoxContainer/OptionsButton
 @onready var options_menu = $HUD/OptionsMenu # Assuming it's a child of the HUD
 @onready var grapple_bar = $HUD/GrappleBar
@@ -91,7 +90,6 @@ func _ready():
 	
 	# Connect UI button signals
 	resume_button.pressed.connect(toggle_pause)
-	save_button.pressed.connect(save_game_from_menu)
 	quit_button.pressed.connect(quit_to_menu)
 	options_button.pressed.connect(func():
 		pause_menu.visible = false
@@ -593,15 +591,6 @@ func toggle_pause():
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
 		Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
-
-func save_game_from_menu():
-	SaveManager.save_game()
-	print("SYSTEM: Manual save triggered from Pause Menu.")
-	
-	# Give the player visual feedback!
-	save_button.text = "Game Saved!"
-	await get_tree().create_timer(1.5).timeout
-	save_button.text = "Save Game"
 
 func quit_to_menu():
 	# Always unpause before changing scenes to prevent a frozen menu

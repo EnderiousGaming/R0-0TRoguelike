@@ -187,11 +187,6 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "OPTIONS"
 
-[node name="SaveButton" type="Button" parent="HUD/PauseMenu/VBoxContainer" unique_id=1639395568]
-layout_mode = 2
-theme_override_font_sizes/font_size = 32
-text = "SAVE GAME"
-
 [node name="QuitButton" type="Button" parent="HUD/PauseMenu/VBoxContainer" unique_id=236232046]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
