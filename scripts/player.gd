@@ -404,9 +404,12 @@ func _process_blaster(delta):
 		elif Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 			if RunManager.current_ammo > 0:
 				if fire_cooldown <= 0.0:
-					fire_weapon()
-					fire_cooldown = RunManager.fire_rate
-					RunManager.current_ammo -= 1 
+					
+					# NEW: Only consume ammo and reset cooldown IF the weapon actually fired!
+					if fire_weapon():
+						fire_cooldown = RunManager.fire_rate
+						RunManager.current_ammo -= 1 
+						
 			else:
 				# Auto-reload if trying to shoot on an empty mag
 				is_reloading = true
@@ -421,7 +424,27 @@ func _process_sword():
 		if not is_swinging:
 			swing_sword()
 
-func fire_weapon():
+func fire_weapon() -> bool:
+	
+	# ==========================================
+	# ANTI-CLIPPING PROTOCOL
+	# ==========================================
+	var space_state = get_world_3d().direct_space_state
+	var query = PhysicsRayQueryParameters3D.create($Head/Camera3D.global_position, blaster_mesh.global_position)
+	
+	# Ignore R0-0T's own hitbox so we don't accidentally block our own shot
+	query.exclude = [self.get_rid()] 
+	
+	var result = space_state.intersect_ray(query)
+	
+	# If there is an object between the camera and the gun barrel...
+	if result:
+		# ...and that object IS NOT an enemy (we still want to allow point-blank shots on Daemons!)
+		if not result.collider.is_in_group("enemy"):
+			print("SYSTEM: Muzzle obstructed. Firing sequence aborted.")
+			return false 
+	# ==========================================
+	
 	var target_point = Vector3.ZERO
 	if aim_raycast.is_colliding():
 		target_point = aim_raycast.get_collision_point()
@@ -442,6 +465,9 @@ func fire_weapon():
 			var spread = 0.05 * (RunManager.blaster_scatter_count - 1)
 			bullet.rotate_x(randf_range(-spread, spread))
 			bullet.rotate_y(randf_range(-spread, spread))
+			
+	# Tell the system the shot was successful!
+	return true
 
 func swing_sword():
 	is_swinging = true
