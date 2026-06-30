@@ -35,6 +35,12 @@ top_radius = 0.05
 bottom_radius = 0.05
 height = 1.0
 
+[sub_resource type="InputEventAction" id="InputEventAction_qhqgy"]
+action = &"ui_cancel"
+
+[sub_resource type="Shortcut" id="Shortcut_dqkch"]
+events = [SubResource("InputEventAction_qhqgy")]
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qhqgy"]
 shader = ExtResource("2_g2els")
 shader_parameter/vignette_multiplier = 100.0
@@ -173,6 +179,7 @@ horizontal_alignment = 1
 [node name="ResumeButton" type="Button" parent="HUD/PauseMenu/VBoxContainer" unique_id=514750130]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_dqkch")
 text = "RESUME"
 
 [node name="OptionsButton" type="Button" parent="HUD/PauseMenu/VBoxContainer" unique_id=1089960113]

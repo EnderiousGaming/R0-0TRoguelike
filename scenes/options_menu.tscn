@@ -2,6 +2,12 @@
 
 [ext_resource type="Script" uid="uid://dww8r6b8yekrq" path="res://scripts/options_menu.gd" id="1_liyum"]
 
+[sub_resource type="InputEventAction" id="InputEventAction_liyum"]
+action = &"ui_cancel"
+
+[sub_resource type="Shortcut" id="Shortcut_ijpji"]
+events = [SubResource("InputEventAction_liyum")]
+
 [node name="OptionsMenu" type="Panel" unique_id=939318422]
 process_mode = 3
 anchors_preset = -1
@@ -67,4 +73,5 @@ text = "CRT Shader"
 [node name="BackButton" type="Button" parent="VBoxContainer" unique_id=1510546249]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
+shortcut = SubResource("Shortcut_ijpji")
 text = "Back"
