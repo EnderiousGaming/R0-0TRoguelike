@@ -23,6 +23,17 @@ func _ready():
 func _on_timer_timeout():
 	print("SYSTEM: WaveTimer ticked! Attempting to spawn enemy...")
 	
+	# ==========================================
+	# POPULATION CAP CHECK
+	# ==========================================
+	var current_enemy_count = get_tree().get_nodes_in_group("enemy").size()
+	var max_enemies = RunManager.DIFF_MAX_ENEMIES[RunManager.current_difficulty]
+	
+	if current_enemy_count >= max_enemies:
+		print("SYSTEM: Maximum threat capacity reached. Spawn aborted.")
+		return 
+	# ==========================================
+	
 	if spawn_points.is_empty():
 		push_error("DIRECTOR ERROR: Spawn points array is empty!")
 		return

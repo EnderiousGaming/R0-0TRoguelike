@@ -117,6 +117,10 @@ const DIFF_SPEED = [0.75, 1.0, 1.25, 1.75, 3.0]
 # Fire Cooldown Multiplier (LOWER = Faster shooting!)
 const DIFF_FIRE_RATE = [1.5, 1.0, 0.75, 0.5, 0.1]
 
+# --- NEW: MAX CONCURRENT ENEMIES ---
+# Caps how many Daemons can be alive in the arena at the exact same time
+const DIFF_MAX_ENEMIES = [5, 8, 12, 18, 25]
+
 # ==========================================
 # ECONOMY (SHOP COSTS)
 # ==========================================
