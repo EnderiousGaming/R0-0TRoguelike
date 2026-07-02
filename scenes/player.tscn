@@ -41,6 +41,12 @@ action = &"ui_cancel"
 [sub_resource type="Shortcut" id="Shortcut_dqkch"]
 events = [SubResource("InputEventAction_qhqgy")]
 
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qhqgy"]
+load_path = "res://.godot/imported/AmmoCircle.png-9cac67154dc12965554c74316e6a0408.ctex"
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_dqkch"]
+load_path = "res://.godot/imported/AmmoCircle.png-9cac67154dc12965554c74316e6a0408.ctex"
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_qhqgy"]
 shader = ExtResource("2_g2els")
 shader_parameter/vignette_multiplier = 100.0
@@ -307,28 +313,6 @@ grow_vertical = 0
 theme_override_font_sizes/font_size = 32
 text = "AMMO: 15/15"
 
-[node name="ReloadBar" type="ProgressBar" parent="HUD" unique_id=1988487152]
-anchors_preset = 3
-anchor_left = 1.0
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = -230.0
-offset_top = -95.0
-offset_right = -29.999756
-offset_bottom = -80.0
-grow_horizontal = 0
-grow_vertical = 0
-show_percentage = false
-
-[node name="ReloadText" type="Label" parent="HUD/ReloadBar" unique_id=1002794112]
-layout_mode = 0
-offset_top = -22.25
-offset_right = 200.0
-offset_bottom = 0.75
-text = "RELOADING..."
-horizontal_alignment = 1
-
 [node name="GrappleBar" type="ProgressBar" parent="HUD" unique_id=1628432861]
 anchors_preset = 8
 anchor_left = 0.5
@@ -361,6 +345,7 @@ mouse_filter = 2
 color = Color(0.6666667, 0, 0, 0)
 
 [node name="OptionsMenu" parent="HUD" unique_id=939318422 instance=ExtResource("2_qhqgy")]
+visible = false
 
 [node name="SaveIndicator" type="Label" parent="HUD" unique_id=2051580663]
 offset_right = 40.0
@@ -387,6 +372,24 @@ theme_override_font_sizes/font_size = 24
 text = "..."
 horizontal_alignment = 1
 autowrap_mode = 2
+
+[node name="AmmoCircle" type="TextureProgressBar" parent="HUD" unique_id=885358246]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -18.224976
+offset_top = -18.76001
+offset_right = 5093.775
+offset_bottom = 5156.24
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(0.007, 0.007)
+fill_mode = 4
+texture_under = SubResource("CompressedTexture2D_qhqgy")
+texture_progress = SubResource("CompressedTexture2D_dqkch")
+tint_under = Color(0.26293245, 0.26293245, 0.26293245, 1)
 
 [node name="CRTFilter" type="CanvasLayer" parent="." unique_id=333146233]
 layer = 0

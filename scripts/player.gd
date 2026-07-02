@@ -36,6 +36,7 @@ var active_reload_end = 0.6
 var is_overclocked = false
 var overclock_timer = 0.0
 var overclock_duration = 3.0
+var active_reload_failed = false # Tracks if they missed the sweet spot
 
 # --- SWORD COMBAT ---
 var sword_damage = 3
@@ -72,8 +73,8 @@ var radiation_timer = 0.0
 @onready var kills_display = $HUD/KillsDisplay
 @onready var score_display = $HUD/ScoreDisplay
 @onready var health_display = $HUD/HealthDisplay
-@onready var ammo_display = $HUD/AmmoDisplay
-@onready var reload_bar = $HUD/ReloadBar
+@onready var ammo_display = $HUD/AmmoDisplay # <--- RESTORED!
+@onready var ammo_circle = $HUD/AmmoCircle   # <--- KEEPS OUR NEW UI!
 @onready var pause_menu = $HUD/PauseMenu
 @onready var resume_button = $HUD/PauseMenu/VBoxContainer/ResumeButton
 @onready var quit_button = $HUD/PauseMenu/VBoxContainer/QuitButton
@@ -93,7 +94,8 @@ func _ready():
 	
 	# Initialize visuals
 	laser_pivot.visible = false
-	reload_bar.visible = false
+	ammo_circle.visible = false
+	ammo_circle.step = 0.01 # <--- NEW LINE: Tells the UI to update in micro-decimals!
 	announcement_label.text = ""
 	
 	# Connect UI button signals
@@ -400,17 +402,17 @@ func _process_blaster(delta):
 	if is_reloading:
 		reload_timer -= delta
 		
-		# 1. Visual Cue: Turn the reload bar GOLD when in the sweet spot!
-		# (But only if the weapon hasn't jammed and turned red!)
-		if reload_bar.modulate != Color.RED:
-			if reload_timer <= active_reload_start and reload_timer >= active_reload_end:
-				reload_bar.modulate = Color.GOLD
-			else:
-				reload_bar.modulate = Color.WHITE
+		# 1. Visual Cue: Turn GOLD when in the sweet spot (if they haven't failed yet!)
+		if not active_reload_failed and reload_timer <= active_reload_start and reload_timer >= active_reload_end:
+			ammo_circle.modulate = Color.GOLD
+		elif not active_reload_failed:
+			ammo_circle.modulate = Color.WHITE
+		else:
+			ammo_circle.modulate = Color.GRAY # Visual cue that the Overclock is locked out
 
 		# 2. The Skill Check
-		# Now listens for BOTH the reload key and the left mouse button!
-		if reload_timer < 1.4 and (Input.is_action_just_pressed("reload") or Input.is_action_just_pressed("shoot")):
+		# Use (reload_time - 0.1) so they don't instantly fail the frame the reload starts
+		if not active_reload_failed and reload_timer < (RunManager.reload_time - 0.1) and (Input.is_action_just_pressed("reload") or Input.is_action_just_pressed("shoot")):
 			
 			if reload_timer <= active_reload_start and reload_timer >= active_reload_end:
 				# SUCCESS! OVERCLOCK ENGAGED
@@ -420,19 +422,15 @@ func _process_blaster(delta):
 				ammo_display.modulate = Color.CYAN 
 				print("SYSTEM: PERFECT TIMING. BLASTER OVERCLOCKED!")
 			else:
-				# FAILURE! WEAPON JAMMED
-				reload_timer += 1.0 
-				reload_bar.modulate = Color.RED
-				print("SYSTEM: TIMING FAILED. WEAPON JAMMED!")
+				# FAILURE! No jam penalty, just lock out the Overclock for this clip.
+				active_reload_failed = true
+				print("SYSTEM: TIMING FAILED. Standard reload continuing.")
 				
 		# 3. Standard Reload Finish
 		if reload_timer <= 0.0:
 			is_reloading = false
 			RunManager.current_ammo = RunManager.max_ammo
-			reload_bar.visible = false
-			reload_bar.modulate = Color.WHITE # Reset color for next time
 			
-			# FIX 1: Bring the gun BACK DOWN to 0 degrees!
 			var tween = create_tween()
 			tween.tween_property(blaster_mesh, "rotation_degrees", Vector3.ZERO, 0.2)
 			
@@ -440,10 +438,11 @@ func _process_blaster(delta):
 	# FIRING & MANUAL RELOAD INPUTS
 	# ==========================================
 	
-	# FIX 2: Explicit Manual Reload Input
+	# Explicit Manual Reload Input
 	elif Input.is_action_just_pressed("reload") and RunManager.current_ammo < RunManager.max_ammo:
 		is_reloading = true
 		reload_timer = RunManager.reload_time
+		active_reload_failed = false # RESET FOR NEW RELOAD
 		print("SYSTEM: Manual Reloading...")
 		
 		var tween = create_tween()
@@ -452,12 +451,10 @@ func _process_blaster(delta):
 	# 4. Firing Input
 	elif Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		if RunManager.current_ammo > 0:
-			
 			if fire_cooldown <= 0.0:
 				if fire_weapon():
 					RunManager.current_ammo -= 1 
 					
-					# If overclocked, cut the delay between shots in half!
 					if is_overclocked:
 						fire_cooldown = RunManager.fire_rate * 0.5
 					else:
@@ -467,6 +464,7 @@ func _process_blaster(delta):
 			# Auto-reload if trying to shoot on an empty mag
 			is_reloading = true
 			reload_timer = RunManager.reload_time
+			active_reload_failed = false # RESET FOR NEW RELOAD
 			print("SYSTEM: Auto-Reloading...")
 			
 			var tween = create_tween()
@@ -641,7 +639,7 @@ func toggle_pause():
 	# Always hide these bars when paused. 
 	# When unpaused, your _process() loop will automatically turn them back on if needed!
 	if new_pause_state:
-		reload_bar.visible = false
+		ammo_circle.visible = false
 		grapple_bar.visible = false
 		Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	else:
@@ -677,16 +675,27 @@ func _update_weapon_ui():
 		ammo_display.visible = true
 		ammo_display.text = "AMMO: " + str(RunManager.current_ammo) + " / " + str(RunManager.max_ammo)
 		
+		# Keep the circle visible at all times when holding the blaster
+		ammo_circle.visible = true 
+		
 		if is_reloading:
-			reload_bar.visible = true
-			reload_bar.max_value = RunManager.reload_time 
-			reload_bar.value = reload_timer 
+			# RELOAD MODE: Fill up as the timer goes down
+			ammo_circle.max_value = RunManager.reload_time 
+			ammo_circle.value = RunManager.reload_time - reload_timer 
 		else:
-			reload_bar.visible = false
+			# AMMO MODE: Show remaining ammo
+			ammo_circle.max_value = RunManager.max_ammo
+			ammo_circle.value = RunManager.current_ammo
+			
+			# SYNC COLOR WITH OVERCLOCK STATE
+			if is_overclocked:
+				ammo_circle.modulate = Color.CYAN
+			else:
+				ammo_circle.modulate = Color.WHITE
 			
 	elif RunManager.equipped_weapon == "sword":
 		ammo_display.visible = false
-		reload_bar.visible = false
+		ammo_circle.visible = false
 
 
 # ==========================================
