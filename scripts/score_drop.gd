@@ -29,11 +29,15 @@ func _process(delta):
 	# ==========================================
 	# THE COURIER PROTOCOL LOGIC (KINEMATIC)
 	# ==========================================
-	if RunManager.has_courier_protocol and is_instance_valid(player):
-		is_magnetized = true
-		var dir = global_position.direction_to(player.global_position)
-		global_position += dir * magnet_speed * delta
-		return 
+	if is_instance_valid(player):
+		var distance = global_position.distance_to(player.global_position)
+		
+		# Magnetize if they have the global upgrade OR if R0-0T is within 2.5 meters!
+		if RunManager.has_courier_protocol or distance <= 2.5:
+			is_magnetized = true
+			var dir = global_position.direction_to(player.global_position)
+			global_position += dir * magnet_speed * delta
+			return 
 		
 	# ==========================================
 	# HOVER & SPIN ANIMATION
@@ -43,7 +47,6 @@ func _process(delta):
 		
 		if base_y != 0.0:
 			time_passed += delta
-			# NEW: Animate the global_position instead of the local position
 			global_position.y = base_y + sin(time_passed * float_speed) * float_amplitude
 
 func _on_body_entered(body):

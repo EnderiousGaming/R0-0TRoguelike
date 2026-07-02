@@ -29,6 +29,14 @@ var is_reloading = false
 var reload_timer = 0.0
 const BULLET = preload("res://scenes/player_projectile.tscn")
 
+# --- OVERCLOCK RELOAD VARIABLES ---
+# If standard reload is 1.5 seconds, the sweet spot is between 0.9s and 0.6s remaining.
+var active_reload_start = 0.9 
+var active_reload_end = 0.6   
+var is_overclocked = false
+var overclock_timer = 0.0
+var overclock_duration = 3.0
+
 # --- SWORD COMBAT ---
 var sword_damage = 3
 var is_swinging = false
@@ -376,46 +384,93 @@ func _process_blaster(delta):
 	if is_grappling:
 		return 
 		
-	# 1. Handle Active Reloading
+	# ==========================================
+	# OVERCLOCK DRAIN LOGIC
+	# ==========================================
+	if is_overclocked:
+		overclock_timer -= delta
+		if overclock_timer <= 0.0:
+			is_overclocked = false
+			ammo_display.modulate = Color.WHITE # Return UI to normal
+			print("SYSTEM: Overclock depleted. Cooling down.")
+
+	# ==========================================
+	# ACTIVE RELOAD LOGIC
+	# ==========================================
 	if is_reloading:
 		reload_timer -= delta
-		if reload_timer <= 0:
+		
+		# 1. Visual Cue: Turn the reload bar GOLD when in the sweet spot!
+		# (But only if the weapon hasn't jammed and turned red!)
+		if reload_bar.modulate != Color.RED:
+			if reload_timer <= active_reload_start and reload_timer >= active_reload_end:
+				reload_bar.modulate = Color.GOLD
+			else:
+				reload_bar.modulate = Color.WHITE
+
+		# 2. The Skill Check
+		# Now listens for BOTH the reload key and the left mouse button!
+		if reload_timer < 1.4 and (Input.is_action_just_pressed("reload") or Input.is_action_just_pressed("shoot")):
+			
+			if reload_timer <= active_reload_start and reload_timer >= active_reload_end:
+				# SUCCESS! OVERCLOCK ENGAGED
+				reload_timer = 0.0
+				is_overclocked = true
+				overclock_timer = overclock_duration
+				ammo_display.modulate = Color.CYAN 
+				print("SYSTEM: PERFECT TIMING. BLASTER OVERCLOCKED!")
+			else:
+				# FAILURE! WEAPON JAMMED
+				reload_timer += 1.0 
+				reload_bar.modulate = Color.RED
+				print("SYSTEM: TIMING FAILED. WEAPON JAMMED!")
+				
+		# 3. Standard Reload Finish
+		if reload_timer <= 0.0:
 			is_reloading = false
 			RunManager.current_ammo = RunManager.max_ammo
-			print("SYSTEM: Reloaded!")
+			reload_bar.visible = false
+			reload_bar.modulate = Color.WHITE # Reset color for next time
 			
-			# Tween: Snap the gun back to the firing position
+			# FIX 1: Bring the gun BACK DOWN to 0 degrees!
 			var tween = create_tween()
-			tween.tween_property(blaster_mesh, "rotation_degrees", Vector3.ZERO, 0.15)
-	else:
-		# 2. Manual Reload Input
-		if Input.is_action_just_pressed("reload") and RunManager.current_ammo < RunManager.max_ammo:
+			tween.tween_property(blaster_mesh, "rotation_degrees", Vector3.ZERO, 0.2)
+			
+	# ==========================================
+	# FIRING & MANUAL RELOAD INPUTS
+	# ==========================================
+	
+	# FIX 2: Explicit Manual Reload Input
+	elif Input.is_action_just_pressed("reload") and RunManager.current_ammo < RunManager.max_ammo:
+		is_reloading = true
+		reload_timer = RunManager.reload_time
+		print("SYSTEM: Manual Reloading...")
+		
+		var tween = create_tween()
+		tween.tween_property(blaster_mesh, "rotation_degrees", Vector3(45, 0, 0), 0.2)
+		
+	# 4. Firing Input
+	elif Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		if RunManager.current_ammo > 0:
+			
+			if fire_cooldown <= 0.0:
+				if fire_weapon():
+					RunManager.current_ammo -= 1 
+					
+					# If overclocked, cut the delay between shots in half!
+					if is_overclocked:
+						fire_cooldown = RunManager.fire_rate * 0.5
+					else:
+						fire_cooldown = RunManager.fire_rate
+						
+		else:
+			# Auto-reload if trying to shoot on an empty mag
 			is_reloading = true
 			reload_timer = RunManager.reload_time
-			print("SYSTEM: Reloading...")
+			print("SYSTEM: Auto-Reloading...")
 			
-			# Tween: Tilt the gun up into the air
 			var tween = create_tween()
 			tween.tween_property(blaster_mesh, "rotation_degrees", Vector3(45, 0, 0), 0.2)
-			
-		# 3. Firing Input
-		elif Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			if RunManager.current_ammo > 0:
-				if fire_cooldown <= 0.0:
-					
-					# NEW: Only consume ammo and reset cooldown IF the weapon actually fired!
-					if fire_weapon():
-						fire_cooldown = RunManager.fire_rate
-						RunManager.current_ammo -= 1 
-						
-			else:
-				# Auto-reload if trying to shoot on an empty mag
-				is_reloading = true
-				reload_timer = RunManager.reload_time
-				print("SYSTEM: Auto-Reloading...")
-				
-				var tween = create_tween()
-				tween.tween_property(blaster_mesh, "rotation_degrees", Vector3(45, 0, 0), 0.2)
 
 func _process_sword():
 	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
