@@ -6,6 +6,8 @@ extends Node3D
 # ==========================================
 
 func _ready():
+	AudioManager.play_menu_music()
+	
 	# 1. Reset the player's run stats upon entering the safe zone
 	RunManager.reset_run()
 	

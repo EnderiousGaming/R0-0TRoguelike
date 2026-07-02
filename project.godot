@@ -21,6 +21,7 @@ config/icon="uid://dft2t2pnedlja"
 
 RunManager="*uid://ioa61y40s8q1"
 SaveManager="*uid://c46fht7dq5iva"
+AudioManager="*uid://dxajnveqrla7n"
 
 [display]
 

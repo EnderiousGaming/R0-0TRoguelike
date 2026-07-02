@@ -595,6 +595,7 @@ func flash_damage_screen():
 	tween.tween_property(damage_overlay, "color:a", 0.0, 0.4).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
 
 func die():
+	AudioManager.stop_all_music()
 	print("CRITICAL FAILURE: R0-0T Offline.")
 	
 	# 1. Update standard accumulative lifetime stats

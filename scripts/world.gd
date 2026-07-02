@@ -19,6 +19,8 @@ var portal_active = false
 # ==========================================
 
 func _ready():
+	AudioManager.play_arena_music()
+	
 	# 1. Reset room progression data
 	RunManager.enemies_defeated_this_room = 0
 	

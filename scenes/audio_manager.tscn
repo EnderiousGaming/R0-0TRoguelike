@@ -1,0 +1,15 @@
+[gd_scene format=3 uid="uid://dxajnveqrla7n"]
+
+[ext_resource type="Script" uid="uid://ktn51b31udf" path="res://scripts/audio_manager.gd" id="1_3asnw"]
+[ext_resource type="AudioStream" uid="uid://dsgkx72tks5ka" path="res://audio/music/pixabay_(placeholder)/monume-cyberpunk-519219.ogg" id="1_liach"]
+[ext_resource type="AudioStream" uid="uid://by1ifewl3vynw" path="res://audio/music/pixabay_(placeholder)/monume-cyberpunk-music-519215.ogg" id="2_3asnw"]
+
+[node name="AudioManager" type="Node" unique_id=1051440063]
+process_mode = 3
+script = ExtResource("1_3asnw")
+
+[node name="MenuMusicPlayer" type="AudioStreamPlayer3D" parent="." unique_id=1632608283]
+stream = ExtResource("1_liach")
+
+[node name="ArenaMusicPlayer" type="AudioStreamPlayer3D" parent="." unique_id=1536689238]
+stream = ExtResource("2_3asnw")

@@ -5,6 +5,8 @@ extends Control
 @onready var options_button = $VBoxContainer/OptionsButton
 
 func _ready():
+	AudioManager.play_menu_music()
+	
 	options_menu.visible = false
 	options_button.pressed.connect(show_options)
 	
