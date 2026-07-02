@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://cxcouiuwfd02w"]
 
 [ext_resource type="Script" uid="uid://2ltufe2p70j8" path="res://scripts/enemy.gd" id="1_7p1mj"]
+[ext_resource type="AudioStream" uid="uid://ddnpp2bg2thcm" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/explosionCrunch_004.ogg" id="2_md0e3"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_7p1mj"]
 
@@ -39,5 +40,9 @@ transform = Transform3D(1.2, 0, 0, 0, 1.2, 0, 0, 0, 1.2, 0, 0, 0)
 shape = SubResource("BoxShape3D_7p1mj")
 
 [node name="NavigationAgent3D" type="NavigationAgent3D" parent="." unique_id=1811071572]
+
+[node name="DeathSound" type="AudioStreamPlayer3D" parent="." unique_id=1203130010]
+stream = ExtResource("2_md0e3")
+max_polyphony = 10
 
 [connection signal="body_entered" from="Hitbox" to="." method="_on_hitbox_body_entered"]

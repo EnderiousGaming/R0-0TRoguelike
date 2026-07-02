@@ -60,7 +60,8 @@ shader_parameter/scanline_count = 350.000016625
 shader_parameter/scanline_intensity = 0.050000002375
 
 [sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_3v2ag"]
-random_pitch = 1.005793
+random_pitch = 1.0656005
+random_volume_offset_db = 0.5
 streams_count = 5
 stream_0/stream = ExtResource("4_smehm")
 stream_1/stream = ExtResource("4_dqkch")

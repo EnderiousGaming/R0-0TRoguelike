@@ -17,6 +17,9 @@ var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var player = null
 @onready var nav_agent = $NavigationAgent3D
 
+# --- NODE REFERENCES: AUDIO ---
+@onready var death_sfx = $DeathSound
+@onready var blaster_sfx = $BlasterSFX
 
 # ==========================================
 # CORE LOOP
@@ -80,6 +83,8 @@ func _on_timer_timeout():
 		var proj = PROJECTILE.instantiate()
 		get_parent().add_child(proj)
 		
+		blaster_sfx.play()
+		
 		# Spawn the projectile at chest height
 		proj.global_position = global_position + Vector3(0, 0.25, 0)
 		proj.look_at(player.global_position + Vector3(0, 1.0, 0), Vector3.UP)
@@ -103,6 +108,15 @@ func take_damage(amount):
 		die()
 
 func die():
+	# --- AUDIO FIX ---
+	# 1. Unparent the sound from the enemy and give it to the main world
+	death_sfx.reparent(get_parent())
+	# 2. Play the sound
+	death_sfx.play()
+	# 3. Tell the audio node to safely delete ITSELF the moment the sound finishes!
+	death_sfx.finished.connect(death_sfx.queue_free)
+	# -----------------
+	
 	# 1. Spawn the physical drop
 	var drop_instance = SCORE_DROP.instantiate()
 	

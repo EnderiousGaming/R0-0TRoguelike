@@ -1,6 +1,12 @@
 [gd_scene format=3 uid="uid://qi6wxh3ktkd7"]
 
 [ext_resource type="Script" uid="uid://b4v58x68kilhm" path="res://scripts/artillery_enemy.gd" id="1_fff5f"]
+[ext_resource type="AudioStream" uid="uid://ddnpp2bg2thcm" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/explosionCrunch_004.ogg" id="2_5w20t"]
+[ext_resource type="AudioStream" uid="uid://b0866xugf7x1a" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/laserSmall_000.ogg" id="3_ytl75"]
+[ext_resource type="AudioStream" uid="uid://dego7guihgx5m" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/laserSmall_001.ogg" id="4_i0kvy"]
+[ext_resource type="AudioStream" uid="uid://i0s51wejrrig" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/laserSmall_002.ogg" id="5_iv8gt"]
+[ext_resource type="AudioStream" uid="uid://bedqaqxjaccit" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/laserSmall_003.ogg" id="6_wkqu0"]
+[ext_resource type="AudioStream" uid="uid://bqtjty7ceyeyn" path="res://audio/sfx/kenney_sci-fi-sounds_(placeholder)/Audio/laserSmall_004.ogg" id="7_eads4"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_fff5f"]
 
@@ -12,6 +18,16 @@ emission_energy_multiplier = 1.5
 
 [sub_resource type="BoxMesh" id="BoxMesh_5uy6h"]
 material = SubResource("StandardMaterial3D_4ra3w")
+
+[sub_resource type="AudioStreamRandomizer" id="AudioStreamRandomizer_si15c"]
+random_pitch = 1.0656005
+random_volume_offset_db = 0.5
+streams_count = 5
+stream_0/stream = ExtResource("3_ytl75")
+stream_1/stream = ExtResource("4_i0kvy")
+stream_2/stream = ExtResource("5_iv8gt")
+stream_3/stream = ExtResource("6_wkqu0")
+stream_4/stream = ExtResource("7_eads4")
 
 [node name="Enemy" type="CharacterBody3D" unique_id=1355696254 groups=["enemy"]]
 collision_layer = 4
@@ -35,5 +51,12 @@ omni_range = 6.5
 [node name="Timer" type="Timer" parent="." unique_id=26171303]
 wait_time = 1.5
 autostart = true
+
+[node name="DeathSound" type="AudioStreamPlayer3D" parent="." unique_id=2081858281]
+stream = ExtResource("2_5w20t")
+max_polyphony = 10
+
+[node name="BlasterSFX" type="AudioStreamPlayer3D" parent="." unique_id=1006162791]
+stream = SubResource("AudioStreamRandomizer_si15c")
 
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

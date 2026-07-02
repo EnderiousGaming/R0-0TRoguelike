@@ -20,6 +20,9 @@ var current_attack_timer = 0.0
 var player = null
 @onready var nav_agent = $NavigationAgent3D
 
+# --- NODE REFERENCES: AUDIO ---
+@onready var death_sfx = $DeathSound
+
 
 # ==========================================
 # CORE LOOP
@@ -122,6 +125,15 @@ func take_damage(amount):
 		die()
 
 func die():
+	# --- AUDIO FIX ---
+	# 1. Unparent the sound from the enemy and give it to the main world
+	death_sfx.reparent(get_parent())
+	# 2. Play the sound
+	death_sfx.play()
+	# 3. Tell the audio node to safely delete ITSELF the moment the sound finishes!
+	death_sfx.finished.connect(death_sfx.queue_free)
+	# -----------------
+	
 	# 1. Spawn the physical drop
 	var drop_instance = SCORE_DROP.instantiate()
 	
