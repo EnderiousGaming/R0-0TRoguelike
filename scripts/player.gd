@@ -67,6 +67,9 @@ var radiation_timer = 0.0
 @onready var sword_pivot = $Head/Camera3D/SwordPivot
 @onready var sword_hitbox = $Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox
 
+# --- NODE REFERENCES: AUDIO ---
+@onready var blaster_sfx = $BlasterSFX
+
 # --- NODE REFERENCES: UI ---
 @onready var stage_display = $HUD/StageDisplay
 @onready var announcement_label = $HUD/AnnouncementLabel
@@ -503,6 +506,7 @@ func fire_weapon() -> bool:
 		target_point = aim_raycast.global_position - aim_raycast.global_transform.basis.z * 50.0
 		
 	RunManager.projectiles_fired += 1
+	blaster_sfx.play()
 
 	# Loop through the spawn sequence based on how many Scatter upgrades R0-0T has
 	for i in range(RunManager.blaster_scatter_count):
