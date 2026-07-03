@@ -11,6 +11,7 @@ signal back_pressed
 
 # --- RESOLUTION DATA ---
 const RESOLUTIONS = [
+	Vector2i(2560, 1440),
 	Vector2i(1920, 1080),
 	Vector2i(1600, 900),
 	Vector2i(1280, 720),
