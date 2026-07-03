@@ -70,6 +70,11 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 32
 text = "CRT Shader"
 
+[node name="VSyncToggle" type="CheckButton" parent="VBoxContainer" unique_id=896053226]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "V-Sync"
+
 [node name="BackButton" type="Button" parent="VBoxContainer" unique_id=1510546249]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32

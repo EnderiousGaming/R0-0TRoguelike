@@ -8,6 +8,7 @@ signal back_pressed
 @onready var sensitivity_slider = $VBoxContainer/HBoxContainer2/SensitivitySlider
 @onready var crt_toggle = $VBoxContainer/CRTToggle
 @onready var back_button = $VBoxContainer/BackButton
+@onready var vsync_toggle = $VBoxContainer/VSyncToggle
 
 # --- RESOLUTION DATA ---
 const RESOLUTIONS = [
@@ -35,6 +36,14 @@ func _ready():
 	
 	# 4. Load saved settings and apply them to the UI
 	load_and_apply_settings()
+	
+	# Check the engine's current V-Sync mode. 
+	# If it is VSYNC_ENABLED, the button will start as 'checked' (true).
+	var current_vsync = DisplayServer.window_get_vsync_mode()
+	vsync_toggle.button_pressed = (current_vsync == DisplayServer.VSYNC_ENABLED)
+	
+	# Connect the signal via code
+	vsync_toggle.toggled.connect(_on_vsync_toggled)
 
 func load_and_apply_settings():
 	var opts = SaveManager.save_data["options"]
@@ -68,6 +77,19 @@ func _on_resolution_selected(index: int):
 	apply_resolution(index)
 	SaveManager.save_data["options"]["resolution_index"] = index
 	SaveManager.save_game()
+
+func _on_vsync_toggled(toggled_on: bool):
+	if toggled_on:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED)
+		print("SYSTEM: V-Sync Enabled")
+	else:
+		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
+		print("SYSTEM: V-Sync Disabled (Uncapped Framerate)")
+		
+	# OPTIONAL: If you want this to persist when they close the game, 
+	# you can save 'toggled_on' to your SaveManager right here!
+	# SaveManager.save_data["options"]["vsync"] = toggled_on
+	# SaveManager.save_game()
 
 func _on_sensitivity_changed(value: float):
 	SaveManager.save_data["options"]["mouse_sensitivity"] = value
