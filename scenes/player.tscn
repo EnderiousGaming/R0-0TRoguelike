@@ -216,9 +216,9 @@ text = "QUIT TO MENU"
 [node name="Controls" type="VBoxContainer" parent="HUD/PauseMenu" unique_id=34557205]
 layout_mode = 0
 offset_left = 807.0
-offset_top = 220.0
+offset_top = 159.135
 offset_right = 1198.0
-offset_bottom = 559.0
+offset_bottom = 645.1353
 
 [node name="Label" type="Label" parent="HUD/PauseMenu/Controls" unique_id=1856763449]
 layout_mode = 2
@@ -244,10 +244,22 @@ theme_override_font_sizes/font_size = 32
 text = "Jump: Space"
 horizontal_alignment = 1
 
+[node name="Label10" type="Label" parent="HUD/PauseMenu/Controls" unique_id=1882041642]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Dash: Shift"
+horizontal_alignment = 1
+
 [node name="Label4" type="Label" parent="HUD/PauseMenu/Controls" unique_id=2095473705]
 layout_mode = 2
 theme_override_font_sizes/font_size = 32
-text = "Dash/Grapple: Right Click"
+text = "Grapple: Right Click"
+horizontal_alignment = 1
+
+[node name="Label9" type="Label" parent="HUD/PauseMenu/Controls" unique_id=365879182]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Sword Throw: Right Click"
 horizontal_alignment = 1
 
 [node name="Label5" type="Label" parent="HUD/PauseMenu/Controls" unique_id=73902867]

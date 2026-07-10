@@ -44,6 +44,14 @@ var is_swinging = false
 var enemies_hit_this_swing = []
 var has_slammed_this_swing = false
 
+# --- SWORD THROW VARIABLES ---
+var is_sword_thrown = false
+var is_sword_returning = false
+var sword_throw_timer = 0.0
+var sword_throw_speed = 35.0
+var sword_throw_direction = Vector3.ZERO
+var enemies_hit_this_throw = [] # Tracks who got sliced so they don't take damage 60 times a second
+
 # --- GRAPPLE VARIABLES ---
 @onready var grapple_beam = $Head/Camera3D/GrappleBeam # Adjust path to match your tree
 @onready var blaster_muzzle = $Head/Camera3D/BlasterMesh # Where the beam starts
@@ -314,6 +322,9 @@ func _process(delta):
 	elif RunManager.equipped_weapon == "sword":
 		_process_sword()
 			
+		# NEW: Handle the blade's flight path if it was thrown
+		if is_sword_thrown:
+			_process_sword_throw(delta)
 	# --- PASSIVE MODIFIERS ---
 	if RunManager.has_health_drain:
 		drain_timer += delta
@@ -369,6 +380,10 @@ func _process(delta):
 # ==========================================
 
 func update_weapon_loadout():
+	# SAFETY FIRST: Force catch the sword if it was in the air during a swap!
+	if is_sword_thrown:
+		catch_sword()
+	
 	# Sync visuals and hitboxes with the global RunManager state
 	if RunManager.equipped_weapon == "blaster":
 		blaster_mesh.visible = true
@@ -474,7 +489,17 @@ func _process_blaster(delta):
 			tween.tween_property(blaster_mesh, "rotation_degrees", Vector3(45, 0, 0), 0.2)
 
 func _process_sword():
-	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+	# WEAPON LOCKOUT: Prevent swinging if the blade is flying across the room
+	if is_sword_thrown:
+		return
+		
+	# 1. Orbital Blade Throw (Right Click)
+	if Input.is_action_just_pressed("secondary_fire") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		if not is_swinging:
+			throw_sword()
+			
+	# 2. Standard Swing (Left Click)
+	elif Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		if not is_swinging:
 			swing_sword()
 
@@ -558,6 +583,116 @@ func swing_sword():
 				enemies_hit_this_swing.append(body)
 				print("SYSTEM: Sliced enemy for ", sword_damage, " damage!")
 
+# ==========================================
+# SWORD THROW LOGIC
+# ==========================================
+
+func throw_sword():
+	is_sword_thrown = true
+	is_sword_returning = false
+	sword_throw_timer = 3.0
+	enemies_hit_this_throw.clear()
+
+	# 1. Detach the sword from the camera's local space
+	sword_pivot.top_level = true
+	
+	sword_pivot.global_position = $Head/Camera3D.global_position
+	
+	# --- THE FIX: RESET ROTATION ---
+	# This removes the resting "wobble" and perfectly aligns the blade with the camera
+	sword_pivot.global_transform.basis = $Head/Camera3D.global_transform.basis
+	
+	# --- THE FIX: LAY THE BLADE FLAT ---
+	# Pitch it down 90 degrees so the blade points directly forward instead of straight up!
+	sword_pivot.rotate_x(deg_to_rad(-90))
+
+	# 2. Lock in the exact direction the player is looking
+	sword_throw_direction = -$Head/Camera3D.global_transform.basis.z.normalized()
+	print("SYSTEM: Executing Orbital Strike.")
+	
+	# --- THE FIX: SHRINK HITBOX ---
+	# Scale the hitbox down so it only registers precise physical hits
+	sword_hitbox.scale = Vector3(0.25, 0.25, 0.25) # Adjust these numbers if it needs to be slightly bigger/smaller!
+
+func start_sword_return():
+	is_sword_returning = true
+	# Clear the array so it can damage the exact SAME enemies on the way back!
+	enemies_hit_this_throw.clear() 
+	print("SYSTEM: Blade returning.")
+
+func catch_sword():
+	is_sword_thrown = false
+	is_sword_returning = false
+
+	# 1. Reattach the sword to the camera
+	sword_pivot.top_level = false
+
+	# 2. Snap it perfectly back into its resting pose
+	sword_pivot.position = Vector3(0.5, -0.4, -0.8)
+	sword_pivot.rotation_degrees = Vector3(15, 0, -15)
+	
+	# --- THE FIX: RESTORE HITBOX ---
+	# Return the sweeping hitbox to its full size, respecting any range upgrades!
+	sword_hitbox.scale = Vector3.ONE * RunManager.sword_range_multiplier
+	
+	print("SYSTEM: Blade caught.")
+
+func _process_sword_throw(delta):
+	# --- THE FIX: GLOBAL HORIZONTAL SPIN ---
+	# Explicitly spin the blade around the world's vertical axis (Vector3.UP)
+	sword_pivot.global_rotate(Vector3.UP, deg_to_rad(1440) * delta) 
+
+	if not is_sword_returning:
+		# --- OUTWARD FLIGHT ---
+		sword_pivot.global_position += sword_throw_direction * sword_throw_speed * delta
+		sword_throw_timer -= delta
+
+		# 1. Timeout Check
+		if sword_throw_timer <= 0.0:
+			start_sword_return()
+			return
+
+		# 2. Collision Check
+		var hit_something = false
+		for body in sword_hitbox.get_overlapping_bodies():
+			if body.is_in_group("player"):
+				continue # Ignore R0-0T!
+
+			hit_something = true
+
+			if body.is_in_group("enemy"):
+				if not body in enemies_hit_this_throw:
+					if body.has_method("take_damage"):
+						body.take_damage(sword_damage)
+					enemies_hit_this_throw.append(body)
+					print("SYSTEM: Blade sliced Daemon on outward throw!")
+			else:
+				# It hit the level geometry!
+				print("SYSTEM: Blade struck environment.")
+
+		# If it touched ANY non-player physics body, instantly rebound!
+		if hit_something:
+			start_sword_return()
+
+	else:
+		# --- RETURN FLIGHT ---
+		var target_pos = $Head/Camera3D.global_position
+		var return_dir = sword_pivot.global_position.direction_to(target_pos)
+
+		# Pull it back even faster than it was thrown (feels punchier)
+		sword_pivot.global_position += return_dir * (sword_throw_speed * 1.5) * delta
+
+		# Damage enemies on the way back
+		for body in sword_hitbox.get_overlapping_bodies():
+			if body.is_in_group("enemy") and not body in enemies_hit_this_throw:
+				if body.has_method("take_damage"):
+					body.take_damage(sword_damage)
+				enemies_hit_this_throw.append(body)
+				print("SYSTEM: Blade sliced Daemon on return flight!")
+
+		# Catch Check
+		if sword_pivot.global_position.distance_to(target_pos) < 1.5:
+			catch_sword()
 
 # ==========================================
 # PLAYER STATE & UI

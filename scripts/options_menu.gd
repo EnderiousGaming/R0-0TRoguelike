@@ -9,6 +9,7 @@ signal back_pressed
 @onready var crt_toggle = $VBoxContainer/CRTToggle
 @onready var back_button = $VBoxContainer/BackButton
 @onready var vsync_toggle = $VBoxContainer/VSyncToggle
+@onready var volume_slider = $VBoxContainer/HBoxContainer3/VolumeSlider
 
 # --- RESOLUTION DATA ---
 const RESOLUTIONS = [
@@ -44,6 +45,15 @@ func _ready():
 	
 	# Connect the signal via code
 	vsync_toggle.toggled.connect(_on_vsync_toggled)
+	
+	# 1. Grab the Master audio bus ID
+	var master_bus = AudioServer.get_bus_index("Master")
+	
+	# 2. Convert current decibels to a linear percentage for the UI
+	volume_slider.value = db_to_linear(AudioServer.get_bus_volume_db(master_bus))
+	
+	# 3. Connect the signal via code
+	volume_slider.value_changed.connect(_on_volume_changed)
 
 func load_and_apply_settings():
 	var opts = SaveManager.save_data["options"]
@@ -151,3 +161,14 @@ func apply_crt(is_enabled: bool):
 func hide_options():
 	visible = false
 	back_pressed.emit()
+	
+func _on_volume_changed(value: float):
+	var master_bus = AudioServer.get_bus_index("Master")
+	
+	# Godot automatically translates 1.0 to 0dB (Max Volume) 
+	# and 0.0 to roughly -80dB (Complete Silence)
+	AudioServer.set_bus_volume_db(master_bus, linear_to_db(value))
+	
+	# OPTIONAL: Save this to your SaveManager so it remembers their volume next time!
+	# SaveManager.save_data["options"]["master_volume"] = value
+	# SaveManager.save_game()

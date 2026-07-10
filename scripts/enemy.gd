@@ -16,6 +16,8 @@ var attack_damage = 1
 var attack_cooldown = 1.0 
 var current_attack_timer = 0.0
 
+var is_dead = false
+
 # --- REFERENCES ---
 var player = null
 @onready var nav_agent = $NavigationAgent3D

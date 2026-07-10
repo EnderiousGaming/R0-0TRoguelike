@@ -13,6 +13,8 @@ var health = 2 # Weaker than the melee brutes
 var speed = 2.0 # Slower movement
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
+var is_dead = false
+
 # --- REFERENCES ---
 var player = null
 @onready var nav_agent = $NavigationAgent3D
@@ -108,6 +110,12 @@ func take_damage(amount):
 		die()
 
 func die():
+	# --- DOUBLE DEATH PREVENTION ---
+	if is_dead:
+		return
+	is_dead = true
+	# -------------------------------
+	
 	# --- AUDIO FIX ---
 	# 1. Unparent the sound from the enemy and give it to the main world
 	death_sfx.reparent(get_parent())
