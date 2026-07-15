@@ -1,16 +1,13 @@
 extends Panel
 
+# ==========================================
+# SIGNALS
+# ==========================================
 signal back_pressed
 
-# --- UI REFERENCES ---
-@onready var fullscreen_toggle = $VBoxContainer/FullscreenToggle
-@onready var resolution_dropdown = $VBoxContainer/HBoxContainer/ResolutionDropdown
-@onready var sensitivity_slider = $VBoxContainer/HBoxContainer2/SensitivitySlider
-@onready var crt_toggle = $VBoxContainer/CRTToggle
-@onready var back_button = $VBoxContainer/BackButton
-@onready var vsync_toggle = $VBoxContainer/VSyncToggle
-@onready var volume_slider = $VBoxContainer/HBoxContainer3/VolumeSlider
-
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
 # --- RESOLUTION DATA ---
 const RESOLUTIONS = [
 	Vector2i(2560, 1440),
@@ -20,7 +17,39 @@ const RESOLUTIONS = [
 	Vector2i(1024, 576)
 ]
 
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# --- UI REFERENCES ---
+@onready var fullscreen_toggle = $VBoxContainer/FullscreenToggle
+@onready var resolution_dropdown = $VBoxContainer/HBoxContainer/ResolutionDropdown
+@onready var sensitivity_slider = $VBoxContainer/HBoxContainer2/SensitivitySlider
+@onready var crt_toggle = $VBoxContainer/CRTToggle
+@onready var back_button = $VBoxContainer/BackButton
+@onready var vsync_toggle = $VBoxContainer/VSyncToggle
+@onready var volume_slider = $VBoxContainer/HBoxContainer3/VolumeSlider
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+
 func _ready():
+	"""Initializes options menu, populates dropdowns, and connects signals."""
 	# 1. Hide the menu by default
 	visible = false
 	
@@ -39,23 +68,21 @@ func _ready():
 	load_and_apply_settings()
 	
 	# Check the engine's current V-Sync mode. 
-	# If it is VSYNC_ENABLED, the button will start as 'checked' (true).
 	var current_vsync = DisplayServer.window_get_vsync_mode()
 	vsync_toggle.button_pressed = (current_vsync == DisplayServer.VSYNC_ENABLED)
 	
-	# Connect the signal via code
 	vsync_toggle.toggled.connect(_on_vsync_toggled)
 	
-	# 1. Grab the Master audio bus ID
 	var master_bus = AudioServer.get_bus_index("Master")
-	
-	# 2. Convert current decibels to a linear percentage for the UI
 	volume_slider.value = db_to_linear(AudioServer.get_bus_volume_db(master_bus))
-	
-	# 3. Connect the signal via code
 	volume_slider.value_changed.connect(_on_volume_changed)
 
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+
 func load_and_apply_settings():
+	"""Loads settings from SaveManager and applies them to UI and engine."""
 	var opts = SaveManager.save_data["options"]
 	
 	# Update UI elements without triggering their signals
@@ -73,6 +100,51 @@ func load_and_apply_settings():
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		player.mouse_sensitivity = opts["mouse_sensitivity"]
+
+func apply_fullscreen(is_full: bool):
+	"""Applies full screen setting to DisplayServer."""
+	if is_full:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
+		resolution_dropdown.disabled = true 
+	else:
+		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
+		resolution_dropdown.disabled = false
+		
+		# Wait one frame for the OS to actually exit fullscreen before resizing
+		await get_tree().process_frame
+		
+		var saved_res_index = SaveManager.save_data["options"]["resolution_index"]
+		apply_resolution(saved_res_index)
+
+func apply_resolution(index: int):
+	"""Applies resolution setting to window."""
+	var is_fullscreen = SaveManager.save_data["options"].get("fullscreen", false)
+	
+	if not is_fullscreen:
+		var target_size = RESOLUTIONS[index]
+		var window = get_window() # Grab the actual Godot Viewport Window
+		
+		# Instantly resize both the OS window and the internal rendering canvas
+		window.size = target_size
+		
+		# Calculate the screen center
+		var screen_center = DisplayServer.screen_get_position() + Vector2i(DisplayServer.screen_get_size() / 2.0)
+		
+		# Move the window flawlessly
+		window.position = screen_center - Vector2i(target_size / 2.0)
+
+func apply_crt(is_enabled: bool):
+	"""Applies CRT filter visibility setting to the player node."""
+	var player = get_tree().get_first_node_in_group("player")
+	if player:
+		var crt_rect = player.get_node_or_null("CRTFilter/CRTEffect")
+		if crt_rect:
+			crt_rect.visible = is_enabled
+
+func hide_options():
+	"""Hides the options menu and emits back_pressed signal."""
+	visible = false
+	back_pressed.emit()
 
 # ==========================================
 # SIGNAL HANDLERS
@@ -95,17 +167,11 @@ func _on_vsync_toggled(toggled_on: bool):
 	else:
 		DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_DISABLED)
 		print("SYSTEM: V-Sync Disabled (Uncapped Framerate)")
-		
-	# OPTIONAL: If you want this to persist when they close the game, 
-	# you can save 'toggled_on' to your SaveManager right here!
-	# SaveManager.save_data["options"]["vsync"] = toggled_on
-	# SaveManager.save_game()
 
 func _on_sensitivity_changed(value: float):
 	SaveManager.save_data["options"]["mouse_sensitivity"] = value
 	SaveManager.save_game()
 	
-	# Immediately update R0-0T if they exist in the scene
 	var player = get_tree().get_first_node_in_group("player")
 	if player:
 		player.mouse_sensitivity = value
@@ -114,61 +180,7 @@ func _on_crt_toggled(toggled_on: bool):
 	apply_crt(toggled_on)
 	SaveManager.save_data["options"]["crt_shader_enabled"] = toggled_on
 	SaveManager.save_game()
-
-# ==========================================
-# ENGINE APPLICATION LOGIC
-# ==========================================
-
-func apply_fullscreen(is_full: bool):
-	if is_full:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
-		resolution_dropdown.disabled = true 
-	else:
-		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-		resolution_dropdown.disabled = false
-		
-		# NEW: Wait one frame for the OS to actually exit fullscreen before resizing
-		await get_tree().process_frame
-		
-		var saved_res_index = SaveManager.save_data["options"]["resolution_index"]
-		apply_resolution(saved_res_index)
-
-func apply_resolution(index: int):
-	var is_fullscreen = SaveManager.save_data["options"].get("fullscreen", false)
-	
-	if not is_fullscreen:
-		var target_size = RESOLUTIONS[index]
-		var window = get_window() # Grab the actual Godot Viewport Window
-		
-		# 1. Instantly resize both the OS window and the internal rendering canvas
-		window.size = target_size
-		
-		# 2. Calculate the screen center (We still use DisplayServer to read monitor stats)
-		var screen_center = DisplayServer.screen_get_position() + Vector2i(DisplayServer.screen_get_size() / 2.0)
-		
-		# 3. Move the window flawlessly
-		window.position = screen_center - Vector2i(target_size / 2.0)
-
-func apply_crt(is_enabled: bool):
-	# Grab the root player node
-	var player = get_tree().get_first_node_in_group("player")
-	if player:
-		# Search down the correct path from the root
-		var crt_rect = player.get_node_or_null("CRTFilter/CRTEffect")
-		if crt_rect:
-			crt_rect.visible = is_enabled
-
-func hide_options():
-	visible = false
-	back_pressed.emit()
 	
 func _on_volume_changed(value: float):
 	var master_bus = AudioServer.get_bus_index("Master")
-	
-	# Godot automatically translates 1.0 to 0dB (Max Volume) 
-	# and 0.0 to roughly -80dB (Complete Silence)
 	AudioServer.set_bus_volume_db(master_bus, linear_to_db(value))
-	
-	# OPTIONAL: Save this to your SaveManager so it remembers their volume next time!
-	# SaveManager.save_data["options"]["master_volume"] = value
-	# SaveManager.save_game()

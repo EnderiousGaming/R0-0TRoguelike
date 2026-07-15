@@ -1,15 +1,53 @@
 extends Area3D
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 # --- STATE VARIABLES ---
 # Security lock to prevent the player from triggering the portal multiple times in one frame
 var is_active = true 
 
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
 
 # ==========================================
-# COLLISION LOGIC
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# SIGNAL HANDLERS
 # ==========================================
 
 func _on_body_entered(body):
+	"""Handles player collision to transition between levels."""
 	if is_active and body.is_in_group("player"):
 		is_active = false
 		

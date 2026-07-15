@@ -1,5 +1,33 @@
 extends Control
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
 # --- UI REFERENCES ---
 @onready var bank_display = $VBoxContainer/BankDisplay
 @onready var health_display = $VBoxContainer/HealthDisplay
@@ -10,13 +38,17 @@ extends Control
 @onready var max_health_button = $VBoxContainer/MaxHealthButton
 @onready var fire_rate_button = $VBoxContainer/FireRateButton
 
-
 # ==========================================
-# CORE UI LOGIC
+# BUILT-IN ENGINE METHODS
 # ==========================================
 
 func _ready():
+	"""Initializes the shop UI when opened."""
 	update_ui()
+
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
 
 func update_ui():
 	"""Refreshes all text and prices on the shop interface."""
@@ -30,12 +62,12 @@ func update_ui():
 	damage_button.text = "UPGRADE LASER (+1 DMG) - " + str(RunManager.damage_cost) + " SCORE"
 	max_health_button.text = "UPGRADE MAX HP (+1 MAX HP) - " + str(RunManager.max_health_cost) + " SCORE"
 
-
 # ==========================================
-# SHOP PURCHASE EVENTS
+# SIGNAL HANDLERS
 # ==========================================
 
 func _on_heal_button_pressed():
+	"""Handles the healing purchase."""
 	# Only allow healing if player is below max health
 	if RunManager.current_health < RunManager.max_health:
 		if RunManager.score >= RunManager.heal_cost:
@@ -52,6 +84,7 @@ func _on_heal_button_pressed():
 		print("SYSTEM: Chassis integrity at maximum.")
 
 func _on_speed_button_pressed():
+	"""Handles the speed upgrade purchase."""
 	if RunManager.score >= RunManager.speed_cost:
 		RunManager.score -= RunManager.speed_cost
 		RunManager.player_speed_multiplier += 0.1
@@ -64,6 +97,7 @@ func _on_speed_button_pressed():
 		print("ERROR: INSUFFICIENT FUNDS")
 
 func _on_damage_button_pressed():
+	"""Handles the damage upgrade purchase."""
 	if RunManager.score >= RunManager.damage_cost:
 		RunManager.score -= RunManager.damage_cost
 		RunManager.laser_damage += 1
@@ -76,6 +110,7 @@ func _on_damage_button_pressed():
 		print("ERROR: INSUFFICIENT FUNDS")
 
 func _on_fire_rate_button_pressed():
+	"""Handles the fire rate upgrade purchase."""
 	# Hard cap the fire rate to prevent potential engine/logic loops
 	if RunManager.fire_rate <= 0.05: 
 		print("SYSTEM: Blaster Overclock at maximum capacity!")
@@ -95,6 +130,7 @@ func _on_fire_rate_button_pressed():
 		print("ERROR: INSUFFICIENT FUNDS")
 
 func _on_max_health_button_pressed():
+	"""Handles the max health upgrade purchase."""
 	if RunManager.score >= RunManager.max_health_cost:
 		RunManager.score -= RunManager.max_health_cost
 		RunManager.max_health += 1
@@ -108,6 +144,7 @@ func _on_max_health_button_pressed():
 		print("ERROR: INSUFFICIENT FUNDS")
 
 func _on_close_button_pressed():
+	"""Handles closing the shop menu."""
 	# Re-enable the player HUD before closing the shop
 	var player = get_tree().get_first_node_in_group("player")
 	if player:

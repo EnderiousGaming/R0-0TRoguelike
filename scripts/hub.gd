@@ -1,11 +1,41 @@
 extends Node3D
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
 
 # ==========================================
-# CORE LOOP
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
 # ==========================================
 
 func _ready():
+	"""Initializes the hub, music, and resets player state for a new run."""
 	AudioManager.play_menu_music()
 	
 	# 1. Reset the player's run stats upon entering the safe zone
@@ -17,3 +47,13 @@ func _ready():
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("update_weapon_loadout"):
 		player.update_weapon_loadout()
+
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# SIGNAL HANDLERS
+# ==========================================
+# (None in this script)

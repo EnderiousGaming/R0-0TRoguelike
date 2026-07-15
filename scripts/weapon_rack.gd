@@ -1,17 +1,52 @@
 extends Area3D
 
 # ==========================================
-# CONFIGURATION
+# SIGNALS
 # ==========================================
+# (None in this script)
 
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
 # Defines which weapon this rack provides (e.g., "blaster" or "sword")
 @export var weapon_type = "blaster" 
 
 # ==========================================
-# INTERACTION LOGIC
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# SIGNAL HANDLERS
 # ==========================================
 
 func _on_body_entered(body):
+	"""Handles player collision to equip the weapon."""
 	if body.is_in_group("player"):
 		# Update the global loadout state
 		RunManager.equipped_weapon = weapon_type

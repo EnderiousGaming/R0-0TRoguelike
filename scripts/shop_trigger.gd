@@ -1,14 +1,52 @@
 extends Area3D
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
 # --- REFERENCES ---
 @onready var shop_menu = $"../ShopMenu"
 
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+# (None in this script)
 
 # ==========================================
-# INTERACTION LOGIC
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# SIGNAL HANDLERS
 # ==========================================
 
 func _on_body_entered(body):
+	"""Handles the player entering the shop trigger."""
 	# Check if the entity entering the trigger is the player
 	if body.is_in_group("player"):
 		

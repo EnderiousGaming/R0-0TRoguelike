@@ -1,17 +1,54 @@
 extends Control
 
-# Grab your column references (Adjust the paths to match your actual scene tree!)
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
 @onready var run_stats_label = $HBoxContainer/ThisRunColumn/StatsText
 @onready var lifetime_stats_label = $HBoxContainer/LifetimeColumn/StatsText
 
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+
 func _ready():
+	"""Initializes the game over screen by unlocking the mouse and populating stats."""
 	# Unlock the mouse so the player can click "Restart" or "Main Menu"
 	Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
 	populate_run_stats()
 	populate_lifetime_stats()
 
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+
 func populate_run_stats():
+	"""Gathers and displays stats from the current run."""
 	var text = "SCORE: %d\n" % RunManager.score
 	text += "FLOOR REACHED: %d\n" % RunManager.current_stage
 	text += "DAEMONS PURGED: %d\n" % RunManager.daemons_purged
@@ -23,6 +60,7 @@ func populate_run_stats():
 	run_stats_label.text = text
 
 func populate_lifetime_stats():
+	"""Gathers and displays lifetime stats from the SaveManager."""
 	var stats = SaveManager.save_data["stats"]
 	
 	# Translate the integer into the difficulty name
@@ -42,11 +80,11 @@ func populate_lifetime_stats():
 	
 	lifetime_stats_label.text = text
 
-
 # ==========================================
-# UI EVENTS
+# SIGNAL HANDLERS
 # ==========================================
 
 func _on_button_pressed():
+	"""Handles the restart button press."""
 	# Teleport the player back to the safe zone (Hub) to start a new run
 	get_tree().change_scene_to_file("res://scenes/hub.tscn")

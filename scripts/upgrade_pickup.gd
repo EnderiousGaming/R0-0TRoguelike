@@ -1,15 +1,26 @@
 extends Area3D
 
 # ==========================================
-# VARIABLES & REFERENCES
+# SIGNALS
 # ==========================================
+# (None in this script)
 
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
 # Export variables allow you to configure shop items directly in the Inspector!
 @export var starting_upgrade_id: int = 1 
 @export var cost: int = 0 # 0 for Uplink, 5000 for Shop
 @export var is_shop_item: bool = false # Prevents deleting the whole shop when one is bought
 
-@onready var label = $Label3D
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 var my_upgrade_id = 1
 var player_in_range = false 
 
@@ -42,30 +53,26 @@ var upgrade_texts = {
 }
 
 # ==========================================
-# INITIALIZATION
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+@onready var label = $Label3D
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
 # ==========================================
 
 func _ready():
+	"""Initializes the upgrade pickup."""
 	# Automatically set up the item if it was manually placed in the Shop scene
 	setup(starting_upgrade_id, cost, is_shop_item)
 
-func setup(id: int, item_cost: int = 0, is_shop: bool = false):
-	my_upgrade_id = id
-	cost = item_cost
-	is_shop_item = is_shop
-	
-	var price_text = "\nFREE"
-	if cost > 0:
-		price_text = "\nCOST: " + str(cost) + " PTS"
-		
-	# Combine the description, the price, and the interact prompt
-	label.text = upgrade_texts[my_upgrade_id] + price_text + "\n\n[Press E or F to Equip]"
-
-# ==========================================
-# INTERACTION LOGIC
-# ==========================================
-
 func _process(_delta):
+	"""Handles user interaction to purchase/equip the upgrade."""
 	if player_in_range and Input.is_action_just_pressed("interact"):
 		# 1. Check the wallet
 		if RunManager.score >= cost:
@@ -86,10 +93,33 @@ func _process(_delta):
 			print("SYSTEM: Insufficient points. Need ", cost, " PTS.")
 			# TODO: You could play a negative "buzzer" sound effect here!
 
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+
+func setup(id: int, item_cost: int = 0, is_shop: bool = false):
+	"""Sets up the upgrade parameters and updates the UI label."""
+	my_upgrade_id = id
+	cost = item_cost
+	is_shop_item = is_shop
+	
+	var price_text = "\nFREE"
+	if cost > 0:
+		price_text = "\nCOST: " + str(cost) + " PTS"
+		
+	# Combine the description, the price, and the interact prompt
+	label.text = upgrade_texts[my_upgrade_id] + price_text + "\n\n[Press E or F to Equip]"
+
+# ==========================================
+# SIGNAL HANDLERS
+# ==========================================
+
 func _on_body_entered(body):
+	"""Handles player entering interaction range."""
 	if body.is_in_group("player"):
 		player_in_range = true
 
 func _on_body_exited(body):
+	"""Handles player exiting interaction range."""
 	if body.is_in_group("player"):
 		player_in_range = false
