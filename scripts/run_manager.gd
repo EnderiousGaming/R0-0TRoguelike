@@ -1,10 +1,23 @@
 extends Node
 
 # ==========================================
-# BOOT SEQUENCE (TUTORIAL) TRACKING
+# SIGNALS
 # ==========================================
-var is_tutorial: bool = false
-var tutorial_room_index: int = 0
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# Array Index matches the difficulty integer
+const DIFF_NAMES = ["EASY", "NORMAL", "HARD", "EXTRA HARD", "YOU WILL DIE"]
+# Health Multiplier (Higher = Tankier)
+const DIFF_HEALTH = [0.5, 1.0, 1.5, 2.5, 5.0]
+# Speed Multiplier (Higher = Faster)
+const DIFF_SPEED = [0.75, 1.0, 1.25, 1.75, 3.0]
+# Fire Cooldown Multiplier (LOWER = Faster shooting!)
+const DIFF_FIRE_RATE = [1.5, 1.0, 0.75, 0.5, 0.1]
+# Caps how many Daemons can be alive in the arena at the exact same time
+const DIFF_MAX_ENEMIES = [5, 8, 12, 18, 25]
 
 const TUTORIAL_SCENES = [
 	"res://scenes/tutorial/tutorial_room_1.tscn", # Movement & Calibration
@@ -13,33 +26,22 @@ const TUTORIAL_SCENES = [
 	"res://scenes/tutorial/tutorial_room_4.tscn"  # Kinetic Deflection (Parry) & Extraction
 ]
 
-func start_tutorial():
-	reset_run()
-	is_tutorial = true
-	tutorial_room_index = 0
-	current_stage = 0
-	get_tree().change_scene_to_file(TUTORIAL_SCENES[0])
-
-func advance_tutorial():
-	tutorial_room_index += 1
-	if tutorial_room_index < TUTORIAL_SCENES.size():
-		get_tree().change_scene_to_file(TUTORIAL_SCENES[tutorial_room_index])
-	else:
-		# Complete tutorial successfully
-		complete_tutorial()
-
-func complete_tutorial():
-	is_tutorial = false
-	print("SYSTEM: Boot sequence complete. Core functionality validated.")
-	get_tree().change_scene_to_file("res://scenes/hub.tscn")
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
 
 # ==========================================
-# GLOBAL LOADOUT & FLAGS
+# PUBLIC VARIABLES
 # ==========================================
+# --- TUTORIAL TRACKING ---
+var is_tutorial: bool = false
+var tutorial_room_index: int = 0
 
+# --- GLOBAL LOADOUT & FLAGS ---
 var equipped_weapon = "blaster" # Options: "blaster", "sword"
 
-# --- MODIFIER FLAGS ---
+# Modifier Flags
 var has_ice_physics = false
 var has_health_drain = false
 var has_lifesteal = false
@@ -51,21 +53,15 @@ var has_hazard_override: bool = false
 var has_courier_protocol: bool = false
 var uplink_rerolls: int = 0
 
-# ==========================================
-# STAT TRACKING
-# ==========================================
-
+# --- STAT TRACKING ---
 var daemons_purged: int = 0
 var projectiles_fired: int = 0
 var damage_dealt: int = 0
 var bosses_purged: int = 0
 var points_spent: int = 0
 
-# ==========================================
-# WEAPON STATS
-# ==========================================
-
-# --- BLASTER STATS ---
+# --- WEAPON STATS ---
+# Blaster Stats
 var laser_damage = 1
 var fire_rate = 0.25
 var max_ammo = 15
@@ -74,73 +70,84 @@ var reload_time = 1.5
 var blaster_scatter_count = 1
 var blaster_bounces = 0
 
-# --- SWORD STATS ---
+# Sword Stats
 var sword_swing_speed = 1.0
 var sword_range_multiplier = 1.0
 var has_deflect_boost = false
 var sword_has_slam = false
 
-
-# ==========================================
-# PLAYER & RUN STATE
-# ==========================================
-
-# --- HP & MOVEMENT ---
+# --- PLAYER & RUN STATE ---
 var max_health = 5
 var current_health = max_health
 var player_speed_multiplier = 1.0
+var dash_cooldown = 1.5
 
-# --- PROGRESSION ---
+# Progression
 var current_stage = 0
 var score = 0
 var enemies_defeated_this_room = 0
 
-# --- DASH ---
-var dash_cooldown = 1.5
-
-
-# ==========================================
-# DIFFICULTY SETTINGS
-# ==========================================
+# Difficulty
 # 0 = Easy, 1 = Normal, 2 = Hard, 3 = Extra Hard, 4 = YOU WILL DIE
 var current_difficulty: int = 1 
 
-# Array Index matches the difficulty integer
-const DIFF_NAMES = ["EASY", "NORMAL", "HARD", "EXTRA HARD", "YOU WILL DIE"]
-
-# Health Multiplier (Higher = Tankier)
-const DIFF_HEALTH = [0.5, 1.0, 1.5, 2.5, 5.0]
-
-# Speed Multiplier (Higher = Faster)
-const DIFF_SPEED = [0.75, 1.0, 1.25, 1.75, 3.0]
-
-# Fire Cooldown Multiplier (LOWER = Faster shooting!)
-const DIFF_FIRE_RATE = [1.5, 1.0, 0.75, 0.5, 0.1]
-
-# --- NEW: MAX CONCURRENT ENEMIES ---
-# Caps how many Daemons can be alive in the arena at the exact same time
-const DIFF_MAX_ENEMIES = [5, 8, 12, 18, 25]
-
-# ==========================================
-# ECONOMY (SHOP COSTS)
-# ==========================================
-
+# --- ECONOMY (SHOP COSTS) ---
 var heal_cost = 500
 var speed_cost = 800
 var damage_cost = 1000
 var fire_rate_cost = 1000
 var max_health_cost = 1200
 
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
 
 # ==========================================
-# RUN LOGIC FUNCTIONS
+# ONREADY VARIABLES
 # ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+
+# --- TUTORIAL LOGIC ---
+
+func start_tutorial():
+	"""Initiates the tutorial sequence and resets run variables."""
+	reset_run()
+	is_tutorial = true
+	tutorial_room_index = 0
+	current_stage = 0
+	get_tree().change_scene_to_file(TUTORIAL_SCENES[0])
+
+func advance_tutorial():
+	"""Advances to the next tutorial room, or completes it if at the end."""
+	tutorial_room_index += 1
+	if tutorial_room_index < TUTORIAL_SCENES.size():
+		get_tree().change_scene_to_file(TUTORIAL_SCENES[tutorial_room_index])
+	else:
+		complete_tutorial()
+
+func complete_tutorial():
+	"""Finalizes the tutorial and returns the player to the hub."""
+	is_tutorial = false
+	print("SYSTEM: Boot sequence complete. Core functionality validated.")
+	get_tree().change_scene_to_file("res://scenes/hub.tscn")
+
+# --- RUN STATE LOGIC ---
 
 func reset_run():
 	"""Resets all variables to default state when starting a new run or entering the Hub."""
 	print("SYSTEM: Resetting run variables...")
 	
-	# Stats
+	# Reset Stats
 	max_health = 5
 	current_health = max_health
 	player_speed_multiplier = 1.0
@@ -152,8 +159,7 @@ func reset_run():
 	bosses_purged = 0
 	points_spent = 0
 	
-	
-	# Weapon Defaults
+	# Reset Weapon Defaults
 	laser_damage = 1
 	fire_rate = 0.25
 	max_ammo = 15
@@ -162,16 +168,16 @@ func reset_run():
 	blaster_scatter_count = 1
 	blaster_bounces = 0
 	
-	# Sword Defaults
+	# Reset Sword Defaults
 	sword_swing_speed = 1.0
 	sword_range_multiplier = 1.0
 	has_deflect_boost = false
 	sword_has_slam = false
 	
-	# Movement Defaults
+	# Reset Movement Defaults
 	dash_cooldown = 1.5
 	
-	# Flags
+	# Reset Flags
 	has_ice_physics = false
 	has_health_drain = false
 	has_lifesteal = false
@@ -183,7 +189,7 @@ func reset_run():
 	has_courier_protocol = false
 	uplink_rerolls = 0
 	
-	# Shop Economy
+	# Reset Shop Economy
 	heal_cost = 500
 	speed_cost = 800
 	damage_cost = 1000

@@ -1,9 +1,23 @@
 extends Node
 
+# ==========================================
+# SIGNALS
+# ==========================================
 signal memory_synced
 
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
 const SAVE_PATH = "user://save_data.json"
 
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 # The master dictionary that holds everything we want to save
 var save_data = {
 	"stats": {
@@ -32,14 +46,33 @@ var save_data = {
 	}
 }
 
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+
 func _ready():
-	# Automatically load the player's data the moment the game boots up
+	"""Automatically load the player's data the moment the game boots up."""
 	load_game()
 
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+
 func save_game():
+	"""Writes the current save_data dictionary to disk as a JSON file."""
 	var file = FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if file:
-		# "\t" makes the JSON pretty-printed and readable in a text editor!
+		# "\t" makes the JSON pretty-printed and readable in a text editor
 		var json_string = JSON.stringify(save_data, "\t") 
 		file.store_string(json_string)
 		file.close()
@@ -50,6 +83,7 @@ func save_game():
 	memory_synced.emit()
 
 func load_game():
+	"""Reads the JSON file from disk and populates the save_data dictionary."""
 	if not FileAccess.file_exists(SAVE_PATH):
 		print("SYSTEM: No save file found. Initializing new memory core.")
 		return # Keep the default values
@@ -71,9 +105,11 @@ func load_game():
 	else:
 		print("CRITICAL ERROR: Failed to open save file for reading.")
 
-# Helper function to safely merge dictionaries.
-# If you add new variables in v0.13.0, this ensures old save files don't crash the game!
 func _merge_data(default_dict: Dictionary, loaded_dict: Dictionary):
+	"""
+	Helper function to safely merge dictionaries.
+	Ensures old save files don't crash the game when new variables are added.
+	"""
 	for key in loaded_dict.keys():
 		if default_dict.has(key):
 			if typeof(default_dict[key]) == TYPE_DICTIONARY and typeof(loaded_dict[key]) == TYPE_DICTIONARY:

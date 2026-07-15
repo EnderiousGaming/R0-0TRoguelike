@@ -1,16 +1,32 @@
 extends CharacterBody3D
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+enum State {HUNT, BARRAGE, LASER_SWEEP}
 const PROJECTILE = preload("res://scenes/enemy_projectile.tscn")
 const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
 const SCORE_DROP = preload("res://scenes/score_drop.tscn")
 
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 # --- BOSS STATS ---
 var max_health = 100
 var health = max_health
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- STATE MACHINE ---
-enum State {HUNT, BARRAGE, LASER_SWEEP}
 var current_state = State.HUNT
 var state_timer = 0.0
 
@@ -19,20 +35,34 @@ var hunt_speed = 3.0
 var contact_damage = 2
 var contact_cooldown = 0.5
 var current_contact_timer = 0.0
-
-@onready var nav_agent = $NavigationAgent3D
-@onready var laser_pivot = $LaserPivot
-@onready var laser_mesh = $LaserPivot/MeshInstance3D # Adjust path
-@onready var laser_hitbox = $LaserPivot/LaserHitbox/CollisionShape3D # Adjust path
 var player = null
 
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+@onready var nav_agent = $NavigationAgent3D
+@onready var laser_pivot = $LaserPivot
+@onready var laser_mesh = $LaserPivot/MeshInstance3D 
+@onready var laser_hitbox = $LaserPivot/LaserHitbox/CollisionShape3D 
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+
 func _ready():
+	"""Initializes boss references and disables laser on spawn."""
 	player = get_tree().get_first_node_in_group("player")
 	# Ensure the laser is off when spawning
 	laser_mesh.visible = false
 	laser_hitbox.disabled = true
 
 func _physics_process(delta):
+	"""Handles state machine updates, gravity, and contact damage."""
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 
@@ -56,10 +86,13 @@ func _physics_process(delta):
 	_check_contact_damage()
 
 # ==========================================
-# STATE LOGIC
+# CORE LOGIC / CUSTOM METHODS
 # ==========================================
 
+# --- STATE LOGIC ---
+
 func _state_hunt(delta):
+	"""Handles movement towards the player."""
 	state_timer += delta
 	
 	# 1. Ask the NavAgent where to step next
@@ -82,6 +115,7 @@ func _state_hunt(delta):
 		transition_to(State.BARRAGE)
 
 func _state_barrage(delta):
+	"""Handles stationary projectile volley attacks."""
 	state_timer += delta
 	velocity.x = 0 # Stop moving to shoot
 	velocity.z = 0
@@ -97,6 +131,7 @@ func _state_barrage(delta):
 		transition_to(State.LASER_SWEEP)
 
 func _state_laser_sweep(delta):
+	"""Handles massive sweeping laser attack."""
 	state_timer += delta
 	velocity.x = 0
 	velocity.z = 0
@@ -109,6 +144,7 @@ func _state_laser_sweep(delta):
 		transition_to(State.HUNT)
 
 func transition_to(new_state):
+	"""Switches the boss state and resets the state timer."""
 	current_state = new_state
 	state_timer = 0.0
 	
@@ -121,11 +157,10 @@ func transition_to(new_state):
 		laser_mesh.visible = false
 		laser_hitbox.disabled = true
 
-# ==========================================
-# ATTACKS & DAMAGE
-# ==========================================
+# --- ATTACKS & DAMAGE ---
 
 func fire_spread():
+	"""Instantiates a spread of projectiles towards the player."""
 	for i in range(5): 
 		var proj = PROJECTILE.instantiate()
 		get_parent().add_child(proj)
@@ -137,11 +172,11 @@ func fire_spread():
 		var target_pos = player.global_position + Vector3(0, 0.2, 0) 
 		proj.look_at(target_pos, Vector3.UP)
 		
-		# (Keep your existing spread rotation math down here)
 		var spread_angle = deg_to_rad(-30 + (i * 15))
 		proj.rotate_y(spread_angle)
 
 func _check_contact_damage():
+	"""Checks for physical collisions with the player and applies damage."""
 	for i in get_slide_collision_count():
 		var col = get_slide_collision(i)
 		var collider = col.get_collider()
@@ -151,8 +186,8 @@ func _check_contact_damage():
 				current_contact_timer = contact_cooldown
 
 func take_damage(amount):
+	"""Applies damage to the boss and checks for death."""
 	health -= amount
-	
 	RunManager.damage_dealt += amount
 	
 	var dmg_text = DAMAGE_NUMBER.instantiate()
@@ -165,6 +200,7 @@ func take_damage(amount):
 		die()
 
 func die():
+	"""Handles death sequence and returns the player to the main menu."""
 	# 1. Spawn the physical drop
 	var drop_instance = SCORE_DROP.instantiate()
 	

@@ -1,10 +1,25 @@
 extends CharacterBody3D
 
-# --- PRELOADS & CONSTANTS ---
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
 const PROJECTILE = preload("res://scenes/enemy_projectile.tscn")
 const DAMAGE_NUMBER = preload("res://scenes/damage_number.tscn")
 const SCORE_DROP = preload("res://scenes/score_drop.tscn")
 
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 # --- ENEMY STATS ---
 var base_max_health = 2
 var base_speed = 2.0
@@ -14,52 +29,53 @@ var speed = 2.0 # Slower movement
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 var is_dead = false
-
-# --- REFERENCES ---
 var player = null
-@onready var nav_agent = $NavigationAgent3D
 
-# --- NODE REFERENCES: AUDIO ---
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+@onready var nav_agent = $NavigationAgent3D
 @onready var death_sfx = $DeathSound
 @onready var blaster_sfx = $BlasterSFX
 
 # ==========================================
-# CORE LOOP
+# BUILT-IN ENGINE METHODS
 # ==========================================
 
 func _ready():
-	# Find and store the player reference upon spawning
+	"""Initializes the Daemon's stats scaled by current difficulty."""
 	player = get_tree().get_first_node_in_group("player")
 	
-	# 1. Grab the current difficulty index (0 through 4)
 	var diff = RunManager.current_difficulty
 	
-	# 2. Scale the stats before the Daemon takes its first step
 	base_max_health = int(base_max_health * RunManager.DIFF_HEALTH[diff])
-	health = base_max_health # Ensure they spawn with full scaled health
+	health = base_max_health 
 	
 	speed = base_speed * RunManager.DIFF_SPEED[diff]
 	
-	# Grab the Timer node and scale its wait_time! 
-	# (Make sure "Timer" matches the actual name of the node in your scene tree)
 	var fire_timer = $Timer 
 	if fire_timer:
 		fire_timer.wait_time = base_fire_cooldown * RunManager.DIFF_FIRE_RATE[diff]
 
 func _physics_process(delta):
-	# 1. Apply Gravity
+	"""Handles Daemon movement, gravity, pathfinding, and facing the player."""
 	if not is_on_floor():
 		velocity.y -= gravity * delta
 		
 	if player:
 		var distance_to_player = global_position.distance_to(player.global_position)
 		
-		# 2. Always aim at the player so projectiles shoot straight
+		# Always aim at the player so projectiles shoot straight
 		var flat_direction = Vector3(player.global_position.x - global_position.x, 0, player.global_position.z - global_position.z).normalized()
 		if flat_direction.length() > 0.05:
 			look_at(global_position + flat_direction, Vector3.UP)
 		
-		# 3. Standard Pathfinding (Stop moving if within 15 meters)
+		# Standard Pathfinding (Stop moving if within 15 meters)
 		if distance_to_player > 15.0:
 			nav_agent.target_position = player.global_position
 			var next_path_position = nav_agent.get_next_path_position()
@@ -74,72 +90,63 @@ func _physics_process(delta):
 			
 	move_and_slide()
 
-
 # ==========================================
-# COMBAT & SPAWNING LOGIC
+# CORE LOGIC / CUSTOM METHODS
 # ==========================================
-
-func _on_timer_timeout():
-	# Fire at the player if they are within sniper range (30 meters)
-	if player and global_position.distance_to(player.global_position) <= 30.0:
-		var proj = PROJECTILE.instantiate()
-		get_parent().add_child(proj)
-		
-		blaster_sfx.play()
-		
-		# Spawn the projectile at chest height
-		proj.global_position = global_position + Vector3(0, 0.25, 0)
-		proj.look_at(player.global_position + Vector3(0, 1.0, 0), Vector3.UP)
 
 func take_damage(amount):
+	"""Applies damage to the Daemon and checks for death."""
+	if is_dead:
+		return
+		
 	health -= amount
-	
 	RunManager.damage_dealt += amount
 	
-	# Spawn floating damage text
 	var dmg_text = DAMAGE_NUMBER.instantiate()
 	get_parent().add_child(dmg_text)
 	dmg_text.global_position = global_position + Vector3(0, 1.5, 0)
 	dmg_text.text = str(amount)
 	dmg_text.animate()
 	
-	# Small knockback effect when hit
 	velocity = -velocity * 2 
 	
 	if health <= 0:
 		die()
 
 func die():
-	# --- DOUBLE DEATH PREVENTION ---
-	if is_dead:
-		return
-	is_dead = true
-	# -------------------------------
+	"""Handles death sequence and spawns drops."""
+	is_dead = true 
 	
-	# --- AUDIO FIX ---
-	# 1. Unparent the sound from the enemy and give it to the main world
 	death_sfx.reparent(get_parent())
-	# 2. Play the sound
 	death_sfx.play()
-	# 3. Tell the audio node to safely delete ITSELF the moment the sound finishes!
-	death_sfx.finished.connect(death_sfx.queue_free)
-	# -----------------
 	
-	# 1. Spawn the physical drop
+	if not death_sfx.finished.is_connected(death_sfx.queue_free):
+		death_sfx.finished.connect(death_sfx.queue_free)
+	
 	var drop_instance = SCORE_DROP.instantiate()
 	
-	# 2. UPDATE THE LIFETIME STATS
 	SaveManager.save_data["stats"]["total_daemons_purged"] += 1
-	SaveManager.save_game() # Instantly write the new total to the hard drive
+	SaveManager.save_game() 
 	
-	# Pass any specific value you want (e.g., Bosses drop more)
 	drop_instance.point_value = 300
-	
 	RunManager.enemies_defeated_this_room += 1
 	
-	# Use call_deferred to safely add it to the world, just like we did with Aureus
 	get_parent().call_deferred("add_child", drop_instance)
 	drop_instance.set_deferred("global_position", global_position + Vector3(0, 0.5, 0))
 	
-	# 2. Delete the enemy
 	queue_free()
+
+# ==========================================
+# SIGNAL HANDLERS
+# ==========================================
+
+func _on_timer_timeout():
+	"""Fires a projectile at the player if they are within sniper range."""
+	if player and global_position.distance_to(player.global_position) <= 30.0:
+		var proj = PROJECTILE.instantiate()
+		get_parent().add_child(proj)
+		
+		blaster_sfx.play()
+		
+		proj.global_position = global_position + Vector3(0, 0.25, 0)
+		proj.look_at(player.global_position + Vector3(0, 1.0, 0), Vector3.UP)

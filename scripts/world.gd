@@ -1,24 +1,44 @@
 extends Node3D
 
 # ==========================================
-# PRELOADS & REFERENCES
+# SIGNALS
 # ==========================================
+# (None in this script)
 
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
 const UPGRADE_SCENE = preload("res://scenes/upgrade_pickup.tscn")
 
-@onready var wave_director_timer = $WaveDirector/Timer
-@onready var portal = $Portal
-@onready var portal_collision = $Portal/CollisionShape3D
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
 
-# --- STATE ---
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 var target_kills = 0
 var portal_active = false
 
 # ==========================================
-# CORE ENGINE LOOPS
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+@onready var wave_director_timer = $WaveDirector/Timer
+@onready var portal = $Portal
+@onready var portal_collision = $Portal/CollisionShape3D
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
 # ==========================================
 
 func _ready():
+	"""Initializes the stage progression requirements and arena setup."""
 	AudioManager.play_arena_music()
 	
 	# 1. Reset room progression data
@@ -33,12 +53,12 @@ func _ready():
 	portal_collision.call_deferred("set_disabled", true)
 
 func _process(_delta):
-	# Monitor kill count to trigger the portal sequence
+	"""Monitors kill count to trigger the portal sequence once the target is reached."""
 	if not portal_active and RunManager.enemies_defeated_this_room >= target_kills:
 		activate_portal()
 
 # ==========================================
-# PROGRESSION LOGIC
+# CORE LOGIC / CUSTOM METHODS
 # ==========================================
 
 func activate_portal():
@@ -56,15 +76,15 @@ func activate_portal():
 	for daemon in remaining_enemies:
 		daemon.queue_free()
 		
-	# --- NEW LINE: TURN OFF HAZARDS ---
+	# 3. Turn off dynamic hazards
 	get_tree().call_group("hazards", "set_hazard_active", false)
 	
-	# 3. Broadcast the secure message to the player
+	# 4. Broadcast the secure message to the player
 	var player = get_tree().get_first_node_in_group("player")
 	if player and player.has_method("announce"):
 		player.announce("AREA SECURED.\nPROCEED TO UPLINK.")
 		
-	# 4. Generate random upgrade choices
+	# 5. Generate random upgrade choices
 	spawn_upgrades()
 	print("SYSTEM: UPLINK AVAILABLE. Area secured!")
 	
@@ -84,7 +104,6 @@ func spawn_upgrades():
 	# Shuffle the valid pool to ensure random selection
 	valid_pool.shuffle()
 	
-	# Changed from 3.0 offset down to 1.5 offset
 	var offsets = [Vector3(-1.5, 0, 1), Vector3(1.5, 0, 1), Vector3(0, 0, -1.5)]
 	
 	# Spawn the top 3 upgrades from the shuffled deck

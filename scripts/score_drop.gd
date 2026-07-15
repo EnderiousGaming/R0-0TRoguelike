@@ -1,5 +1,23 @@
 extends Area3D
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
 var point_value = 100
 var magnet_speed = 25.0 # Speed it flies to R0-0T when Courier is active
 var player = null
@@ -11,10 +29,25 @@ var base_y = 0.0
 var time_passed = 0.0
 var is_magnetized = false
 
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+
 func _ready():
+	"""Initializes the drop and starts its pop-up animation."""
 	player = get_tree().get_first_node_in_group("player")
 	
-	# NEW: Wait one frame so the Daemon's 'set_deferred' location applies first!
+	# Wait one frame so the Daemon's 'set_deferred' location applies first!
 	await get_tree().physics_frame
 	
 	# Pop the drop up slightly based on its TRUE global position
@@ -26,9 +59,8 @@ func _ready():
 	base_y = global_position.y
 
 func _process(delta):
-	# ==========================================
-	# THE COURIER PROTOCOL LOGIC (KINEMATIC)
-	# ==========================================
+	"""Handles the hover animation and Courier Protocol magnet logic."""
+	# --- THE COURIER PROTOCOL LOGIC (KINEMATIC) ---
 	if is_instance_valid(player):
 		var distance = global_position.distance_to(player.global_position)
 		
@@ -39,9 +71,7 @@ func _process(delta):
 			global_position += dir * magnet_speed * delta
 			return 
 		
-	# ==========================================
-	# HOVER & SPIN ANIMATION
-	# ==========================================
+	# --- HOVER & SPIN ANIMATION ---
 	if not is_magnetized:
 		rotate_y(2.0 * delta) 
 		
@@ -49,7 +79,17 @@ func _process(delta):
 			time_passed += delta
 			global_position.y = base_y + sin(time_passed * float_speed) * float_amplitude
 
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# SIGNAL HANDLERS
+# ==========================================
+
 func _on_body_entered(body):
+	"""Handles collection by the player."""
 	if body.is_in_group("player"):
 		RunManager.score += point_value
 		print("SYSTEM: Points acquired. Current balance: ", RunManager.score)

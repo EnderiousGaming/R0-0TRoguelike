@@ -1,37 +1,63 @@
 extends GridMap
 
-@export var is_boss_arena: bool = false
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
 
-# --- CONFIGURATION ---
-var grid_width = 20
-var grid_depth = 20
-
+# ==========================================
+# ENUMS & CONSTANTS
+# ==========================================
 # Ensure these match your MeshLibrary IDs!
 const TILE_FLOOR = 0
 const TILE_WALL = 1
 const TILE_PILLAR = 3
 const TILE_HAZARD = 4
-const TILE_CEILING = 5 # Or whatever index your new tile ends up being
+const TILE_CEILING = 5 
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+@export var is_boss_arena: bool = false
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# --- CONFIGURATION ---
+var grid_width = 20
+var grid_depth = 20
 
 # SPAWN WEIGHTS (Higher number = Spawns more often)
 var tile_weights = {
 	TILE_FLOOR: 80, # 80% chance (Keeps the arena open)
-	TILE_WALL: 5,    # 5% chance  (Occasional thick block)
-	TILE_PILLAR: 10,  # 10% chance (Thin, tall obstacles)
-	TILE_HAZARD: 5 #5% chance (occasional hazard)
+	TILE_WALL: 5,   # 5% chance  (Occasional thick block)
+	TILE_PILLAR: 10, # 10% chance (Thin, tall obstacles)
+	TILE_HAZARD: 5  # 5% chance (Occasional hazard)
 }
 
 var wave = {}
 
 # ==========================================
-# INITIALIZATION
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
 # ==========================================
 
 func _ready():
+	"""Initializes the arena by setting spawn weights and starting the WFC generation."""
 	# Automatically detect if this is the final encounter
 	if RunManager.current_stage == 10:
 		is_boss_arena = true
 		print("SYSTEM: Final Stage reached. Initializing Boss Arena protocols.")
+		
 	# 1. Decide the weights right when the node loads!
 	if is_boss_arena:
 		# THE UNSTABLE CORE: No walls, lots of pillars, 20% hazard floor
@@ -54,20 +80,24 @@ func _ready():
 	print("SYSTEM: Initializing Wave Function Collapse...")
 	generate_wfc()
 
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
+# ==========================================
+
 func generate_wfc():
+	"""Runs the core Wave Function Collapse algorithm to procedurally generate the room."""
 	clear() 
 	wave.clear()
 	
-	# 1. INITIALIZE THE WAVE & HARDCODE BORDERS
+	# --- 1. INITIALIZE THE WAVE & HARDCODE BORDERS ---
 	for x in range(grid_width):
 		for z in range(grid_depth):
 			if x == 0 or x == grid_width - 1 or z == 0 or z == grid_depth - 1:
 				wave[Vector2(x, z)] = [TILE_WALL] 
 			else:
-				# --- REMOVED TILE_WALL FROM INTERIOR OPTIONS ---
 				wave[Vector2(x, z)] = [TILE_FLOOR, TILE_PILLAR, TILE_HAZARD]
 			
-	# 2. COLLAPSE THE GRID
+	# --- 2. COLLAPSE THE GRID ---
 	var uncollapsed_cells = grid_width * grid_depth
 	
 	while uncollapsed_cells > 0:
@@ -79,7 +109,7 @@ func generate_wfc():
 		if options.is_empty():
 			options = [TILE_FLOOR] # Failsafe
 			
-		# --- DYNAMIC WEIGHTED SELECTION ---
+		# DYNAMIC WEIGHTED SELECTION
 		var chosen_tile = options[0]
 		if options.size() > 1:
 			var total_weight = 0
@@ -99,7 +129,7 @@ func generate_wfc():
 		propagate()
 		uncollapsed_cells -= 1
 		
-	# 3. THE BUILDING PASS
+	# --- 3. THE BUILDING PASS ---
 	for x in range(grid_width):
 		for z in range(grid_depth):
 			var final_options = wave[Vector2(x, z)]
@@ -110,52 +140,43 @@ func generate_wfc():
 			
 	print("SYSTEM: Map Generation Complete!")
 	
-	# ==========================================
-	# CEILING GENERATION PASS
-	# ==========================================
-	# Aureus is 4 meters tall, so the ceiling must be AT LEAST Y=5. 
-	# Y=6 or Y=7 is safer so his collision capsule doesn't scrape it.
+	# --- 4. CEILING GENERATION PASS ---
+	# Boss is tall, so ceiling must be high enough.
 	var ceiling_height = 6 
-		
 	print("SYSTEM: Enclosing arena architecture...")
 	for x in range(grid_width):
 		for z in range(grid_depth):
-			# Places a ceiling tile directly above every single grid coordinate
-			set_cell_item(Vector3i(x, ceiling_height, z), TILE_CEILING) # Swap to TILE_CEILING if you made one
+			set_cell_item(Vector3i(x, ceiling_height, z), TILE_CEILING)
 	
-	# ==========================================
-	# ENTITY SPAWN LOGIC & LIGHTING
-	# ==========================================
+	_deploy_entities()
+	
+func _deploy_entities():
+	"""Handles spawning the player, portal, enemies, lights, and hazards after map generation."""
 	var floor_cells = get_used_cells_by_item(TILE_FLOOR)
 	
 	if floor_cells.size() > 0:
-		# Player
+		# Player Spawn
 		var player = get_tree().get_first_node_in_group("player")
 		if player:
-			# Wrap coordinates in to_global() to guarantee perfect placement regardless of parent nodes
 			player.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 2.0, 0)
 			
-		# Portal - Safely search from the absolute root of the level, ignoring hierarchy!
+		# Portal Spawn
 		var portal = get_tree().current_scene.get_node_or_null("Portal")
 		if portal:
 			portal.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.5, 0)
 			
-		# ==========================================
-		# DAEMON SPAWN LOGIC
-		# ==========================================
+		# Daemon Spawn Logic
 		var spawn_points = get_tree().get_nodes_in_group("spawn_point")
 		
 		if is_boss_arena:
-			# Purge all daemon spawners so it is a strict 1v1 fight
 			for sp in spawn_points:
 				sp.queue_free()
 			print("SYSTEM: Standard Daemon spawners neutralized.")
 		else:
-			# Standard room: scatter the spawners
 			for sp in spawn_points:
 				sp.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.0, 0)
 
-		# PROCEDURAL LIGHTING PASS
+		# Procedural Lighting Pass
 		var lights_placed = 0
 		for cell in floor_cells:
 			if randf() < 0.08: 
@@ -168,32 +189,19 @@ func generate_wfc():
 				new_light.global_position = to_global(map_to_local(cell)) + Vector3(0, 4.0, 0)
 				lights_placed += 1
 				
-		# Enemies (Only spawn if this is NOT a boss arena!)
-		if not is_boss_arena:
-			for sp in get_tree().get_nodes_in_group("spawn_point"):
-				sp.global_position = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 1.0, 0)
-				
 		print("SYSTEM: ", lights_placed, " cyan light fixtures deployed.")
 		
-		# ==========================================
-		# BOSS SPAWN LOGIC
-		# ==========================================
+		# Boss Spawn Logic
 		if is_boss_arena:
 			var aureus_scene = preload("res://scenes/boss.tscn")
 			var boss_instance = aureus_scene.instantiate()
 			
-			# 1. Queue the boss to be added safely
 			get_parent().call_deferred("add_child", boss_instance)
-			
-			# 2. Queue the position assignment so it waits until the boss is physically in the world
 			var spawn_pos = to_global(map_to_local(floor_cells.pick_random())) + Vector3(0, 3.0, 0)
 			boss_instance.set_deferred("global_position", spawn_pos)
-			
 			print("SYSTEM: AUREUS has materialized.")
 		
-	# ==========================================
-	# CORRUPTED DOMAIN DEPLOYMENT
-	# ==========================================
+		# Corrupted Domain (Hazards) Deployment
 		var hazard_scene = preload("res://scenes/hazard_zone.tscn")
 		var hazard_cells = get_used_cells_by_item(TILE_HAZARD)
 		var domains_placed = 0
@@ -201,24 +209,22 @@ func generate_wfc():
 		for cell in hazard_cells:
 			var zone = hazard_scene.instantiate()
 			add_child(zone)
-			# Drop the zone exactly on the red tile!
 			zone.global_position = to_global(map_to_local(cell)) 
 			domains_placed += 1
 			
 		print("SYSTEM: ", domains_placed, " corrupted domains materialized.")
 
-	# ==========================================
-	# NAVMESH BAKING
-	# ==========================================
-	
-	# 1. Wait one single frame so Godot's physics engine registers the concrete foundation
+	_bake_navmesh()
+
+func _bake_navmesh():
+	"""Bakes the navigation mesh dynamically after generation."""
+	# Wait one frame so Godot's physics engine registers the concrete foundation
 	await get_tree().process_frame
 	
-	# 2. Find the NavigationRegion3D safely
+	# Find the NavigationRegion3D safely
 	var nav_region = get_parent()
 	if nav_region is NavigationRegion3D:
 		# PASS FALSE TO BAKE SYNCHRONOUSLY! 
-		# This freezes the loading screen until the NavMesh is 100% finished so enemies don't crash.
 		nav_region.bake_navigation_mesh(false)
 		print("SYSTEM: NavMesh dynamically baked! Enemies are online.")
 
@@ -227,6 +233,7 @@ func generate_wfc():
 # ==========================================
 
 func get_lowest_entropy_cell() -> Vector2:
+	"""Finds the uncollapsed cell with the fewest remaining tile options."""
 	var best_cell = Vector2(-1, -1)
 	var lowest_entropy = 999
 	for x in range(grid_width):
@@ -239,6 +246,7 @@ func get_lowest_entropy_cell() -> Vector2:
 	return best_cell
 
 func propagate():
+	"""Updates the possible tiles for neighboring cells based on recent collapses."""
 	for x in range(grid_width):
 		for z in range(grid_depth):
 			var current_options = wave[Vector2(x, z)]
@@ -250,7 +258,6 @@ func propagate():
 			var neighbors = [Vector2(x+1, z), Vector2(x-1, z), Vector2(x, z+1), Vector2(x, z-1)]
 			
 			for n in neighbors:
-				# Treat both solid walls and cover blocks as geometry to avoid clumping!
 				if wave.has(n) and wave[n].size() == 1:
 					if wave[n][0] == TILE_WALL:
 						locked_wall_neighbors += 1
@@ -259,18 +266,18 @@ func propagate():
 				if current_options.has(TILE_WALL):
 					current_options.erase(TILE_WALL)
 
-
 # ==========================================
 # DYNAMIC ARENA HAZARDS
 # ==========================================
 
 func _on_hazard_shift_timer_timeout():
+	"""Dynamically re-routes corrupted domains during the Boss battle."""
 	if not is_boss_arena:
 		return # Only shift the room if we are fighting AUREUS
 		
 	print("SYSTEM: Arena Core unstable! Re-routing Corrupted Domains...")
 	
-	# 1. Destroy the old invisible damage hitboxes safely
+	# 1. Destroy old invisible damage hitboxes safely
 	for child in get_children():
 		if child.name.begins_with("DynamicHazard"):
 			child.queue_free()
@@ -297,7 +304,7 @@ func _on_hazard_shift_timer_timeout():
 		# Change the visual GridMap tile to the purple Hazard material
 		set_cell_item(cell, TILE_HAZARD)
 		
-		# Spawn the physical damage hitbox and lift it 1 meter up (like we fixed earlier!)
+		# Spawn the physical damage hitbox and lift it 1 meter up
 		var zone = hazard_scene.instantiate()
 		zone.name = "DynamicHazard_" + str(i)
 		add_child(zone)

@@ -1,11 +1,49 @@
 extends Label3D
 
+# ==========================================
+# SIGNALS
+# ==========================================
+# (None in this script)
 
 # ==========================================
-# ANIMATION LOGIC
+# ENUMS & CONSTANTS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# EXPORT VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PUBLIC VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# PRIVATE VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# ONREADY VARIABLES
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# BUILT-IN ENGINE METHODS
+# ==========================================
+# (None in this script)
+
+# ==========================================
+# CORE LOGIC / CUSTOM METHODS
 # ==========================================
 
 func animate():
+	"""
+	Animates the damage number floating upwards and fading out before deleting it.
+	Called externally right after this node is instantiated and positioned.
+	"""
 	var tween = create_tween()
 	
 	# 1. Float Upwards:
