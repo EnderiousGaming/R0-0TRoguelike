@@ -58,12 +58,6 @@ func _physics_process(delta):
 						body.take_damage(damage_amount)
 						print("SYSTEM: R0-0T is taking Corrupted Domain damage!")
 			
-			# 2. DAEMON LOGIC
-			elif body.is_in_group("enemy"):
-				if body.has_method("take_damage"):
-					body.take_damage(damage_amount)
-					# Optional: print("SYSTEM: Daemon taking Corrupted Domain damage.")
-
 # ==========================================
 # CORE LOGIC / CUSTOM METHODS
 # ==========================================

@@ -45,6 +45,10 @@ extends Area3D
 # ==========================================
 
 func _on_body_entered(body):
+	# Daemons are strictly immune to environmental hazards!
+	if body.is_in_group("player") and body.has_method("take_damage"):
+		body.take_damage(1)
+		
 	"""Handles out-of-bounds collision for players and enemies."""
 	# 1. Did the player fall out of bounds?
 	if body.is_in_group("player"):

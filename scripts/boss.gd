@@ -186,6 +186,8 @@ func _check_contact_damage():
 				current_contact_timer = contact_cooldown
 
 func take_damage(amount):
+	RunManager.ultimate_charge += 1
+	
 	"""Applies damage to the boss and checks for death."""
 	health -= amount
 	RunManager.damage_dealt += amount

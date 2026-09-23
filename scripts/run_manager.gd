@@ -98,6 +98,15 @@ var damage_cost = 1000
 var fire_rate_cost = 1000
 var max_health_cost = 1200
 
+# --- SIPHON TETHER STATS ---
+var tether_count = 1       # Upgrade this to 2, 3, or 4 to connect to multiple enemies!
+var tether_tick_rate = 0.5 # Upgrade by lowering this (e.g., 0.25) to drain health faster
+var tether_damage = 1      # Damage dealt per tick
+var tether_charge_rate = 0.0 # How much charge is drained per tick
+var ultimate_charge = 0.0
+var max_ultimate_charge = 100.0
+var tether_range_multiplier = 1.0 # Upgrades add +0.2 or +0.5 to this!
+
 # ==========================================
 # PRIVATE VARIABLES
 # ==========================================
@@ -148,6 +157,7 @@ func reset_run():
 	print("SYSTEM: Resetting run variables...")
 	
 	# Reset Stats
+	ultimate_charge = 0
 	max_health = 5
 	current_health = max_health
 	player_speed_multiplier = 1.0

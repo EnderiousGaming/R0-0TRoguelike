@@ -23,6 +23,21 @@ const BULLET = preload("res://scenes/player_projectile.tscn")
 # ==========================================
 # PUBLIC VARIABLES
 # ==========================================
+# --- ABILITIES & ULTIMATES ---
+var emp_mat: StandardMaterial3D
+var emp_particle_mat: StandardMaterial3D
+
+var is_hovering = false
+var hover_timer = 0.0
+
+var is_chrono_active = false
+var chrono_timer = 0.0
+
+var are_blades_active = false
+var blades_timer = 0.0
+var blades_tick = 0.0
+var phantom_pivot: Node3D
+
 var gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 
 # --- MOVEMENT ---
@@ -67,6 +82,13 @@ var current_grapple_cooldown: float = 0.0
 # --- MODIFIERS ---
 var drain_timer = 0.0
 var radiation_timer = 0.0
+
+# --- NODE REFERENCES: TETHER ---
+@onready var tether_zone = $Head/TetherDetectionZone
+@onready var tether_timer = $TetherTickTimer
+
+var active_tether_targets = []
+var tether_visuals = [] # Holds our generated 3D beams
 
 # ==========================================
 # PRIVATE VARIABLES
@@ -136,6 +158,63 @@ func _ready():
 	
 	if is_instance_valid(tutorial_overlay):
 		tutorial_overlay.visible = false
+		
+	tether_timer.timeout.connect(_on_tether_tick)
+	
+	# --- THE FIX: STUTTER & SHADER CACHING ---
+	# Pre-generate a pool of 10 beams so the graphics card doesn't panic mid-combat
+	var mat = StandardMaterial3D.new()
+	mat.albedo_color = Color(1.0, 0.0, 0.0, 0.8)
+	mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	mat.emission_enabled = true
+	mat.emission = Color.RED
+	mat.emission_energy_multiplier = 4.0
+	
+	var box = BoxMesh.new()
+	box.size = Vector3(0.05, 0.05, 1.0)
+	
+	for i in range(10): # 10 is more than enough for maximum upgrades
+		var new_beam = MeshInstance3D.new()
+		new_beam.mesh = box
+		new_beam.material_override = mat
+		new_beam.top_level = true
+		new_beam.visible = false
+		add_child(new_beam)
+		tether_visuals.append(new_beam)
+		
+	# 1. CACHE EMP MATERIALS (Fixes the stutter)
+	emp_mat = StandardMaterial3D.new()
+	emp_mat.albedo_color = Color(0.0, 0.8, 1.0, 0.6)
+	emp_mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	emp_mat.emission_enabled = true
+	emp_mat.emission = Color.CYAN
+	emp_mat.emission_energy_multiplier = 8.0
+	
+	emp_particle_mat = StandardMaterial3D.new()
+	emp_particle_mat.albedo_color = Color.CYAN
+	emp_particle_mat.emission_enabled = true
+	emp_particle_mat.emission = Color.CYAN
+	emp_particle_mat.emission_energy_multiplier = 5.0
+
+	# 2. PRE-BUILD PHANTOM BLADES
+	phantom_pivot = Node3D.new()
+	add_child(phantom_pivot)
+	for i in range(5):
+		var blade = MeshInstance3D.new()
+		var b_mesh = BoxMesh.new()
+		b_mesh.size = Vector3(0.1, 1.5, 0.3)
+		blade.mesh = b_mesh
+		blade.material_override = emp_particle_mat
+		
+		# --- THE FIX: Add to the tree before calling look_at ---
+		phantom_pivot.add_child(blade)
+		
+		var angle = (i / 5.0) * TAU
+		blade.position = Vector3(cos(angle) * 3.5, 0, sin(angle) * 3.5)
+		# Aim inward toward R0-0T rather than map coordinate (0, 0, 0)
+		blade.look_at(global_position, Vector3.UP)
+		
+	phantom_pivot.visible = false
 	
 func _unhandled_input(event):
 	"""Handles mouse capture, camera rotation, and game state toggles."""
@@ -177,6 +256,11 @@ func _unhandled_input(event):
 				print("SYSTEM: Reroll failed. No Uplink Rerolls available.")
 
 func _physics_process(delta):
+	# Ensure we never divide by zero if time_scale is 0!
+	var real_delta = delta
+	if Engine.time_scale > 0.0:
+		real_delta = delta / Engine.time_scale
+	
 	"""Handles movement, jumping, dashing, grappling, and modifiers."""
 	var current_gravity = gravity
 	var current_jump = JUMP_VELOCITY
@@ -197,7 +281,7 @@ func _physics_process(delta):
 		velocity.y = current_jump
 
 	if dash_cooldown_timer > 0.0:
-		dash_cooldown_timer -= delta
+		dash_cooldown_timer -= real_delta
 
 	var input_dir = Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
 	var direction = (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
@@ -253,9 +337,41 @@ func _physics_process(delta):
 			velocity.x = lerp(velocity.x, 0.0, current_accel * delta)
 			velocity.z = lerp(velocity.z, 0.0, current_accel * delta)
 			
+	# Trick the engine by inflating velocity, moving, then instantly deflating it!
+	if Engine.time_scale > 0.0:
+		velocity /= Engine.time_scale
+		
 	move_and_slide()
+	
+	if Engine.time_scale > 0.0:
+		velocity *= Engine.time_scale
+	
+	# --- TETHER GRAVITY HACK (L-Shift) ---
+	if Input.is_action_just_pressed("dash"):
+		if RunManager.equipped_weapon == "tether" and current_grapple_cooldown <= 0.0:
+			is_hovering = true
+			hover_timer = 3.0
+			velocity.y = JUMP_VELOCITY * 1.8 # Launch R0-0T up!
+			current_grapple_cooldown = grapple_cooldown_max
+			print("SYSTEM: GRAVITY HACK ENGAGED.")
+			
+	# --- PROCESS HOVER ---
+	if is_hovering:
+		hover_timer -= delta
+		# Once R0-0T reaches the peak of the jump, drastically cut gravity
+		if velocity.y < 0:
+			current_gravity = gravity * 0.15 
+		if hover_timer <= 0.0 or is_on_floor():
+			is_hovering = false
+			
+	
 
 func _process(delta):
+	# Ensure we never divide by zero if time_scale is 0!
+	var real_delta = delta
+	if Engine.time_scale > 0.0:
+		real_delta = delta / Engine.time_scale
+	
 	"""Handles dynamic HUD updates, weapon logic processing, and passive modifiers."""
 	score_display.text = "SCORE: " + str(RunManager.score)
 	kills_display.text = "CLEARED: " + str(RunManager.enemies_defeated_this_room)
@@ -268,7 +384,7 @@ func _process(delta):
 
 	# --- COOLDOWNS ---
 	if fire_cooldown > 0.0:
-		fire_cooldown -= delta
+		fire_cooldown -= real_delta
 		
 	if RunManager.equipped_weapon == "blaster":
 		_process_blaster(delta)
@@ -276,6 +392,8 @@ func _process(delta):
 		_process_sword()
 		if is_sword_thrown:
 			_process_sword_throw(delta)
+	elif RunManager.equipped_weapon == "tether":
+		_process_tether()
 			
 	# --- MODIFIERS ---
 	if RunManager.has_health_drain:
@@ -314,6 +432,60 @@ func _process(delta):
 		grapple_beam.scale = Vector3(1.0, distance, 1.0)
 	else:
 		grapple_beam.visible = false
+		
+	# --- ULTIMATE UI ---
+	var ult_percent = int((RunManager.ultimate_charge / RunManager.max_ultimate_charge) * 100)
+	$HUD/UltimateDisplay.text = "ULTIMATE: " + str(ult_percent) + "%"
+	if RunManager.ultimate_charge >= RunManager.max_ultimate_charge:
+		$HUD/UltimateDisplay.modulate = Color.CYAN
+	else:
+		$HUD/UltimateDisplay.modulate = Color.WHITE
+
+	# --- ULTIMATE TRIGGERS ---
+	if Input.is_action_just_pressed("ultimate_ability") and RunManager.ultimate_charge >= RunManager.max_ultimate_charge:
+		RunManager.ultimate_charge = 0.0
+		
+		if RunManager.equipped_weapon == "tether":
+			execute_emp_blast() 
+			
+		elif RunManager.equipped_weapon == "blaster":
+			is_chrono_active = true
+			chrono_timer = 5.0 
+			Engine.time_scale = 0.25
+			print("SYSTEM: CHRONO-DRIVE ENGAGED.")
+			
+		elif RunManager.equipped_weapon == "sword":
+			are_blades_active = true
+			blades_timer = 10.0
+			phantom_pivot.visible = true
+			print("SYSTEM: PHANTOM BLADES DEPLOYED.")
+
+	# --- PROCESS CHRONO-DRIVE ---
+	if is_chrono_active:
+		# Use unscaled delta so the timer runs in real-world time, not slow-mo time
+		var unscaled_delta = delta / Engine.time_scale 
+		chrono_timer -= unscaled_delta
+		if chrono_timer <= 0.0:
+			is_chrono_active = false
+			Engine.time_scale = 1.0
+			print("SYSTEM: CHRONO-DRIVE DISENGAGED.")
+
+	# --- PROCESS PHANTOM BLADES ---
+	if are_blades_active:
+		# Spin the blades rapidly!
+		phantom_pivot.rotate_y(8.0 * delta)
+		blades_timer -= delta
+		blades_tick -= delta
+		
+		if blades_tick <= 0.0:
+			blades_tick = 0.25 # Damage enemies 4 times a second
+			for enemy in get_tree().get_nodes_in_group("enemy"):
+				if not enemy.is_dead and global_position.distance_to(enemy.global_position) <= 4.0:
+					enemy.take_damage(10)
+					
+		if blades_timer <= 0.0:
+			are_blades_active = false
+			phantom_pivot.visible = false
 
 # ==========================================
 # CORE LOGIC / CUSTOM METHODS
@@ -335,7 +507,26 @@ func update_weapon_loadout():
 		sword_pivot.visible = true
 		sword_hitbox.scale = Vector3.ONE * RunManager.sword_range_multiplier
 		sword_pivot.position = Vector3(0.5, -0.4, -0.8)
-		sword_pivot.rotation_degrees = Vector3(15, 0, -15) 
+		sword_pivot.rotation_degrees = Vector3(15, 0, -15)
+		
+		# --- THE FIX: TETHER UI ---
+	elif RunManager.equipped_weapon == "tether":
+		blaster_mesh.visible = false
+		sword_pivot.visible = false
+		ammo_display.visible = true
+		# Display as a clean percentage (e.g., "EMP: 100%")
+		var charge_percent = int((RunManager.ultimate_charge / RunManager.max_ultimate_charge) * 100)
+		ammo_display.text = "EMP: " + str(charge_percent) + "%"
+		
+		ammo_circle.visible = true
+		ammo_circle.max_value = RunManager.max_ultimate_charge
+		ammo_circle.value = RunManager.ultimate_charge
+		
+		# Flash cyan when fully charged and ready to detonate!
+		if RunManager.ultimate_charge >= RunManager.max_ultimate_charge:
+			ammo_circle.modulate = Color.CYAN
+		else:
+			ammo_circle.modulate = Color.WHITE
 
 func _process_blaster(delta):
 	"""Processes firing and reloading for the blaster."""
@@ -365,6 +556,13 @@ func _process_blaster(delta):
 				overclock_timer = overclock_duration
 				ammo_display.modulate = Color.CYAN 
 				print("SYSTEM: PERFECT TIMING. BLASTER OVERCLOCKED!")
+				
+				# --- NEW: ACTIVE RELOAD HEAL ---
+				if RunManager.current_health < RunManager.max_health:
+					RunManager.current_health += 1
+					health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
+					print("SYSTEM: Coolant flush successful. Hull repaired.")
+				# -------------------------------
 			else:
 				active_reload_failed = true
 				print("SYSTEM: TIMING FAILED. Standard reload continuing.")
@@ -677,6 +875,11 @@ func _update_weapon_ui():
 		ammo_display.visible = false
 		ammo_circle.visible = false
 
+	elif RunManager.equipped_weapon == "tether":
+		# The new UltimateDisplay label handles the UI now, so we just hide the blaster ammo!
+		ammo_display.visible = false
+		ammo_circle.visible = false
+			
 func force_level_clear():
 	"""DEBUG: Forces a level clear for testing."""
 	print("DEBUG: Sequence broken. Warping to The Golden Process...")
@@ -701,6 +904,12 @@ func _on_sword_hitbox_body_entered(body):
 			body.take_damage(sword_damage)
 			enemies_hit_this_swing.append(body)
 			
+			# --- NEW: GLORY KILL HEAL ---
+			if body.is_dead and RunManager.current_health < RunManager.max_health:
+				RunManager.current_health += 1
+				health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
+				print("SYSTEM: Daemon code extracted. Hull repaired.")
+			
 	elif RunManager.sword_has_slam and not body.is_in_group("player"):
 		if not has_slammed_this_swing:
 			has_slammed_this_swing = true
@@ -718,11 +927,190 @@ func _on_sword_hitbox_area_entered(area):
 		area.deflect(aim_dir)
 		print("SYSTEM: PARRIED PROJECTILE!")
 		
+		# --- NEW: PARRY HEAL ---
+		if RunManager.current_health < RunManager.max_health:
+			RunManager.current_health += 1
+			health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
+			print("SYSTEM: Kinetic energy absorbed. Hull repaired.")
+		
 		if RunManager.has_deflect_boost:
 			RunManager.player_speed_multiplier += 0.4
 			await get_tree().create_timer(1.5).timeout
 			RunManager.player_speed_multiplier -= 0.4
+			
+	
 
 func _on_options_button_pressed() -> void:
 	"""Handles options button press."""
 	pass 
+
+# ==========================================
+# SIPHON TETHER LOGIC
+# ==========================================
+
+func _process_tether():
+	if Input.is_action_pressed("shoot") and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
+		var bodies = tether_zone.get_overlapping_bodies()
+		var valid_enemies = []
+		var space_state = get_world_3d().direct_space_state
+		
+		# --- THE FIX: FORWARD VECTOR ---
+		# Grab the exact direction the camera is facing
+		var aim_dir = -$Head/Camera3D.global_transform.basis.z.normalized()
+		
+		for body in bodies:
+			if body.is_in_group("enemy") and not body.is_dead:
+				
+				# --- THE FIX: DOT PRODUCT (FOV CHECK) ---
+				# Get a vector pointing straight from R0-0T to the enemy
+				var dir_to_enemy = global_position.direction_to(body.global_position)
+				
+				# Compare the two vectors! 
+				# 1.0 = Dead center of crosshair. 0.0 = Exactly 90 degrees to the side. -1.0 = Directly behind.
+				# A value of 0.5 gives you a generous 120-degree cone of vision.
+				if aim_dir.dot(dir_to_enemy) > 0.5:
+					
+					# (Keep your existing LOS check here)
+					var target_center = body.global_position + Vector3(0, 0.5, 0) 
+					var query = PhysicsRayQueryParameters3D.create($Head/Camera3D.global_position, target_center)
+					query.exclude = [self.get_rid()]
+					var result = space_state.intersect_ray(query)
+					
+					if result and result.collider == body:
+						valid_enemies.append(body)
+					
+		# Sort by distance
+		valid_enemies.sort_custom(func(a, b): 
+			return global_position.distance_to(a.global_position) < global_position.distance_to(b.global_position)
+		)
+		
+		active_tether_targets = valid_enemies.slice(0, RunManager.tether_count)
+		
+		if active_tether_targets.size() > 0 and tether_timer.is_stopped():
+			tether_timer.start(RunManager.tether_tick_rate)
+			
+		_update_tether_visuals()
+		
+	else:
+		active_tether_targets.clear()
+		_update_tether_visuals()
+		tether_timer.stop()
+		
+
+func _update_tether_visuals():
+	for i in range(tether_visuals.size()):
+		# Safety check to ensure the enemy didn't despawn this exact frame
+		if i < active_tether_targets.size() and is_instance_valid(active_tether_targets[i]):
+			tether_visuals[i].visible = true
+			var enemy = active_tether_targets[i]
+			
+			# Use the exact same lowered target point as the LOS check
+			var target_pos = enemy.global_position + Vector3(0, 0.5, 0)
+			var start_pos = blaster_muzzle.global_position
+			var distance = start_pos.distance_to(target_pos)
+			
+			tether_visuals[i].global_position = start_pos.lerp(target_pos, 0.5)
+			
+			if Vector3.UP.cross(target_pos - start_pos).is_zero_approx():
+				tether_visuals[i].look_at(target_pos, Vector3.RIGHT)
+			else:
+				tether_visuals[i].look_at(target_pos, Vector3.UP)
+			
+			tether_visuals[i].scale = Vector3(1, 1, distance)
+		else:
+			# Hide any unused beams from the pool
+			tether_visuals[i].visible = false
+			
+func _on_tether_tick():
+	var total_charge_gained = 0.0
+	
+	for enemy in active_tether_targets:
+		if is_instance_valid(enemy) and not enemy.is_dead:
+			enemy.take_damage(RunManager.tether_damage)
+			total_charge_gained += RunManager.tether_charge_rate
+			
+	if total_charge_gained > 0:
+		# --- THE FIX: Point only to the universal Ultimate pool ---
+		RunManager.ultimate_charge += total_charge_gained
+		
+		if RunManager.ultimate_charge >= RunManager.max_ultimate_charge:
+			RunManager.ultimate_charge = RunManager.max_ultimate_charge
+		
+		# Cap the charge at the max
+		if RunManager.ultimate_charge >= RunManager.max_ultimate_charge:
+			RunManager.ultimate_charge = RunManager.max_ultimate_charge
+			print("SYSTEM: TETHER OVERCHARGED. ABILITY READY.")
+
+func execute_emp_blast():
+	var emp_radius = 20.0
+	var emp_damage = 25 
+	var enemies_caught = 0 
+	
+	print("SYSTEM: EMP DETONATED!")
+	
+	for enemy in get_tree().get_nodes_in_group("enemy"):
+		if is_instance_valid(enemy) and not enemy.is_dead:
+			if global_position.distance_to(enemy.global_position) <= emp_radius:
+				enemy.take_damage(emp_damage)
+				enemies_caught += 1
+				print("DEBUG: EMP zapped an enemy. Tally: ", enemies_caught)
+				
+	# --- BULLETPROOF HEAL LOGIC ---
+	if enemies_caught > 0:
+		if RunManager.current_health < RunManager.max_health:
+			RunManager.current_health = min(RunManager.current_health + enemies_caught, RunManager.max_health)
+			health_display.text = "HP: " + str(RunManager.current_health) + " / " + str(RunManager.max_health)
+			print("SYSTEM: EMP Siphon tapped ", enemies_caught, " targets. Health is now ", RunManager.current_health)
+		else:
+			print("SYSTEM: EMP Siphon successful, but R0-0T is already at max health.")
+	else:
+		print("SYSTEM: EMP detonated, but caught 0 enemies.")
+		
+	# --- 1. SHOCKWAVE MESH ---
+	var shockwave = MeshInstance3D.new()
+	shockwave.mesh = SphereMesh.new()
+	shockwave.top_level = true
+	
+	# Duplicate the cached material! This prevents the shader compilation hitch 
+	# while allowing us to safely fade out the alpha without making future EMPs invisible.
+	var shockwave_mat = emp_mat.duplicate()
+	shockwave.material_override = shockwave_mat
+	
+	get_parent().add_child(shockwave)
+	shockwave.global_position = global_position
+	
+	var tween = create_tween()
+	tween.tween_property(shockwave, "scale", Vector3(emp_radius * 2, emp_radius * 2, emp_radius * 2), 0.3).set_trans(Tween.TRANS_EXPO).set_ease(Tween.EASE_OUT)
+	tween.parallel().tween_property(shockwave_mat, "albedo_color:a", 0.0, 0.3)
+	tween.tween_callback(shockwave.queue_free)
+	
+	# --- 2. THE PARTICLE BURST ---
+	var particles = GPUParticles3D.new()
+	particles.amount = 150
+	particles.lifetime = 0.8
+	particles.one_shot = true
+	particles.explosiveness = 0.9 
+	particles.top_level = true
+	
+	var p_mat = ParticleProcessMaterial.new()
+	p_mat.emission_shape = ParticleProcessMaterial.EMISSION_SHAPE_SPHERE
+	p_mat.emission_sphere_radius = 1.0
+	p_mat.direction = Vector3(0, 1, 0)
+	p_mat.spread = 180.0
+	p_mat.initial_velocity_min = 25.0
+	p_mat.initial_velocity_max = 40.0
+	p_mat.gravity = Vector3.ZERO
+	particles.process_material = p_mat
+	
+	var p_mesh = BoxMesh.new()
+	p_mesh.size = Vector3(0.2, 0.2, 0.2)
+	
+	# Assign the cached material directly to the mesh
+	p_mesh.material = emp_particle_mat
+	particles.draw_pass_1 = p_mesh
+	
+	get_parent().add_child(particles)
+	particles.global_position = global_position
+	particles.emitting = true
+	
+	get_tree().create_timer(1.5).timeout.connect(particles.queue_free)

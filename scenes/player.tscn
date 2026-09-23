@@ -40,6 +40,9 @@ top_radius = 0.05
 bottom_radius = 0.05
 height = 1.0
 
+[sub_resource type="SphereShape3D" id="SphereShape3D_3hqy5"]
+radius = 15.0
+
 [sub_resource type="InputEventAction" id="InputEventAction_qhqgy"]
 action = &"ui_cancel"
 
@@ -129,6 +132,13 @@ shape = SubResource("BoxShape3D_g2els")
 transform = Transform3D(1, 0, 0, 0, -4.371139e-08, -1, 0, 1, -4.371139e-08, 0, 0, 0)
 visible = false
 mesh = SubResource("CylinderMesh_g2els")
+
+[node name="TetherDetectionZone" type="Area3D" parent="Head" unique_id=1247207985]
+collision_layer = 7
+collision_mask = 7
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Head/TetherDetectionZone" unique_id=165459990]
+shape = SubResource("SphereShape3D_3hqy5")
 
 [node name="HUD" type="CanvasLayer" parent="." unique_id=961869898]
 
@@ -418,6 +428,20 @@ texture_under = SubResource("CompressedTexture2D_qhqgy")
 texture_progress = SubResource("CompressedTexture2D_dqkch")
 tint_under = Color(0.26293245, 0.26293245, 0.26293245, 1)
 
+[node name="UltimateDisplay" type="Label" parent="HUD" unique_id=1347579023]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -20.0
+offset_top = -95.0
+offset_right = 20.0
+offset_bottom = -50.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_font_sizes/font_size = 32
+
 [node name="CRTFilter" type="CanvasLayer" parent="." unique_id=333146233]
 layer = 0
 
@@ -433,6 +457,8 @@ mouse_filter = 2
 [node name="BlasterSFX" type="AudioStreamPlayer3D" parent="." unique_id=2000809279]
 stream = SubResource("AudioStreamRandomizer_3v2ag")
 max_polyphony = 10
+
+[node name="TetherTickTimer" type="Timer" parent="." unique_id=1565437371]
 
 [connection signal="area_entered" from="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_area_entered"]
 [connection signal="body_entered" from="Head/Camera3D/SwordPivot/SwordMesh/SwordHitbox" to="." method="_on_sword_hitbox_body_entered"]

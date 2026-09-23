@@ -95,6 +95,8 @@ func _physics_process(delta):
 # ==========================================
 
 func take_damage(amount):
+	RunManager.ultimate_charge += 1
+	
 	"""Applies damage to the Daemon and checks for death."""
 	if is_dead:
 		return

@@ -5,7 +5,7 @@
 .export_presets.cfg
 
 # Ignore all beta exports
-testbuilds/
+releases/
 
 # Ignore the github personal access token
 pat_github.txt/

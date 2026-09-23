@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://brf32bxx2jhxk" path="res://scenes/kill_plane.tscn" id="4_7wvbm"]
 [ext_resource type="Script" uid="uid://o4kkpjhrl3kf" path="res://scripts/weapon_rack.gd" id="5_bfqb0"]
 [ext_resource type="Script" uid="uid://csod4l1jotnr5" path="res://scripts/difficulty_terminal.gd" id="6_hlsmc"]
+[ext_resource type="PackedScene" uid="uid://esner75re3qc" path="res://scenes/tether_equip_station.tscn" id="7_3wyi3"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_d1od2"]
 sky_horizon_color = Color(0.66224277, 0.6717428, 0.6867428, 1)
@@ -104,6 +105,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.9964437, 0)
 billboard = 1
 no_depth_test = true
 text = "Difficulty Select"
+
+[node name="TetherEquipStation" parent="." unique_id=1410050913 instance=ExtResource("7_3wyi3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.976137, 1.5000005, -2.289456)
 
 [connection signal="body_entered" from="BlasterRack" to="BlasterRack" method="_on_body_entered"]
 [connection signal="body_entered" from="SwordRack" to="SwordRack" method="_on_body_entered"]
