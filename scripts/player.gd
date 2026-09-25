@@ -445,6 +445,9 @@ func _process(delta):
 	if Input.is_action_just_pressed("ultimate_ability") and RunManager.ultimate_charge >= RunManager.max_ultimate_charge:
 		RunManager.ultimate_charge = 0.0
 		
+		# --- NEW: FIRE THE FOV PUNCH ---
+		trigger_fov_punch()
+		
 		if RunManager.equipped_weapon == "tether":
 			execute_emp_blast() 
 			
@@ -880,6 +883,18 @@ func _update_weapon_ui():
 		ammo_display.visible = false
 		ammo_circle.visible = false
 			
+			
+func trigger_fov_punch():
+	var cam = $Head/Camera3D
+	var base_fov = 75.0 # Change this if your default FOV is different (e.g., 90.0)
+	var punch_fov = base_fov + 15.0
+	
+	var tween = create_tween()
+	# Snap the FOV wide open in 0.05 seconds
+	tween.tween_property(cam, "fov", punch_fov, 0.05).set_trans(Tween.TRANS_SINE).set_ease(Tween.EASE_OUT)
+	# Ease it back to normal over 0.4 seconds
+	tween.tween_property(cam, "fov", base_fov, 0.4).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
+	
 func force_level_clear():
 	"""DEBUG: Forces a level clear for testing."""
 	print("DEBUG: Sequence broken. Warping to The Golden Process...")
